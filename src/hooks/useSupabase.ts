@@ -1,0 +1,76 @@
+import { useState, useEffect } from 'react'
+import { supabase } from '@/lib/supabase'
+
+export const useSupabase = () => {
+  const [isConnected, setIsConnected] = useState<boolean | null>(null)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const testConnection = async () => {
+      try {
+        const { data, error } = await supabase.from('products').select('count').limit(1)
+        
+        if (error) {
+          setError(error.message)
+          setIsConnected(false)
+        } else {
+          setIsConnected(true)
+          setError(null)
+        }
+      } catch (err) {
+        setError('Failed to connect to Supabase')
+        setIsConnected(false)
+      }
+    }
+
+    testConnection()
+  }, [])
+
+  return { isConnected, error }
+}
+
+// Utility functions for database operations
+export const supabaseUtils = {
+  // Get all products
+  async getProducts() {
+    const { data, error } = await supabase
+      .from('products')
+      .select('*')
+      .order('created_at', { ascending: false })
+    
+    return { data, error }
+  },
+
+  // Get products by category
+  async getProductsByCategory(category: string) {
+    const { data, error } = await supabase
+      .from('products')
+      .select('*')
+      .eq('category', category)
+      .order('created_at', { ascending: false })
+    
+    return { data, error }
+  },
+
+  // Get all categories
+  async getCategories() {
+    const { data, error } = await supabase
+      .from('categories')
+      .select('*')
+      .order('name', { ascending: true })
+    
+    return { data, error }
+  },
+
+  // Get featured products
+  async getFeaturedProducts() {
+    const { data, error } = await supabase
+      .from('products')
+      .select('*')
+      .or('is_new.eq.true,is_best_seller.eq.true')
+      .order('created_at', { ascending: false })
+      .limit(8)
+    
+    return { data, error }
+  }
+} 
