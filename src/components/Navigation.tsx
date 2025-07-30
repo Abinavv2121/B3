@@ -83,12 +83,12 @@ const Navigation = () => {
             </button>
             <button 
               onClick={() => navigate('/cart')}
-              className="flex items-center justify-center p-2 hover:bg-white/10 rounded-lg transition-colors cursor-pointer"
+              className="flex items-center justify-center p-3 hover:bg-white/10 rounded-lg transition-colors cursor-pointer"
             >
               <img 
                 src={cartIcon} 
                 alt="Cart" 
-                className="h-14 w-14"
+                className="h-16 w-16"
               />
             </button>
           </div>

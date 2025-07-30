@@ -79,8 +79,8 @@ const SupportiveToolbar = () => {
       onMouseEnter={() => setHoveredCategory(category)}
       onMouseLeave={() => setHoveredCategory(null)}
     >
-      <div className="flex items-center space-x-1 px-3 lg:px-4 py-3 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer whitespace-nowrap">
-        <span className={`font-serif text-xs lg:text-sm font-medium uppercase tracking-wide transition-colors duration-500 ${
+      <div className="flex items-center space-x-1 px-3 lg:px-4 py-3 rounded-lg transition-colors cursor-pointer whitespace-nowrap">
+        <span className={`font-italiana text-xs lg:text-sm font-medium uppercase tracking-wide transition-colors duration-500 ${
           lastScrollY > window.innerHeight ? 'text-gray-800' : 'text-white'
         }`}>
           {category}
@@ -101,7 +101,7 @@ const SupportiveToolbar = () => {
                 <Link
                   key={subcategory}
                   to={`/${category.toLowerCase().replace(/\s+/g, '-')}/${subcategory.toLowerCase().replace(/\s+/g, '-')}`}
-                  className="flex items-center justify-between group text-gray-700 hover:text-gray-900 transition-colors py-2 px-3 hover:bg-gray-50 rounded-lg"
+                  className="flex items-center justify-between group text-gray-700 hover:text-gray-900 transition-colors py-2 px-3 rounded-lg"
                 >
                   <span className="text-sm">{subcategory}</span>
                   <ChevronRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
@@ -117,7 +117,7 @@ const SupportiveToolbar = () => {
   const renderSimpleLink = (link: string) => (
     <Link
       to={`/${link.toLowerCase().replace(/\s+/g, '-').replace(/&/g, 'and')}`}
-      className={`px-3 lg:px-4 py-3 text-xs lg:text-sm font-medium transition-colors whitespace-nowrap ${
+      className={`px-3 lg:px-4 py-3 text-xs lg:text-sm font-medium font-italiana transition-colors whitespace-nowrap ${
         lastScrollY > window.innerHeight 
           ? 'text-gray-800 hover:text-purple-600' 
           : 'text-white hover:text-gray-200'
