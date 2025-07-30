@@ -8,6 +8,16 @@ export const useSupabase = () => {
   useEffect(() => {
     const testConnection = async () => {
       try {
+        // Check if we're using placeholder values
+        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://placeholder.supabase.co'
+        const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'placeholder_key'
+        
+        if (supabaseUrl === 'https://placeholder.supabase.co' || supabaseAnonKey === 'placeholder_key') {
+          setError('Supabase not configured - using placeholder values')
+          setIsConnected(false)
+          return
+        }
+
         const { data, error } = await supabase.from('products').select('count').limit(1)
         
         if (error) {
