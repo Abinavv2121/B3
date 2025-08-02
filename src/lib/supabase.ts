@@ -3,8 +3,11 @@ import { createClient } from '@supabase/supabase-js'
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://placeholder.supabase.co'
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'placeholder_key'
 
+// Check if we're using placeholder values
+const isUsingPlaceholders = supabaseUrl === 'https://placeholder.supabase.co' || supabaseAnonKey === 'placeholder_key'
+
 // Don't throw error for missing env vars in development
-if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY) {
+if (isUsingPlaceholders) {
   console.warn('Missing Supabase environment variables - using placeholder values')
 }
 

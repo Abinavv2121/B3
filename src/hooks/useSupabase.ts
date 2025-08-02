@@ -9,7 +9,10 @@ export const useSupabase = () => {
     const testConnection = async () => {
       try {
         // Check if we're using placeholder values
-        if (import.meta.env.VITE_SUPABASE_URL === 'https://placeholder.supabase.co') {
+        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://placeholder.supabase.co'
+        const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'placeholder_key'
+        
+        if (supabaseUrl === 'https://placeholder.supabase.co' || supabaseAnonKey === 'placeholder_key') {
           setError('Supabase not configured - using placeholder values')
           setIsConnected(false)
           return
