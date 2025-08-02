@@ -6,12 +6,15 @@ import cartIcon from "/src/assets/cart.png";
 import searchIcon from "/src/assets/search.png";
 import nameIcon from "/src/assets/name.png";
 import SearchModal from "./SearchModal";
+import { useFavourites } from "@/contexts/FavouritesContext";
+import { Badge } from "@/components/ui/badge";
 
 const Navigation = () => {
   const navigate = useNavigate();
   const [isVisible, setIsVisible] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const { favouritesCount } = useFavourites();
 
 
 
@@ -64,12 +67,20 @@ const Navigation = () => {
           
           {/* Right side buttons */}
           <div className="flex-1 flex items-center justify-end space-x-6 pr-24">
-            <button className="flex items-center justify-center p-2 hover:bg-white/10 rounded-lg transition-colors">
+            <button 
+              onClick={() => navigate('/wishlist')}
+              className="relative flex items-center justify-center p-2 hover:bg-white/10 rounded-lg transition-colors cursor-pointer"
+            >
               <img 
                 src={wishlistIcon} 
                 alt="Wishlist" 
                 className="h-14 w-14"
               />
+              {favouritesCount > 0 && (
+                <Badge className="absolute -top-2 -right-2 h-6 w-6 rounded-full bg-red-500 text-white text-xs flex items-center justify-center p-0">
+                  {favouritesCount > 99 ? '99+' : favouritesCount}
+                </Badge>
+              )}
             </button>
             <button 
               onClick={() => setIsSearchOpen(true)}

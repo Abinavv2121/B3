@@ -4,6 +4,7 @@ import { Heart, ShoppingBag, Star, Eye, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
+import { useFavourites } from "@/contexts/FavouritesContext";
 
 interface ProductCardProps {
   product: {
@@ -24,17 +25,40 @@ interface ProductCardProps {
 }
 
 const ProductCard = ({ product }: ProductCardProps) => {
-  const [isWishlisted, setIsWishlisted] = useState(false);
   const [selectedColor, setSelectedColor] = useState(product.colors[0]);
   const { toast } = useToast();
+  const { addToFavourites, removeFromFavourites, isInFavourites } = useFavourites();
+
+  const isWishlisted = isInFavourites(product.id);
 
   const handleWishlist = (e: React.MouseEvent) => {
     e.preventDefault();
-    setIsWishlisted(!isWishlisted);
-    toast({
-      title: isWishlisted ? "Removed from wishlist" : "Added to wishlist",
-      description: isWishlisted ? `${product.name} removed` : `${product.name} added to your wishlist`,
-    });
+    if (isWishlisted) {
+      removeFromFavourites(product.id);
+      toast({
+        title: "Removed from wishlist",
+        description: `${product.name} has been removed from your wishlist`,
+      });
+    } else {
+      addToFavourites({
+        id: product.id,
+        name: product.name,
+        category: product.category,
+        price: product.price,
+        originalPrice: product.originalPrice,
+        image: product.image,
+        rating: product.rating,
+        reviews: product.reviews,
+        isNew: product.isNew,
+        isBestSeller: product.isBestSeller,
+        colors: product.colors,
+        sizes: product.sizes,
+      });
+      toast({
+        title: "Added to wishlist",
+        description: `${product.name} has been added to your wishlist`,
+      });
+    }
   };
 
   const handleQuickAdd = (e: React.MouseEvent) => {
