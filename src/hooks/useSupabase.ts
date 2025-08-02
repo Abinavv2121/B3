@@ -8,6 +8,13 @@ export const useSupabase = () => {
   useEffect(() => {
     const testConnection = async () => {
       try {
+        // Check if we're using placeholder values
+        if (import.meta.env.VITE_SUPABASE_URL === 'https://placeholder.supabase.co') {
+          setError('Supabase not configured - using placeholder values')
+          setIsConnected(false)
+          return
+        }
+        
         const { data, error } = await supabase.from('products').select('count').limit(1)
         
         if (error) {
@@ -70,6 +77,42 @@ export const supabaseUtils = {
       .or('is_new.eq.true,is_best_seller.eq.true')
       .order('created_at', { ascending: false })
       .limit(8)
+    
+    return { data, error }
+  },
+
+  // Admin functions for product management
+  async addProduct(product: any) {
+    const { data, error } = await supabase
+      .from('products')
+      .insert([{
+        ...product,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      }])
+      .select()
+    
+    return { data, error }
+  },
+
+  async updateProduct(id: string, updates: any) {
+    const { data, error } = await supabase
+      .from('products')
+      .update({
+        ...updates,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', id)
+      .select()
+    
+    return { data, error }
+  },
+
+  async deleteProduct(id: string) {
+    const { data, error } = await supabase
+      .from('products')
+      .delete()
+      .eq('id', id)
     
     return { data, error }
   }

@@ -12,7 +12,8 @@ import {
   Heart,
   Star,
   Award,
-  Shield
+  Shield,
+  Settings
 } from "lucide-react";
 import brandLogo from "/src/assets/brand-logo.png";
 
@@ -198,6 +199,14 @@ const Footer = () => {
               <span>Crafted with ❤️ in India</span>
               <span>•</span>
               <span>Made for Global Fashion</span>
+              <span>•</span>
+              <Link 
+                to="/admin" 
+                className="flex items-center space-x-1 hover:text-white transition-colors duration-200"
+              >
+                <Settings className="h-3 w-3" />
+                <span>Admin</span>
+              </Link>
             </div>
           </div>
         </div>

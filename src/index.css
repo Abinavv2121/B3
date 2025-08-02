@@ -1,10 +1,10 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=Roboto+Slab:wght@300;400;500;600;700;800;900&family=Italiana:wght@400&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 /* B3 Premium Ethnic Wear Design System - Cultural Heritage meets Digital Excellence */
-
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=Roboto+Slab:wght@300;400;500;600;700;800;900&family=Italiana:wght@400&display=swap');
 
 @layer base {
   * {
