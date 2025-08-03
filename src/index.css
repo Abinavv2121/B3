@@ -229,4 +229,88 @@
   .scrollbar-hide::-webkit-scrollbar {
     display: none;  /* Chrome, Safari and Opera */
   }
+
+  /* Luxury fabric texture animations */
+  @keyframes luxuryFlow {
+    0% {
+      background-position: 0% 0%, 100% 100%, 50% 0%, 0% 100%;
+      filter: hue-rotate(0deg) brightness(1);
+    }
+    25% {
+      background-position: 25% 25%, 75% 75%, 75% 25%, 25% 75%;
+      filter: hue-rotate(5deg) brightness(1.1);
+    }
+    50% {
+      background-position: 50% 50%, 50% 50%, 100% 50%, 50% 50%;
+      filter: hue-rotate(10deg) brightness(0.9);
+    }
+    75% {
+      background-position: 75% 25%, 25% 75%, 25% 75%, 75% 25%;
+      filter: hue-rotate(5deg) brightness(1.1);
+    }
+    100% {
+      background-position: 100% 0%, 0% 100%, 0% 100%, 100% 0%;
+      filter: hue-rotate(0deg) brightness(1);
+    }
+  }
+
+  @keyframes textureShift {
+    0% {
+      transform: translateX(0) translateY(0) rotate(0deg);
+      opacity: 0.15;
+    }
+    33% {
+      transform: translateX(-10px) translateY(-5px) rotate(1deg);
+      opacity: 0.12;
+    }
+    66% {
+      transform: translateX(5px) translateY(-10px) rotate(-1deg);
+      opacity: 0.18;
+    }
+    100% {
+      transform: translateX(0) translateY(0) rotate(0deg);
+      opacity: 0.15;
+    }
+  }
+
+  /* Sparkly effects animations */
+  @keyframes sparkleFloat {
+    0% {
+      transform: translateY(0px) translateX(0px) rotate(0deg) scale(1);
+      opacity: 0.8;
+    }
+    25% {
+      transform: translateY(-15px) translateX(5px) rotate(90deg) scale(1.2);
+      opacity: 1;
+    }
+    50% {
+      transform: translateY(-30px) translateX(-3px) rotate(180deg) scale(0.8);
+      opacity: 0.6;
+    }
+    75% {
+      transform: translateY(-15px) translateX(-8px) rotate(270deg) scale(1.1);
+      opacity: 0.9;
+    }
+    100% {
+      transform: translateY(0px) translateX(0px) rotate(360deg) scale(1);
+      opacity: 0.8;
+    }
+  }
+
+  @keyframes shootingStar {
+    0% {
+      transform: translateX(-100px) translateY(-50px) rotate(25deg);
+      opacity: 0;
+    }
+    20% {
+      opacity: 0.4;
+    }
+    80% {
+      opacity: 0.4;
+    }
+    100% {
+      transform: translateX(calc(100vw + 100px)) translateY(calc(50vh + 50px)) rotate(25deg);
+      opacity: 0;
+    }
+  }
 }
