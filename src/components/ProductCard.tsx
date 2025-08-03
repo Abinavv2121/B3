@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { useFavourites } from "@/contexts/FavouritesContext";
+import { useCart } from "@/contexts/CartContext";
 
 interface ProductCardProps {
   product: {
@@ -26,13 +27,16 @@ interface ProductCardProps {
 
 const ProductCard = ({ product }: ProductCardProps) => {
   const [selectedColor, setSelectedColor] = useState(product.colors[0]);
+  const [selectedSize, setSelectedSize] = useState(product.sizes[0]);
   const { toast } = useToast();
   const { addToFavourites, removeFromFavourites, isInFavourites } = useFavourites();
+  const { addToCart } = useCart();
 
   const isWishlisted = isInFavourites(product.id);
 
   const handleWishlist = (e: React.MouseEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     if (isWishlisted) {
       removeFromFavourites(product.id);
       toast({
@@ -63,6 +67,19 @@ const ProductCard = ({ product }: ProductCardProps) => {
 
   const handleQuickAdd = (e: React.MouseEvent) => {
     e.preventDefault();
+    e.stopPropagation();
+    
+    addToCart({
+      id: product.id,
+      name: product.name,
+      category: product.category,
+      price: product.price,
+      originalPrice: product.originalPrice,
+      image: product.image,
+      selectedSize: selectedSize,
+      selectedColor: selectedColor,
+    });
+    
     toast({
       title: "Added to cart",
       description: `${product.name} has been added to your cart`,
@@ -106,16 +123,20 @@ const ProductCard = ({ product }: ProductCardProps) => {
             )}
           </div>
 
-          {/* Action Buttons */}
-          <div className="absolute top-3 right-3 flex flex-col space-y-2 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-4 group-hover:translate-x-0">
+          {/* Heart Icon - Always Visible */}
+          <div className="absolute top-3 right-3">
             <Button
               size="icon"
               variant="secondary"
-              className="w-9 h-9 rounded-full bg-white/90 hover:bg-white"
+              className="w-9 h-9 rounded-full bg-white/90 hover:bg-white shadow-md"
               onClick={handleWishlist}
             >
-              <Heart className={`h-4 w-4 ${isWishlisted ? 'fill-red-500 text-red-500' : ''}`} />
+              <Heart className={`h-4 w-4 ${isWishlisted ? 'fill-red-500 text-red-500' : 'text-gray-600'}`} />
             </Button>
+          </div>
+
+          {/* Action Buttons - Show on Hover */}
+          <div className="absolute top-12 right-3 flex flex-col space-y-2 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-4 group-hover:translate-x-0">
             <Button
               size="icon"
               variant="secondary"
@@ -155,6 +176,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
                   style={{ backgroundColor: color }}
                   onClick={(e) => {
                     e.preventDefault();
+                    e.stopPropagation();
                     setSelectedColor(color);
                   }}
                 />

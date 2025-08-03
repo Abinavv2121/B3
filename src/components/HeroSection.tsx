@@ -11,6 +11,15 @@ const HeroSection = () => {
         backgroundPosition: '65% center'
       }}
     >
+      {/* Vignette overlay for bokeh effect */}
+      <div className="absolute inset-0 bg-gradient-radial from-transparent via-transparent to-black/40 z-5"></div>
+      
+      {/* Additional corner darkening for stronger vignette effect */}
+      <div className="absolute inset-0 bg-gradient-to-br from-black/20 via-transparent to-black/30 z-5"></div>
+      <div className="absolute inset-0 bg-gradient-to-bl from-black/20 via-transparent to-black/30 z-5"></div>
+      <div className="absolute inset-0 bg-gradient-to-tr from-black/20 via-transparent to-black/30 z-5"></div>
+      <div className="absolute inset-0 bg-gradient-to-tl from-black/20 via-transparent to-black/30 z-5"></div>
+      
       <div className="absolute inset-0 flex items-center justify-center z-10">
         <div className="text-left -mt-16">
           <RotatingText

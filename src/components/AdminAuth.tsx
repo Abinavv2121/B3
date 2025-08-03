@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Lock, Shield } from "lucide-react";
+import { setAdminAuthenticated } from "@/lib/admin-utils";
 
 interface AdminAuthProps {
   onAuthenticated: () => void;
@@ -26,7 +27,7 @@ const AdminAuth = ({ onAuthenticated }: AdminAuthProps) => {
     // Simulate a slight delay for security
     setTimeout(() => {
       if (password === ADMIN_PASSWORD) {
-        localStorage.setItem("admin_authenticated", "true");
+        setAdminAuthenticated();
         onAuthenticated();
       } else {
         setError("Invalid password. Please try again.");

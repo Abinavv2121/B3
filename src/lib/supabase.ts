@@ -32,6 +32,10 @@ export type Database = {
           is_best_seller: boolean
           colors: string[]
           sizes: string[]
+          product_code: string | null
+          barcode_no: string | null
+          design: string | null
+          status: string
           created_at: string
           updated_at: string
         }
@@ -49,6 +53,10 @@ export type Database = {
           is_best_seller?: boolean
           colors?: string[]
           sizes?: string[]
+          product_code?: string
+          barcode_no?: string
+          design?: string
+          status?: string
           created_at?: string
           updated_at?: string
         }
@@ -66,6 +74,10 @@ export type Database = {
           is_best_seller?: boolean
           colors?: string[]
           sizes?: string[]
+          product_code?: string
+          barcode_no?: string
+          design?: string
+          status?: string
           created_at?: string
           updated_at?: string
         }

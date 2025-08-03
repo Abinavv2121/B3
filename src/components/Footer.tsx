@@ -1,212 +1,334 @@
 import { Link } from "react-router-dom";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { 
-  Facebook, 
-  Instagram, 
-  Twitter, 
-  Youtube, 
-  Mail, 
-  Phone, 
-  MapPin,
-  Heart,
-  Star,
-  Award,
-  Shield,
-  Settings
-} from "lucide-react";
-import brandLogo from "/src/assets/brand-logo.png";
+import { Crown, Sparkles, Mail, Phone, MapPin, Facebook, Twitter, Instagram, Youtube, Shield, Truck, CreditCard, HeadphonesIcon } from "lucide-react";
 
 const Footer = () => {
-  const currentYear = new Date().getFullYear();
-
-  const footerLinks = {
-    shop: [
-      { name: "Bridal Dreams", href: "/bridal" },
-      { name: "Festival Glory", href: "/festival" },
-      { name: "Special Moments", href: "/special" },
-      { name: "Western Edge", href: "/western" },
-      { name: "New Arrivals", href: "/new-arrivals" },
-      { name: "Sale", href: "/sale" }
-    ],
-    help: [
-      { name: "Size Guide", href: "/size-guide" },
-      { name: "Care Instructions", href: "/care" },
-      { name: "Shipping & Returns", href: "/shipping" },
-      { name: "Track Your Order", href: "/track" },
-      { name: "Customer Reviews", href: "/reviews" },
-      { name: "FAQs", href: "/faq" }
-    ],
-    company: [
-      { name: "About B3", href: "/about" },
-      { name: "Our Craftsmen", href: "/craftsmen" },
-      { name: "Sustainability", href: "/sustainability" },
-      { name: "Careers", href: "/careers" },
-      { name: "Press", href: "/press" },
-      { name: "Blog", href: "/blog" }
-    ],
-    legal: [
-      { name: "Privacy Policy", href: "/privacy" },
-      { name: "Terms of Service", href: "/terms" },
-      { name: "Refund Policy", href: "/refund" },
-      { name: "Cookie Policy", href: "/cookies" }
-    ]
-  };
-
-  const socialLinks = [
-    { name: "Facebook", icon: Facebook, href: "https://www.facebook.com/b3fashionstudio/", color: "hover:text-blue-600" },
-    { name: "Instagram", icon: Instagram, href: "https://www.instagram.com/b3fashionstudio?igsh=MWQxY3Y1bTN0NWFuZg==", color: "hover:text-pink-600" }
-  ];
-
-  const trustBadges = [
-    { icon: Shield, text: "Secure Payments" },
-    { icon: Award, text: "Premium Quality" },
-    { icon: Star, text: "4.9★ Rated" },
-    { icon: Heart, text: "50K+ Happy Customers" }
-  ];
-
   return (
-    <footer className="bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white">
+    <footer className="relative overflow-hidden">
+      {/* Top fade transition from previous section */}
+      <div 
+        className="absolute top-0 left-0 right-0 h-32 z-20 pointer-events-none"
+        style={{
+          background: 'linear-gradient(180deg, rgba(26,26,26,0.8) 0%, rgba(26,26,26,0.6) 50%, rgba(26,26,26,0) 100%)'
+        }}
+      />
+      
+      {/* Main footer background */}
+      <div 
+        className="relative z-10"
+        style={{
+          background: '#000000'
+        }}
+      >
+        {/* Subtle luxury texture overlay */}
+        <div 
+          className="absolute inset-0 opacity-5"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3Cpattern id='footer-luxury' x='0' y='0' width='100' height='100' patternUnits='userSpaceOnUse'%3E%3Cpath d='M50 50c0-27.614-22.386-50-50-50v100c27.614 0 50-22.386 50-50z' fill='%23D4AF37' fill-opacity='0.15'/%3E%3Cpath d='M50 50c0-27.614 22.386-50 50-50v100c-27.614 0-50-22.386-50-50z' fill='%23B8860B' fill-opacity='0.1'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='100' height='100' fill='url(%23footer-luxury)'/%3E%3C/svg%3E")`,
+            backgroundSize: '100px 100px'
+          }}
+        />
+        
+        <div className="relative z-10">
+          {/* Main Footer Content */}
+          <div className="w-full px-4 lg:px-8 py-20 lg:py-24">
+            <div className="max-w-7xl mx-auto">
+              <div className="grid grid-cols-1 lg:grid-cols-4 gap-12 lg:gap-16">
+                
+                {/* Brand Section */}
+                <div className="lg:col-span-1 space-y-8">
+                  <div className="space-y-4">
+                    <div className="flex items-center space-x-3">
+                      <img 
+                        src="/src/assets/logo.png" 
+                        alt="Aval Logo" 
+                        className="h-20 w-auto"
+                      />
+                      <div className="flex items-center space-x-2">
+                        <Crown className="w-6 h-6 text-yellow-500" />
+                        <span className="text-sm font-medium tracking-widest uppercase text-yellow-500">
+                          Premium Ethnic Wear
+                        </span>
+                      </div>
+                    </div>
+                    
+                    <p className="text-white/80 leading-relaxed font-light tracking-wide max-w-sm">
+                      Crafting timeless elegance through premium ethnic wear. Every piece tells a story of tradition, luxury, and contemporary sophistication.
+                    </p>
+                  </div>
 
-      {/* Main Footer Content */}
-      <div className="container-premium py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-8">
-          
-          {/* Brand Section */}
-          <div className="lg:col-span-2 space-y-6">
-            <Link to="/" className="flex items-center">
-              <img
-                src={brandLogo}
-                alt="B3 Fashion Studio"
-                className="h-16 w-auto"
-              />
-            </Link>
-            
-            <p className="text-white/80 leading-relaxed">
-              Where cultural heritage meets contemporary elegance. 
-              Crafting timeless ethnic wear for the modern Indian woman since 2020.
-            </p>
-            
-            <div className="space-y-3">
-              <div className="flex items-center space-x-3 text-white/80">
-                <MapPin className="h-5 w-5 text-primary" />
-                <span>14, 285, Purasaivakkam High Rd, Perumalpet, Purasaiwakkam, Chennai, Tamil Nadu 600007</span>
+                  {/* Contact Info */}
+                  <div className="space-y-4">
+                    <div className="flex items-center space-x-4">
+                      <div 
+                        className="w-12 h-12 rounded-full flex items-center justify-center"
+                        style={{
+                          backgroundColor: '#D4AF37',
+                          border: '2px solid #B8860B'
+                        }}
+                      >
+                        <Phone className="w-5 h-5 text-black" />
+                      </div>
+                      <div>
+                        <p className="text-white font-medium">+91 98765 43210</p>
+                        <p className="text-white/60 text-sm">24/7 Support</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center space-x-4">
+                      <div 
+                        className="w-12 h-12 rounded-full flex items-center justify-center"
+                        style={{
+                          backgroundColor: '#D4AF37',
+                          border: '2px solid #B8860B'
+                        }}
+                      >
+                        <Mail className="w-5 h-5 text-black" />
+                      </div>
+                      <div>
+                        <p className="text-white font-medium">hello@aval.com</p>
+                        <p className="text-white/60 text-sm">Email Support</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center space-x-4">
+                      <div 
+                        className="w-12 h-12 rounded-full flex items-center justify-center"
+                        style={{
+                          backgroundColor: '#D4AF37',
+                          border: '2px solid #B8860B'
+                        }}
+                      >
+                        <MapPin className="w-5 h-5 text-black" />
+                      </div>
+                      <div>
+                        <p className="text-white font-medium">Mumbai, India</p>
+                        <p className="text-white/60 text-sm">Head Office</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Social Links */}
+                  <div className="space-y-4">
+                    <h4 className="text-white font-medium tracking-wider">Follow Us</h4>
+                    <div className="flex space-x-4">
+                      {[
+                        { icon: Facebook, href: "#", label: "Facebook" },
+                        { icon: Twitter, href: "#", label: "Twitter" },
+                        { icon: Instagram, href: "#", label: "Instagram" },
+                        { icon: Youtube, href: "#", label: "YouTube" }
+                      ].map((social) => (
+                        <a
+                          key={social.label}
+                          href={social.href}
+                          className="w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110"
+                          style={{
+                            backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                            border: '1px solid rgba(255, 255, 255, 0.2)'
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = '#D4AF37';
+                            e.currentTarget.style.border = '1px solid #B8860B';
+                            e.currentTarget.style.boxShadow = '0 8px 25px rgba(212, 175, 55, 0.3)';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+                            e.currentTarget.style.border = '1px solid rgba(255, 255, 255, 0.2)';
+                            e.currentTarget.style.boxShadow = 'none';
+                          }}
+                        >
+                          <social.icon className="w-5 h-5 text-white" />
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Shop Links */}
+                <div className="space-y-8">
+                  <h4 
+                    className="text-xl font-['Playfair_Display'] font-medium tracking-wider"
+                    style={{ color: '#D4AF37' }}
+                  >
+                    Shop
+                  </h4>
+                  <div className="space-y-4">
+                    {[
+                      { name: "Sarees", href: "/saree" },
+                      { name: "Anarkalis", href: "/anarkali" },
+                      { name: "Lehengas", href: "/lehenga" },
+                      { name: "Salwar Suits", href: "/salwar-suit" },
+                      { name: "Western Wear", href: "/western" },
+                      { name: "Bridal Collection", href: "/bridal" }
+                    ].map((link) => (
+                      <Link
+                        key={link.name}
+                        to={link.href}
+                        className="block text-white/80 hover:text-white transition-all duration-300 font-light tracking-wide font-['Italiana', serif]"
+                      >
+                        {link.name}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Customer Care */}
+                <div className="space-y-8">
+                  <h4 
+                    className="text-xl font-['Playfair_Display'] font-medium tracking-wider"
+                    style={{ color: '#D4AF37' }}
+                  >
+                    Customer Care
+                  </h4>
+                  <div className="space-y-4">
+                    {[
+                      { name: "Contact Us", href: "/contact" },
+                      { name: "Size Guide", href: "/size-guide" },
+                      { name: "Shipping Info", href: "/shipping" },
+                      { name: "Returns & Exchanges", href: "/returns" },
+                      { name: "Care Instructions", href: "/care" },
+                      { name: "Track Order", href: "/track" }
+                    ].map((link) => (
+                      <Link
+                        key={link.name}
+                        to={link.href}
+                        className="block text-white/80 hover:text-white transition-all duration-300 font-light tracking-wide font-['Italiana', serif]"
+                      >
+                        {link.name}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Company & Legal */}
+                <div className="space-y-8">
+                  <h4 
+                    className="text-xl font-['Playfair_Display'] font-medium tracking-wider"
+                    style={{ color: '#D4AF37' }}
+                  >
+                    Company
+                  </h4>
+                  <div className="space-y-4">
+                    {[
+                      { name: "About Us", href: "/about" },
+                      { name: "Our Story", href: "/story" },
+                      { name: "Craftsmanship", href: "/craftsmanship" },
+                      { name: "Sustainability", href: "/sustainability" },
+                      { name: "Careers", href: "/careers" },
+                      { name: "Press", href: "/press" }
+                    ].map((link) => (
+                      <Link
+                        key={link.name}
+                        to={link.href}
+                        className="block text-white/80 hover:text-white transition-all duration-300 font-light tracking-wide font-['Italiana', serif]"
+                      >
+                        {link.name}
+                      </Link>
+                    ))}
+                  </div>
+                  
+                  <div className="pt-8">
+                    <h4 
+                      className="text-xl font-['Playfair_Display'] font-medium tracking-wider mb-4"
+                      style={{ color: '#D4AF37' }}
+                    >
+                      Legal
+                    </h4>
+                    <div className="space-y-4">
+                      {[
+                        { name: "Privacy Policy", href: "/privacy" },
+                        { name: "Terms of Service", href: "/terms" },
+                        { name: "Cookie Policy", href: "/cookies" },
+                        { name: "Accessibility", href: "/accessibility" }
+                      ].map((link) => (
+                        <Link
+                          key={link.name}
+                          to={link.href}
+                          className="block text-white/80 hover:text-white transition-all duration-300 font-light tracking-wide font-['Italiana', serif]"
+                        >
+                          {link.name}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div className="flex items-center space-x-3 text-white/80">
-                <Phone className="h-5 w-5 text-primary" />
-                <span>9884091314 / 044-42661314</span>
-              </div>
-              <div className="flex items-center space-x-3 text-white/80">
-                <Mail className="h-5 w-5 text-primary" />
-                <span>B3fashionstudios@gmail.com</span>
+
+              {/* Trust Badges Section */}
+              <div className="mt-20 pt-12 border-t border-white/10">
+                <div className="text-center space-y-8">
+                  <h4 
+                    className="text-2xl font-['Playfair_Display'] font-medium tracking-wider"
+                    style={{ color: '#D4AF37' }}
+                  >
+                    Trust & Quality
+                  </h4>
+                  <div className="flex flex-wrap justify-center items-center gap-8 lg:gap-12">
+                    {[
+                      { icon: Shield, text: "100% Authentic" },
+                      { icon: Truck, text: "Free Shipping" },
+                      { icon: CreditCard, text: "Secure Payment" },
+                      { icon: HeadphonesIcon, text: "24/7 Support" }
+                    ].map((badge) => (
+                      <div key={badge.text} className="flex items-center space-x-3">
+                        <div 
+                          className="w-10 h-10 rounded-full flex items-center justify-center"
+                          style={{
+                            backgroundColor: '#D4AF37',
+                            border: '2px solid #B8860B'
+                          }}
+                        >
+                          <badge.icon className="w-5 h-5 text-black" />
+                        </div>
+                        <span className="text-white font-medium text-sm">{badge.text}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
-
-            {/* Social Links */}
-            <div className="flex space-x-4">
-              {socialLinks.map((social) => (
-                <a
-                  key={social.name}
-                  href={social.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`w-10 h-10 bg-white/10 rounded-full flex items-center justify-center transition-all duration-300 hover:bg-white/20 ${social.color}`}
-                >
-                  <social.icon className="h-5 w-5" />
-                </a>
-              ))}
-            </div>
           </div>
 
-          {/* Shop Links */}
-          <div className="space-y-6">
-            <h3 className="text-lg font-semibold">Shop</h3>
-            <ul className="space-y-3">
-              {footerLinks.shop.map((link) => (
-                <li key={link.name}>
-                  <Link 
-                    to={link.href}
-                    className="text-white/70 hover:text-white transition-colors duration-200"
-                  >
-                    {link.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Help Links */}
-          <div className="space-y-6">
-            <h3 className="text-lg font-semibold">Customer Care</h3>
-            <ul className="space-y-3">
-              {footerLinks.help.map((link) => (
-                <li key={link.name}>
-                  <Link 
-                    to={link.href}
-                    className="text-white/70 hover:text-white transition-colors duration-200"
-                  >
-                    {link.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Company Links */}
-          <div className="space-y-6">
-            <h3 className="text-lg font-semibold">Company</h3>
-            <ul className="space-y-3">
-              {footerLinks.company.map((link) => (
-                <li key={link.name}>
-                  <Link 
-                    to={link.href}
-                    className="text-white/70 hover:text-white transition-colors duration-200"
-                  >
-                    {link.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Legal Links */}
-          <div className="space-y-6">
-            <h3 className="text-lg font-semibold">Legal</h3>
-            <ul className="space-y-3">
-              {footerLinks.legal.map((link) => (
-                <li key={link.name}>
-                  <Link 
-                    to={link.href}
-                    className="text-white/70 hover:text-white transition-colors duration-200"
-                  >
-                    {link.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      </div>
-
-      {/* Bottom Bar */}
-      <div className="border-t border-white/10">
-        <div className="container-premium py-6">
-          <div className="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0">
-            <div className="text-white/60 text-sm">
-              © {currentYear} B3 Premium Ethnic Wear. All rights reserved.
-            </div>
-            <div className="flex items-center space-x-6 text-sm text-white/60">
-              <span>Crafted with ❤️ in India</span>
-              <span>•</span>
-              <span>Made for Global Fashion</span>
-              <span>•</span>
-              <Link 
-                to="/admin" 
-                className="flex items-center space-x-1 hover:text-white transition-colors duration-200"
-              >
-                <Settings className="h-3 w-3" />
-                <span>Admin</span>
-              </Link>
+          {/* Bottom Bar */}
+          <div 
+            className="border-t border-white/10"
+            style={{
+              backgroundColor: 'rgba(0, 0, 0, 0.8)'
+            }}
+          >
+            <div className="w-full px-4 lg:px-8 py-8">
+              <div className="max-w-7xl mx-auto">
+                <div className="flex flex-col lg:flex-row items-center justify-between space-y-4 lg:space-y-0">
+                  <div className="text-center lg:text-left">
+                    <p className="text-white/60 font-light tracking-wide">
+                      © 2024 Aval. All rights reserved. Crafted with elegance and precision.
+                    </p>
+                  </div>
+                  
+                  <div className="flex items-center space-x-6 text-sm">
+                    <span className="text-white/60">Made in India</span>
+                    <span 
+                      className="text-yellow-500"
+                      style={{ fontSize: '18px' }}
+                    >
+                      •
+                    </span>
+                    <span className="text-white/60">Handcrafted Excellence</span>
+                    <span 
+                      className="text-yellow-500"
+                      style={{ fontSize: '18px' }}
+                    >
+                      •
+                    </span>
+                    <Link 
+                      to="/admin" 
+                      className="text-white/60 hover:text-yellow-500 transition-colors duration-300 flex items-center space-x-2"
+                    >
+                      <Crown className="w-4 h-4" />
+                      <span>Admin</span>
+                    </Link>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

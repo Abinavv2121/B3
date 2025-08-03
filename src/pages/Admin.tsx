@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import AdminAuth from "@/components/AdminAuth";
 import AdminDashboard from "@/components/AdminDashboard";
+import { isAdminAuthenticated, clearAdminSession, setAdminAuthenticated } from "@/lib/admin-utils";
 
 const Admin = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -8,16 +9,17 @@ const Admin = () => {
 
   useEffect(() => {
     // Check if user is already authenticated
-    const authStatus = localStorage.getItem("admin_authenticated");
-    setIsAuthenticated(authStatus === "true");
+    setIsAuthenticated(isAdminAuthenticated());
     setIsLoading(false);
   }, []);
 
   const handleAuthenticated = () => {
+    setAdminAuthenticated();
     setIsAuthenticated(true);
   };
 
   const handleLogout = () => {
+    clearAdminSession();
     setIsAuthenticated(false);
   };
 

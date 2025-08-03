@@ -68,7 +68,8 @@ export default {
 				'gradient-primary': 'var(--gradient-primary)',
 				'gradient-rose-gold': 'var(--gradient-rose-gold)',
 				'gradient-cultural': 'var(--gradient-cultural)',
-				'gradient-subtle': 'var(--gradient-subtle)'
+				'gradient-subtle': 'var(--gradient-subtle)',
+				'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))'
 			},
 			fontFamily: {
 				'serif': ['Playfair Display', 'serif'],

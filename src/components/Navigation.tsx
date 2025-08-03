@@ -7,6 +7,7 @@ import searchIcon from "/src/assets/search.png";
 import nameIcon from "/src/assets/name.png";
 import SearchModal from "./SearchModal";
 import { useFavourites } from "@/contexts/FavouritesContext";
+import { useCart } from "@/contexts/CartContext";
 import { Badge } from "@/components/ui/badge";
 
 const Navigation = () => {
@@ -15,8 +16,7 @@ const Navigation = () => {
   const [lastScrollY, setLastScrollY] = useState(0);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const { favouritesCount } = useFavourites();
-
-
+  const { cartCount } = useCart();
 
   // Scroll event handler
   useEffect(() => {
@@ -35,8 +35,6 @@ const Navigation = () => {
       window.removeEventListener('scroll', handleScroll);
     };
   }, [lastScrollY]);
-
-
 
   return (
     <>
@@ -94,13 +92,18 @@ const Navigation = () => {
             </button>
             <button 
               onClick={() => navigate('/cart')}
-              className="flex items-center justify-center p-3 hover:bg-white/10 rounded-lg transition-colors cursor-pointer"
+              className="relative flex items-center justify-center p-3 hover:bg-white/10 rounded-lg transition-colors cursor-pointer"
             >
               <img 
                 src={cartIcon} 
                 alt="Cart" 
                 className="h-16 w-16"
               />
+              {cartCount > 0 && (
+                <Badge className="absolute -top-2 -right-2 h-6 w-6 rounded-full bg-blue-500 text-white text-xs flex items-center justify-center p-0">
+                  {cartCount > 99 ? '99+' : cartCount}
+                </Badge>
+              )}
             </button>
           </div>
         </div>

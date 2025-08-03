@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -22,6 +23,7 @@ import {
 } from "lucide-react";
 import { supabaseUtils } from "@/hooks/useSupabase";
 import { Database } from "@/lib/supabase";
+import { clearAdminSession } from "@/lib/admin-utils";
 
 type Product = Database['public']['Tables']['products']['Row'];
 type ProductInsert = Database['public']['Tables']['products']['Insert'];
@@ -31,11 +33,13 @@ interface AdminDashboardProps {
 }
 
 const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
+  const navigate = useNavigate();
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [editingProductId, setEditingProductId] = useState<string | null>(null);
   const [formData, setFormData] = useState<Partial<ProductInsert>>({
     name: "",
     category: "",
@@ -46,7 +50,11 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
     colors: [],
     sizes: [],
     is_new: false,
-    is_best_seller: false
+    is_best_seller: false,
+    product_code: "",
+    barcode_no: "",
+    design: "",
+    status: "IN STOCK"
   });
 
   const categories = [
@@ -60,8 +68,9 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
     "Salwar Suit"
   ];
 
-  const availableSizes = ["XS", "S", "M", "L", "XL", "XXL", "Free Size"];
-  const availableColors = ["Red", "Blue", "Green", "Yellow", "Purple", "Pink", "Black", "White", "Gold", "Silver"];
+  const availableSizes = ["XS", "S", "M", "L", "XL", "XXL", "Free Size", "NA-5", "30", "38", "NA"];
+  const availableColors = ["Red", "Blue", "Green", "Yellow", "Purple", "Pink", "Black", "White", "Gold", "Silver", "Peach", "Beige", "T. Blue", "Orange", "Mustard"];
+  const availableStatuses = ["IN STOCK", "SOLD OUT", "OUT OF STOCK", "DISCONTINUED"];
 
   useEffect(() => {
     loadProducts();
@@ -107,6 +116,7 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
       } else {
         await loadProducts();
         setEditingProduct(null);
+        setEditingProductId(null);
         resetForm();
       }
     } catch (err) {
@@ -140,12 +150,17 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
       colors: [],
       sizes: [],
       is_new: false,
-      is_best_seller: false
+      is_best_seller: false,
+      product_code: "",
+      barcode_no: "",
+      design: "",
+      status: "IN STOCK"
     });
   };
 
   const startEdit = (product: Product) => {
     setEditingProduct(product);
+    setEditingProductId(product.id);
     setFormData({
       name: product.name,
       category: product.category,
@@ -156,7 +171,11 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
       colors: product.colors,
       sizes: product.sizes,
       is_new: product.is_new,
-      is_best_seller: product.is_best_seller
+      is_best_seller: product.is_best_seller,
+      product_code: product.product_code || "",
+      barcode_no: product.barcode_no || "",
+      design: product.design || "",
+      status: product.status || "IN STOCK"
     });
     setShowAddForm(true);
   };
@@ -178,8 +197,10 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("admin_authenticated");
+    // Clear authentication data and redirect to homepage
+    clearAdminSession();
     onLogout();
+    navigate('/');
   };
 
   if (isLoading) {
@@ -240,15 +261,13 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
               </Button>
             </div>
 
-            {/* Add/Edit Product Form */}
-            {showAddForm && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>
-                    {editingProduct ? "Edit Product" : "Add New Product"}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
+                         {/* Add Product Form - Only show at top when adding new product */}
+             {showAddForm && !editingProduct && (
+               <Card>
+                 <CardHeader>
+                   <CardTitle>Add New Product</CardTitle>
+                 </CardHeader>
+                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="name">Product Name</Label>
@@ -257,6 +276,40 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
                         value={formData.name}
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                         placeholder="Enter product name"
+                        required
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="product_code">Product Code</Label>
+                      <Input
+                        id="product_code"
+                        value={formData.product_code}
+                        onChange={(e) => setFormData({ ...formData, product_code: e.target.value })}
+                        placeholder="e.g., B3SKU001"
+                        required
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="barcode_no">Barcode Number</Label>
+                      <Input
+                        id="barcode_no"
+                        value={formData.barcode_no}
+                        onChange={(e) => setFormData({ ...formData, barcode_no: e.target.value })}
+                        placeholder="e.g., 431574"
+                        required
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="design">Design</Label>
+                      <Input
+                        id="design"
+                        value={formData.design}
+                        onChange={(e) => setFormData({ ...formData, design: e.target.value })}
+                        placeholder="e.g., 1-MATERIAL, BLAZER, PANT"
+                        required
                       />
                     </div>
 
@@ -280,6 +333,25 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
                     </div>
 
                     <div className="space-y-2">
+                      <Label htmlFor="status">Status</Label>
+                      <Select 
+                        value={formData.status} 
+                        onValueChange={(value) => setFormData({ ...formData, status: value })}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {availableStatuses.map((status) => (
+                            <SelectItem key={status} value={status}>
+                              {status}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2">
                       <Label htmlFor="price">Price (₹)</Label>
                       <Input
                         id="price"
@@ -287,6 +359,7 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
                         value={formData.price}
                         onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })}
                         placeholder="0"
+                        required
                       />
                     </div>
 
@@ -379,88 +452,322 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
                     </div>
                   </div>
 
-                  <div className="flex gap-2">
-                    <Button 
-                      onClick={editingProduct ? handleEditProduct : handleAddProduct}
-                      disabled={!formData.name || !formData.category}
-                    >
-                      <Save className="h-4 w-4 mr-2" />
-                      {editingProduct ? "Update Product" : "Add Product"}
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      onClick={() => {
-                        setShowAddForm(false);
-                        setEditingProduct(null);
-                        resetForm();
-                      }}
-                    >
-                      <X className="h-4 w-4 mr-2" />
-                      Cancel
-                    </Button>
-                  </div>
+                                     <div className="flex gap-2">
+                     <Button 
+                       onClick={handleAddProduct}
+                       disabled={!formData.name || !formData.category || !formData.product_code || !formData.barcode_no || !formData.design || !formData.price}
+                     >
+                       <Save className="h-4 w-4 mr-2" />
+                       Add Product
+                     </Button>
+                     <Button 
+                       variant="outline" 
+                       onClick={() => {
+                         setShowAddForm(false);
+                         setEditingProduct(null);
+                         setEditingProductId(null);
+                         resetForm();
+                       }}
+                     >
+                       <X className="h-4 w-4 mr-2" />
+                       Cancel
+                     </Button>
+                   </div>
                 </CardContent>
               </Card>
             )}
 
-            {/* Products List */}
-            <div className="grid gap-4">
-              {products.map((product) => (
-                <Card key={product.id}>
-                  <CardContent className="p-6">
-                    <div className="flex justify-between items-start">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
-                          <h3 className="text-lg font-semibold">{product.name}</h3>
-                          {product.is_new && <Badge variant="secondary">New</Badge>}
-                          {product.is_best_seller && <Badge variant="default">Best Seller</Badge>}
-                        </div>
-                        <p className="text-gray-600 mb-2">{product.category}</p>
-                        <p className="text-sm text-gray-500 mb-3">{product.description}</p>
-                        <div className="flex items-center gap-4 text-sm">
-                          <span className="font-semibold">₹{product.price.toLocaleString()}</span>
-                          {product.original_price && product.original_price > product.price && (
-                            <span className="text-gray-500 line-through">₹{product.original_price.toLocaleString()}</span>
-                          )}
-                        </div>
-                        <div className="mt-2 flex flex-wrap gap-1">
-                          {product.sizes?.map((size) => (
-                            <Badge key={size} variant="outline" className="text-xs">
-                              {size}
-                            </Badge>
-                          ))}
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2 ml-4">
-                        {product.image_url && (
-                          <img 
-                            src={product.image_url} 
-                            alt={product.name}
-                            className="w-16 h-16 object-cover rounded"
-                          />
-                        )}
-                        <div className="flex flex-col gap-2">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => startEdit(product)}
-                          >
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="destructive"
-                            onClick={() => handleDeleteProduct(product.id)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+                         {/* Products List */}
+             <div className="grid gap-4">
+               {products.map((product) => (
+                 <div key={product.id}>
+                   <Card>
+                     <CardContent className="p-6">
+                       <div className="flex justify-between items-start">
+                         <div className="flex-1">
+                           <div className="flex items-center gap-2 mb-2">
+                             <h3 className="text-lg font-semibold">{product.name}</h3>
+                             {product.is_new && <Badge variant="secondary">New</Badge>}
+                             {product.is_best_seller && <Badge variant="default">Best Seller</Badge>}
+                             <Badge variant={product.status === 'IN STOCK' ? 'default' : 'destructive'}>
+                               {product.status}
+                             </Badge>
+                           </div>
+                           <div className="grid grid-cols-2 gap-2 text-sm mb-2">
+                             <div>
+                               <span className="font-medium">Code:</span> {product.product_code || 'N/A'}
+                             </div>
+                             <div>
+                               <span className="font-medium">Barcode:</span> {product.barcode_no || 'N/A'}
+                             </div>
+                             <div>
+                               <span className="font-medium">Design:</span> {product.design || 'N/A'}
+                             </div>
+                             <div>
+                               <span className="font-medium">Category:</span> {product.category}
+                             </div>
+                           </div>
+                           <p className="text-sm text-gray-500 mb-3">{product.description}</p>
+                           <div className="flex items-center gap-4 text-sm">
+                             <span className="font-semibold">₹{product.price.toLocaleString()}</span>
+                             {product.original_price && product.original_price > product.price && (
+                               <span className="text-gray-500 line-through">₹{product.original_price.toLocaleString()}</span>
+                             )}
+                           </div>
+                           <div className="mt-2 flex flex-wrap gap-1">
+                             {product.sizes?.map((size) => (
+                               <Badge key={size} variant="outline" className="text-xs">
+                                 {size}
+                               </Badge>
+                             ))}
+                           </div>
+                         </div>
+                         <div className="flex items-center gap-2 ml-4">
+                           {product.image_url && (
+                             <img 
+                               src={product.image_url} 
+                               alt={product.name}
+                               className="w-16 h-16 object-cover rounded"
+                             />
+                           )}
+                           <div className="flex flex-col gap-2">
+                             <Button
+                               size="sm"
+                               variant="outline"
+                               onClick={() => startEdit(product)}
+                             >
+                               <Edit className="h-4 w-4" />
+                             </Button>
+                             <Button
+                               size="sm"
+                               variant="destructive"
+                               onClick={() => handleDeleteProduct(product.id)}
+                             >
+                               <Trash2 className="h-4 w-4" />
+                             </Button>
+                           </div>
+                         </div>
+                       </div>
+                     </CardContent>
+                   </Card>
+
+                   {/* Edit Form - Shows below the product when editing */}
+                   {editingProductId === product.id && (
+                     <Card className="mt-4 border-l-4 border-l-blue-500">
+                       <CardHeader>
+                         <CardTitle className="text-blue-600">Edit Product: {product.name}</CardTitle>
+                       </CardHeader>
+                       <CardContent className="space-y-4">
+                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                           <div className="space-y-2">
+                             <Label htmlFor={`edit-name-${product.id}`}>Product Name</Label>
+                             <Input
+                               id={`edit-name-${product.id}`}
+                               value={formData.name}
+                               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                               placeholder="Enter product name"
+                               required
+                             />
+                           </div>
+
+                           <div className="space-y-2">
+                             <Label htmlFor={`edit-product-code-${product.id}`}>Product Code</Label>
+                             <Input
+                               id={`edit-product-code-${product.id}`}
+                               value={formData.product_code}
+                               onChange={(e) => setFormData({ ...formData, product_code: e.target.value })}
+                               placeholder="e.g., B3SKU001"
+                               required
+                             />
+                           </div>
+
+                           <div className="space-y-2">
+                             <Label htmlFor={`edit-barcode-no-${product.id}`}>Barcode Number</Label>
+                             <Input
+                               id={`edit-barcode-no-${product.id}`}
+                               value={formData.barcode_no}
+                               onChange={(e) => setFormData({ ...formData, barcode_no: e.target.value })}
+                               placeholder="e.g., 431574"
+                               required
+                             />
+                           </div>
+
+                           <div className="space-y-2">
+                             <Label htmlFor={`edit-design-${product.id}`}>Design</Label>
+                             <Input
+                               id={`edit-design-${product.id}`}
+                               value={formData.design}
+                               onChange={(e) => setFormData({ ...formData, design: e.target.value })}
+                               placeholder="e.g., 1-MATERIAL, BLAZER, PANT"
+                               required
+                             />
+                           </div>
+
+                           <div className="space-y-2">
+                             <Label htmlFor={`edit-category-${product.id}`}>Category</Label>
+                             <Select 
+                               value={formData.category} 
+                               onValueChange={(value) => setFormData({ ...formData, category: value })}
+                             >
+                               <SelectTrigger>
+                                 <SelectValue placeholder="Select category" />
+                               </SelectTrigger>
+                               <SelectContent>
+                                 {categories.map((category) => (
+                                   <SelectItem key={category} value={category}>
+                                     {category}
+                                   </SelectItem>
+                                 ))}
+                               </SelectContent>
+                             </Select>
+                           </div>
+
+                           <div className="space-y-2">
+                             <Label htmlFor={`edit-status-${product.id}`}>Status</Label>
+                             <Select 
+                               value={formData.status} 
+                               onValueChange={(value) => setFormData({ ...formData, status: value })}
+                             >
+                               <SelectTrigger>
+                                 <SelectValue placeholder="Select status" />
+                               </SelectTrigger>
+                               <SelectContent>
+                                 {availableStatuses.map((status) => (
+                                   <SelectItem key={status} value={status}>
+                                     {status}
+                                   </SelectItem>
+                                 ))}
+                               </SelectContent>
+                             </Select>
+                           </div>
+
+                           <div className="space-y-2">
+                             <Label htmlFor={`edit-price-${product.id}`}>Price (₹)</Label>
+                             <Input
+                               id={`edit-price-${product.id}`}
+                               type="number"
+                               value={formData.price}
+                               onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })}
+                               placeholder="0"
+                               required
+                             />
+                           </div>
+
+                           <div className="space-y-2">
+                             <Label htmlFor={`edit-original-price-${product.id}`}>Original Price (₹)</Label>
+                             <Input
+                               id={`edit-original-price-${product.id}`}
+                               type="number"
+                               value={formData.original_price}
+                               onChange={(e) => setFormData({ ...formData, original_price: Number(e.target.value) })}
+                               placeholder="0"
+                             />
+                           </div>
+
+                           <div className="space-y-2">
+                             <Label htmlFor={`edit-image-url-${product.id}`}>Image URL</Label>
+                             <Input
+                               id={`edit-image-url-${product.id}`}
+                               value={formData.image_url}
+                               onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
+                               placeholder="https://example.com/image.jpg"
+                             />
+                           </div>
+
+                           <div className="space-y-2">
+                             <Label>Product Flags</Label>
+                             <div className="flex gap-4">
+                               <label className="flex items-center space-x-2">
+                                 <input
+                                   type="checkbox"
+                                   checked={formData.is_new}
+                                   onChange={(e) => setFormData({ ...formData, is_new: e.target.checked })}
+                                 />
+                                 <span>New Product</span>
+                               </label>
+                               <label className="flex items-center space-x-2">
+                                 <input
+                                   type="checkbox"
+                                   checked={formData.is_best_seller}
+                                   onChange={(e) => setFormData({ ...formData, is_best_seller: e.target.checked })}
+                                 />
+                                 <span>Best Seller</span>
+                               </label>
+                             </div>
+                           </div>
+                         </div>
+
+                         <div className="space-y-2">
+                           <Label htmlFor={`edit-description-${product.id}`}>Description</Label>
+                           <Textarea
+                             id={`edit-description-${product.id}`}
+                             value={formData.description}
+                             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                             placeholder="Enter product description"
+                             rows={3}
+                           />
+                         </div>
+
+                         <div className="space-y-2">
+                           <Label>Available Sizes</Label>
+                           <div className="flex flex-wrap gap-2">
+                             {availableSizes.map((size) => (
+                               <Button
+                                 key={size}
+                                 type="button"
+                                 variant={formData.sizes?.includes(size) ? "default" : "outline"}
+                                 size="sm"
+                                 onClick={() => toggleSize(size)}
+                               >
+                                 {size}
+                               </Button>
+                             ))}
+                           </div>
+                         </div>
+
+                         <div className="space-y-2">
+                           <Label>Available Colors</Label>
+                           <div className="flex flex-wrap gap-2">
+                             {availableColors.map((color) => (
+                               <Button
+                                 key={color}
+                                 type="button"
+                                 variant={formData.colors?.includes(color) ? "default" : "outline"}
+                                 size="sm"
+                                 onClick={() => toggleColor(color)}
+                               >
+                                 {color}
+                               </Button>
+                             ))}
+                           </div>
+                         </div>
+
+                         <div className="flex gap-2">
+                           <Button 
+                             onClick={handleEditProduct}
+                             disabled={!formData.name || !formData.category || !formData.product_code || !formData.barcode_no || !formData.design || !formData.price}
+                           >
+                             <Save className="h-4 w-4 mr-2" />
+                             Update Product
+                           </Button>
+                           <Button 
+                             variant="outline" 
+                             onClick={() => {
+                               setEditingProduct(null);
+                               setEditingProductId(null);
+                               resetForm();
+                             }}
+                           >
+                             <X className="h-4 w-4 mr-2" />
+                             Cancel
+                           </Button>
+                         </div>
+                       </CardContent>
+                     </Card>
+                   )}
+                 </div>
+               ))}
+             </div>
           </TabsContent>
 
           <TabsContent value="analytics" className="space-y-6">
