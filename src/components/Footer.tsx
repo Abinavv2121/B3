@@ -14,10 +14,7 @@ const Footer = () => {
       
       {/* Main footer background */}
       <div 
-        className="relative z-10"
-        style={{
-          background: '#000000'
-        }}
+        className="relative z-10 bg-black/95 backdrop-blur-xl"
       >
         {/* Subtle luxury texture overlay */}
         <div 
@@ -253,38 +250,7 @@ const Footer = () => {
                 </div>
               </div>
 
-              {/* Trust Badges Section */}
-              <div className="mt-20 pt-12 border-t border-white/10">
-                <div className="text-center space-y-8">
-                  <h4 
-                    className="text-2xl font-['Playfair_Display'] font-medium tracking-wider"
-                    style={{ color: '#D4AF37' }}
-                  >
-                    Trust & Quality
-                  </h4>
-                  <div className="flex flex-wrap justify-center items-center gap-8 lg:gap-12">
-                    {[
-                      { icon: Shield, text: "100% Authentic" },
-                      { icon: Truck, text: "Free Shipping" },
-                      { icon: CreditCard, text: "Secure Payment" },
-                      { icon: HeadphonesIcon, text: "24/7 Support" }
-                    ].map((badge) => (
-                      <div key={badge.text} className="flex items-center space-x-3">
-                        <div 
-                          className="w-10 h-10 rounded-full flex items-center justify-center"
-                          style={{
-                            backgroundColor: '#D4AF37',
-                            border: '2px solid #B8860B'
-                          }}
-                        >
-                          <badge.icon className="w-5 h-5 text-black" />
-                        </div>
-                        <span className="text-white font-medium text-sm">{badge.text}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
+
             </div>
           </div>
 

@@ -1,291 +1,202 @@
-import { useEffect, useRef, useState } from 'react';
+import { useState, useEffect } from 'react';
+import { Crown, Star, Heart, Eye, ArrowRight } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Link } from 'react-router-dom';
+import heroBridal from "@/assets/hero-bridal.jpg";
+
 
 const AutoScrollCarousel = () => {
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const [scrollPosition, setScrollPosition] = useState(0);
-  const [isVisible, setIsVisible] = useState(false);
-
-  useEffect(() => {
-    const scrollSpeed = 0.5; // pixels per frame
-    const imageWidth = 320; // width of each image including gap
-    const totalImages = 9;
-    const totalWidth = imageWidth * totalImages;
-
-    const scroll = () => {
-      setScrollPosition(prev => {
-        const newPosition = prev + scrollSpeed;
-        // Reset to beginning when we've scrolled past all images
-        return newPosition >= totalWidth ? 0 : newPosition;
-      });
-    };
-
-    const intervalId = setInterval(scroll, 16); // ~60fps
-
-    return () => {
-      clearInterval(intervalId);
-    };
-  }, []);
-
-  // Intersection Observer for scroll animations
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    if (scrollRef.current) {
-      observer.observe(scrollRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, []);
-
-  // Create placeholder images array
-  const placeholderImages = Array.from({ length: 18 }, (_, index) => ({
-    id: index + 1,
-    src: `https://via.placeholder.com/300x400/E5E7EB/9CA3AF?text=Image+${(index % 9) + 1}`,
-    alt: `Placeholder ${(index % 9) + 1}`
-  }));
+  // Product collection
+  const products = [
+    { id: 1, name: "Emerald Silk Lehenga", price: "₹45,999", originalPrice: "₹52,999", category: "Bridal Collection", rating: 4.9, reviews: 234, isFeatured: true, isNew: false, image: heroBridal },
+    { id: 2, name: "Royal Gold Saree", price: "₹28,999", originalPrice: "₹32,999", category: "Traditional Wear", rating: 4.8, reviews: 156, isFeatured: false, isNew: true, image: heroBridal },
+    { id: 3, name: "Burgundy Anarkali", price: "₹35,999", originalPrice: null, category: "Festive Wear", rating: 4.9, reviews: 89, isFeatured: true, isNew: false, image: heroBridal },
+    { id: 4, name: "Rose Pink Sharara", price: "₹22,999", originalPrice: "₹26,999", category: "Party Wear", rating: 4.7, reviews: 112, isFeatured: false, isNew: true, image: heroBridal },
+    { id: 5, name: "Navy Blue Gown", price: "₹38,999", originalPrice: null, category: "Evening Wear", rating: 4.8, reviews: 78, isFeatured: false, isNew: false, image: heroBridal },
+    { id: 6, name: "Cream Silk Ensemble", price: "₹42,999", originalPrice: "₹48,999", category: "Designer Collection", rating: 4.9, reviews: 203, isFeatured: true, isNew: false, image: heroBridal }
+  ];
 
   return (
-    <div 
-      className="w-full relative overflow-hidden"
-      style={{ 
-        background: 'linear-gradient(135deg, #1a1a1a 0%, #2d1b1b 25%, #3d2a2a 50%, #2d1b1b 75%, #1a1a1a 100%)',
-        paddingTop: '120px',
-        paddingBottom: '80px'
-      }}
+    <section 
+      id="customer-favourites" 
+      className="w-full py-20 relative overflow-hidden starry-night-section"
     >
-      {/* Elegant geometric separator from hero section */}
-      <div className="absolute top-0 left-0 right-0 h-16 z-20 pointer-events-none">
-        <svg
-          className="w-full h-full"
-          viewBox="0 0 1200 64"
-          preserveAspectRatio="none"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M0 0L1200 0L1200 32C1200 32 900 64 600 32C300 0 0 32 0 32V0Z"
-            fill="rgba(0, 0, 0, 0.8)"
-          />
-          <path
-            d="M0 16L1200 16L1200 48C1200 48 900 80 600 48C300 16 0 48 0 48V16Z"
-            fill="#D4AF37"
-            fillOpacity="0.1"
-          />
-        </svg>
-      </div>
+      {/* Starry Night Background */}
+      <div className="absolute inset-0 starry-night-bg" />
       
-      {/* Primary luxury damask texture overlay */}
-      <div 
-        className="absolute inset-0 opacity-10"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='120' height='120' viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3Cpattern id='luxury-damask' x='0' y='0' width='120' height='120' patternUnits='userSpaceOnUse'%3E%3Cpath d='M60 60c0-16.569-13.431-30-30-30s-30 13.431-30 30 13.431 30 30 30 30-13.431 30-30z' fill='%23D4AF37' fill-opacity='0.08'/%3E%3Cpath d='M60 60c0-16.569 13.431-30 30-30s30 13.431 30 30-13.431 30-30 30-30-13.431-30-30z' fill='%23B8860B' fill-opacity='0.06'/%3E%3Cpath d='M30 30c0-16.569 13.431-30 30-30s30 13.431 30 30-13.431 30-30 30-30-13.431-30-30z' fill='%23D4AF37' fill-opacity='0.05'/%3E%3Cpath d='M90 90c0-16.569-13.431-30-30-30s-30 13.431-30 30 13.431 30 30 30 30-13.431 30-30z' fill='%23B8860B' fill-opacity='0.04'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='120' height='120' fill='url(%23luxury-damask)'/%3E%3C/svg%3E")`,
-          backgroundSize: '120px 120px'
-        }}
-      />
+      {/* Twinkling Stars */}
+      <div className="absolute inset-0 twinkling-stars" />
       
-      {/* Secondary ornate baroque texture overlay */}
-      <div 
-        className="absolute inset-0 opacity-8"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='160' height='160' viewBox='0 0 160 160' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3Cpattern id='baroque-luxury' x='0' y='0' width='160' height='160' patternUnits='userSpaceOnUse'%3E%3Cpath d='M80 80c0-22.091-17.909-40-40-40s-40 17.909-40 40 17.909 40 40 40 40-17.909 40-40z' fill='%23D4AF37' fill-opacity='0.06' stroke='%23B8860B' stroke-width='0.5' stroke-opacity='0.1'/%3E%3Cpath d='M80 80c0-11.046 8.954-20 20-20s20 8.954 20 20-8.954 20-20 20-20-8.954-20-20z' fill='%23FFD700' fill-opacity='0.04'/%3E%3Cpath d='M40 40c0-11.046 8.954-20 20-20s20 8.954 20 20-8.954 20-20 20-20-8.954-20-20z' fill='%23B8860B' fill-opacity='0.05'/%3E%3Cpath d='M120 120c0-11.046 8.954-20 20-20s20 8.954 20 20-8.954 20-20 20-20-8.954-20-20z' fill='%23FFD700' fill-opacity='0.03'/%3E%3Cpath d='M80 20L85 35L100 40L85 45L80 60L75 45L60 40L75 35Z' fill='%23D4AF37' fill-opacity='0.08'/%3E%3Cpath d='M80 100L85 115L100 120L85 125L80 140L75 125L60 120L75 115Z' fill='%23B8860B' fill-opacity='0.06'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='160' height='160' fill='url(%23baroque-luxury)'/%3E%3C/svg%3E")`,
-          backgroundSize: '160px 160px',
-          transform: 'rotate(15deg)',
-          transformOrigin: 'center'
-        }}
-      />
-      
-      {/* Animated sparkle effect */}
-      <div className="absolute inset-0 overflow-hidden">
-        {[...Array(20)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute animate-pulse"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 3}s`,
-              animationDuration: `${2 + Math.random() * 2}s`
-            }}
-          >
-            <div className="w-1 h-1 bg-yellow-400 rounded-full opacity-60"></div>
-          </div>
-        ))}
-      </div>
-      
+      {/* Elegant gradient overlay for depth */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/30" />
       <div className="container mx-auto px-4 relative z-10">
-        <div className="text-center mb-16">
-          <h2 
-            className={`transition-all duration-1000 ease-out ${
-              isVisible ? 'opacity-100 translate-y-0 skew-y-0' : 'opacity-0 translate-y-8 skew-y-1'
-            }`}
-          >
-            <span 
-              className="font-['Playfair_Display'] font-light text-6xl lg:text-7xl block mb-4 tracking-widest"
+        {/* Minimalist header */}
+        <div className="text-center mb-12">
+          <h2 className="font-['Italiana'] text-4xl lg:text-5xl tracking-wide" 
               style={{ 
-                color: '#D4AF37',
-                textShadow: '0 0 30px rgba(212, 175, 55, 0.3)'
-              }}
-            >
-              CUSTOMER
-            </span>
-            <span 
-              className="font-['Italiana'] text-5xl lg:text-6xl block relative tracking-wider"
-              style={{ 
-                color: '#FFFFFF',
-                textShadow: '0 0 20px rgba(255, 255, 255, 0.2)'
-              }}
-            >
-              FAVOURITES
-              <div 
-                className="mx-auto mt-6 relative"
-                style={{
-                  width: '120px',
-                  height: '3px',
-                  background: 'linear-gradient(90deg, transparent, #D4AF37, transparent)'
-                }}
-              >
-                <div 
-                  className="absolute inset-0 animate-pulse"
-                  style={{
-                    background: 'linear-gradient(90deg, transparent, #B8860B, transparent)',
-                    animationDuration: '2s'
-                  }}
-                ></div>
-              </div>
-            </span>
-            <p 
-              className="mt-6 text-lg lg:text-xl font-light tracking-wide"
-              style={{ color: '#C0C0C0' }}
-            >
-              Curated selections loved by our discerning clientele
-            </p>
+                color: '#F8F7F3',
+                textShadow: '0 2px 4px rgba(0,0,0,0.8)'
+              }}>
+            Customer <span style={{ color: '#D4AF37' }}>Favourites</span>
           </h2>
         </div>
         
-        <div className="relative overflow-hidden">
-          <div 
-            ref={scrollRef}
-            className="flex gap-8"
-            style={{ 
-              transform: `translateX(-${scrollPosition}px)`,
-              width: 'fit-content',
-              transition: 'none'
-            }}
-          >
-            {placeholderImages.map((image) => (
-              <div
-                key={`${image.id}-${Math.floor(image.id / 9)}`}
-                className="flex-shrink-0 w-80 h-96 relative group"
-              >
-                <div 
-                  className="w-full h-full bg-white rounded-3xl p-4 transition-all duration-500 relative overflow-hidden"
-                  style={{
-                    boxShadow: '0 20px 60px rgba(0,0,0,0.3), 0 0 40px rgba(212, 175, 55, 0.1)',
-                    border: '1px solid rgba(212, 175, 55, 0.1)'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = 'translateY(-8px) scale(1.02)';
-                    e.currentTarget.style.boxShadow = '0 30px 80px rgba(0,0,0,0.4), 0 0 60px rgba(212, 175, 55, 0.2)';
-                    e.currentTarget.style.border = '1px solid rgba(212, 175, 55, 0.3)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = 'translateY(0) scale(1)';
-                    e.currentTarget.style.boxShadow = '0 20px 60px rgba(0,0,0,0.3), 0 0 40px rgba(212, 175, 55, 0.1)';
-                    e.currentTarget.style.border = '1px solid rgba(212, 175, 55, 0.1)';
-                  }}
-                >
-                  {/* Luxury Badge */}
-                  <div 
-                    className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-all duration-500 z-10 px-3 py-1 rounded-full text-white text-xs font-medium backdrop-blur-sm"
-                    style={{ 
-                      backgroundColor: 'rgba(212, 175, 55, 0.9)',
-                      boxShadow: '0 4px 20px rgba(212, 175, 55, 0.3)'
-                    }}
-                  >
-                    ✨ BEST SELLER
-                  </div>
-                  
-                  {/* Gold accent line */}
-                  <div 
-                    className="absolute top-0 left-0 right-0 h-1 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                    style={{
-                      background: 'linear-gradient(90deg, #D4AF37, #B8860B, #D4AF37)'
-                    }}
-                  ></div>
-                  
+        {/* Product showcase */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+          {products.map((item) => (
+            <div key={item.id} className="group">
+              <div className="elegant-card rounded-xl p-8 transition-all duration-700 hover:scale-[1.03] hover:shadow-2xl relative overflow-hidden">
+                {/* Subtle shine effect */}
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+                {/* Image container */}
+                <div className="relative aspect-[3/4] overflow-hidden rounded-lg mb-6">
                   <img
-                    src={image.src}
-                    alt={image.alt}
-                    className="w-full h-full object-cover transition-all duration-500"
-                    style={{
-                      borderTopLeftRadius: '20px',
-                      borderTopRightRadius: '20px',
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.transform = 'scale(1.08)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.transform = 'scale(1)';
-                    }}
+                    src={item.image}
+                    alt={item.name}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
                   
-                  {/* Product Info */}
-                  <div className="mt-4 px-3 pb-2">
-                    <h3 
-                      className="font-['Playfair_Display'] font-semibold text-base mb-2 tracking-wide"
-                      style={{ color: '#2C2C2C' }}
+                  {/* Simple badges */}
+                  <div className="absolute top-4 left-4 flex flex-col space-y-2">
+                    {item.isNew && (
+                      <Badge className="bg-white/90 text-black text-xs px-3 py-1">
+                        NEW
+                      </Badge>
+                    )}
+                    {item.isFeatured && (
+                      <Badge className="text-black text-xs px-3 py-1" style={{ backgroundColor: '#D4AF37' }}>
+                        FEATURED
+                      </Badge>
+                    )}
+                  </div>
+
+                  {/* Simple action buttons */}
+                  <div className="absolute top-4 right-4 flex flex-col space-y-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="w-10 h-10 rounded-full backdrop-blur-sm transition-all duration-300 border"
+                      style={{ 
+                        backgroundColor: 'rgba(11, 15, 20, 0.6)',
+                        color: '#F5F5F3',
+                        borderColor: '#3A2F1C'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = 'rgba(224, 195, 108, 0.2)';
+                        e.currentTarget.style.borderColor = '#E0C36C';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = 'rgba(11, 15, 20, 0.6)';
+                        e.currentTarget.style.borderColor = '#3A2F1C';
+                      }}
                     >
-                      Premium Ethnic Wear
-                    </h3>
-                    <div className="flex items-center justify-between">
-                      <p 
-                        className="font-['Italiana'] text-lg font-medium tracking-wider"
-                        style={{ color: '#D4AF37' }}
-                      >
-                        ₹12,999
-                      </p>
-                      <div className="flex items-center space-x-1">
-                        <span className="text-yellow-500">★★★★★</span>
-                        <span className="text-sm text-gray-600">(4.9)</span>
-                      </div>
+                      <Heart className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="w-10 h-10 rounded-full backdrop-blur-sm transition-all duration-300 border"
+                      style={{ 
+                        backgroundColor: 'rgba(11, 15, 20, 0.6)',
+                        color: '#F5F5F3',
+                        borderColor: '#3A2F1C'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = 'rgba(224, 195, 108, 0.2)';
+                        e.currentTarget.style.borderColor = '#E0C36C';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = 'rgba(11, 15, 20, 0.6)';
+                        e.currentTarget.style.borderColor = '#3A2F1C';
+                      }}
+                    >
+                      <Eye className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Product details */}
+                <div className="text-center space-y-4 relative z-10">
+                  <p className="text-xs font-medium tracking-[0.2em] uppercase" 
+                     style={{ 
+                       color: '#C08E5D',
+                       textShadow: '0 1px 2px rgba(0,0,0,0.5)',
+                       letterSpacing: '0.15em'
+                     }}>
+                    {item.category}
+                  </p>
+
+                  <h3 className="font-['Playfair_Display'] text-2xl lg:text-3xl font-semibold leading-tight tracking-wide" 
+                      style={{ 
+                        color: '#F8F7F3',
+                        textShadow: '0 2px 4px rgba(0,0,0,0.7)',
+                        letterSpacing: '0.01em'
+                      }}>
+                    {item.name}
+                  </h3>
+
+                  {/* Premium rating */}
+                  <div className="flex items-center justify-center gap-3 py-2">
+                    <div className="flex gap-1">
+                      {[...Array(5)].map((_, i) => (
+                        <Star key={i} className="w-5 h-5 drop-shadow-sm" 
+                              style={{ 
+                                fill: '#D4AF37', 
+                                color: '#D4AF37',
+                                filter: 'drop-shadow(0 1px 2px rgba(212,175,55,0.3))'
+                              }} />
+                      ))}
                     </div>
+                    <span className="text-sm font-medium tracking-wide" 
+                          style={{ 
+                            color: '#E8E3D9',
+                            textShadow: '0 1px 2px rgba(0,0,0,0.5)'
+                          }}>
+                      ({item.reviews} reviews)
+                    </span>
+                  </div>
+
+                  {/* Elegant pricing */}
+                  <div className="flex items-center justify-center gap-4 pt-2">
+                    <span className="font-['Inter'] text-3xl lg:text-4xl font-light tracking-wide" 
+                          style={{ 
+                            background: 'linear-gradient(135deg, #F8F7F3 0%, #E8E3D9 100%)',
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent',
+                            textShadow: '0 2px 4px rgba(0,0,0,0.8)',
+                            letterSpacing: '0.02em'
+                          }}>
+                      {item.price}
+                    </span>
+                    {item.originalPrice && (
+                      <span className="font-['Inter'] text-xl line-through font-light" 
+                            style={{ 
+                              color: '#C8C8C5', 
+                              opacity: '0.7',
+                              textShadow: '0 1px 2px rgba(0,0,0,0.5)'
+                            }}>
+                        {item.originalPrice}
+                      </span>
+                    )}
+                  </div>
                   </div>
                 </div>
               </div>
             ))}
           </div>
+
+        {/* Simple CTA */}
+        <div className="text-center">
+          <Link to="/wishlist">
+            <Button variant="luxury" size="lg" className="px-8 py-3 text-lg">
+              View All Favourites
+              <ArrowRight className="ml-3 w-5 h-5" />
+            </Button>
+          </Link>
         </div>
       </div>
-      
-      {/* Elegant geometric separator to next section */}
-      <div className="absolute bottom-0 left-0 right-0 h-16 z-20 pointer-events-none">
-        <svg
-          className="w-full h-full"
-          viewBox="0 0 1200 64"
-          preserveAspectRatio="none"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M0 64L1200 64L1200 32C1200 32 900 0 600 32C300 64 0 32 0 32V64Z"
-            fill="#1a1a2e"
-            fillOpacity="0.8"
-          />
-          <path
-            d="M0 48L1200 48L1200 16C1200 16 900 -16 600 16C300 48 0 16 0 16V48Z"
-            fill="#B76E79"
-            fillOpacity="0.1"
-          />
-        </svg>
-      </div>
-    </div>
+    </section>
   );
 };
 

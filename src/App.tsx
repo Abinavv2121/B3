@@ -15,6 +15,8 @@ import Bridal from "./pages/Bridal";
 import Festival from "./pages/Festival";
 import Special from "./pages/Special";
 import Cart from "./pages/Cart";
+import Checkout from "./pages/Checkout";
+import OrderSuccess from "./pages/OrderSuccess";
 import Wishlist from "./pages/Wishlist";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
@@ -40,6 +42,8 @@ const App = () => (
               <Route path="/festival" element={<Festival />} />
               <Route path="/special" element={<Special />} />
               <Route path="/cart" element={<Cart />} />
+              <Route path="/checkout" element={<Checkout />} />
+              <Route path="/order-success" element={<OrderSuccess />} />
               <Route path="/wishlist" element={<Wishlist />} />
               <Route path="/admin" element={<Admin />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

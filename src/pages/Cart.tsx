@@ -157,44 +157,48 @@ const Cart = () => {
               
               {/* Order Summary */}
               <div className="lg:col-span-1">
-                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 sticky top-32">
-                  <h2 className="text-xl font-semibold text-gray-900 mb-6">
+                <div className="bg-white rounded-xl shadow-lg p-8 sticky top-32">
+                  <h2 className="text-2xl font-medium mb-8">
                     Order Summary
                   </h2>
                   
-                  <div className="space-y-4">
-                    <div className="flex justify-between text-sm">
+                  <div className="space-y-6">
+                    <div className="flex justify-between text-base">
                       <span>Subtotal</span>
                       <span>₹{subtotal.toLocaleString()}</span>
                     </div>
                     
                     {discount > 0 && (
-                      <div className="flex justify-between text-sm text-green-600">
+                      <div className="flex justify-between text-base text-green-600">
                         <span>Discount</span>
                         <span>-₹{discount.toLocaleString()}</span>
                       </div>
                     )}
                     
-                    <div className="flex justify-between text-sm">
+                    <div className="flex justify-between text-base">
                       <span>Shipping</span>
                       <span>{shipping === 0 ? 'Free' : `₹${shipping}`}</span>
                     </div>
                     
-                    <div className="border-t border-gray-200 pt-4">
-                      <div className="flex justify-between text-lg font-semibold">
+                    <div className="border-t border-gray-200 pt-6">
+                      <div className="flex justify-between text-xl font-medium">
                         <span>Total</span>
                         <span>₹{total.toLocaleString()}</span>
                       </div>
                     </div>
                   </div>
                   
-                  <div className="mt-6 space-y-3">
-                    <Button className="w-full bg-cultural hover:bg-cultural/90">
-                      Proceed to Checkout
-                    </Button>
+                  <div className="mt-8 space-y-4">
+                    <Link to="/checkout">
+                      <Button 
+                        className="w-full py-6 text-lg font-medium bg-black hover:bg-black/90 text-white"
+                      >
+                        Proceed to Checkout
+                      </Button>
+                    </Link>
                     <Button 
                       variant="outline" 
-                      className="w-full"
+                      className="w-full py-6 text-lg font-medium bg-cream hover:bg-cream/90"
                       onClick={clearCart}
                     >
                       Clear Cart
@@ -202,11 +206,11 @@ const Cart = () => {
                   </div>
                   
                   {/* Shipping Info */}
-                  <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-                    <h3 className="font-semibold text-sm text-gray-900 mb-2">
+                  <div className="mt-8 border-t border-gray-200 pt-6">
+                    <h3 className="text-lg font-medium mb-3">
                       Shipping Information
                     </h3>
-                    <p className="text-xs text-gray-600">
+                    <p className="text-gray-600">
                       Free shipping on orders above ₹29,999. Standard delivery takes 3-5 business days.
                     </p>
                   </div>
