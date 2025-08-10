@@ -5,12 +5,10 @@ import AutoScrollCarousel from "@/components/AutoScrollCarousel";
 import CategoryShowcase from "@/components/CategoryShowcase";
 import FeaturedProducts from "@/components/FeaturedProducts";
 import Footer from "@/components/Footer";
-import SupabaseTest from "@/components/SupabaseTest";
 
 const Index = () => {
   return (
     <div className="min-h-screen m-0 p-0">
-      <SupabaseTest />
       <Navigation />
       <SupportiveToolbar />
       <main className="m-0 p-0">

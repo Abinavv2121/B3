@@ -8,12 +8,18 @@ export const useSupabase = () => {
   useEffect(() => {
     const testConnection = async () => {
       try {
-        // Check if we're using placeholder values
-        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://placeholder.supabase.co'
-        const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'placeholder_key'
+        // Check if we have valid Supabase credentials
+        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+        const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
         
-        if (supabaseUrl === 'https://placeholder.supabase.co' || supabaseAnonKey === 'placeholder_key') {
-          setError('Supabase not configured - using placeholder values')
+        const hasValidCredentials = supabaseUrl && supabaseAnonKey && 
+          supabaseUrl !== 'your_supabase_project_url' && 
+          supabaseAnonKey !== 'your_supabase_anon_key' &&
+          supabaseUrl.startsWith('https://') &&
+          supabaseAnonKey.length > 10
+        
+        if (!hasValidCredentials) {
+          setError('Supabase not configured - using mock client')
           setIsConnected(false)
           return
         }
