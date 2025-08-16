@@ -1,7 +1,17 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Crown, Sparkles, Mail, Phone, MapPin, Facebook, Twitter, Instagram, Youtube, Shield, Truck, CreditCard, HeadphonesIcon } from "lucide-react";
 
 const Footer = () => {
+  const navigate = useNavigate();
+
+  const handlePageNavigation = (path: string) => {
+    navigate(path);
+    // Scroll to top after navigation
+    setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, 100);
+  };
+
   return (
     <footer className="relative overflow-hidden">
       {/* Top fade transition from previous section */}
@@ -36,8 +46,8 @@ const Footer = () => {
                   <div className="space-y-4">
                     <div className="flex items-center space-x-3">
                       <img 
-                        src="/src/assets/logo.png" 
-                        alt="Aval Logo" 
+                        src="/src/assets/brand-logo.png" 
+                        alt="B3 Fashion Studio Logo" 
                         className="h-20 w-auto"
                       />
                       <div className="flex items-center space-x-2">
@@ -98,7 +108,14 @@ const Footer = () => {
                         <MapPin className="w-5 h-5 text-black" />
                       </div>
                       <div>
-                        <p className="text-white font-medium">Mumbai, India</p>
+                        <a 
+                          href="https://maps.google.com/?q=14,+285,+Purasaivakkam+High+Rd,+Perumalpet,+Purasaiwakkam,+Chennai,+Tamil+Nadu+600007"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-white font-medium hover:text-yellow-400 transition-colors duration-300 cursor-pointer"
+                        >
+                          Chennai, Tamil Nadu
+                        </a>
                         <p className="text-white/60 text-sm">Head Office</p>
                       </div>
                     </div>
@@ -157,13 +174,13 @@ const Footer = () => {
                       { name: "Western Wear", href: "/western" },
                       { name: "Bridal Collection", href: "/bridal" }
                     ].map((link) => (
-                      <Link
+                      <button
                         key={link.name}
-                        to={link.href}
-                        className="block text-white/80 hover:text-white transition-all duration-300 font-light tracking-wide font-['Italiana', serif]"
+                        onClick={() => handlePageNavigation(link.href)}
+                        className="block text-white/80 hover:text-white transition-all duration-300 font-light tracking-wide font-['Italiana', serif] text-left w-full"
                       >
                         {link.name}
-                      </Link>
+                      </button>
                     ))}
                   </div>
                 </div>
@@ -185,13 +202,13 @@ const Footer = () => {
                       { name: "Care Instructions", href: "/care" },
                       { name: "Track Order", href: "/track" }
                     ].map((link) => (
-                      <Link
+                      <button
                         key={link.name}
-                        to={link.href}
-                        className="block text-white/80 hover:text-white transition-all duration-300 font-light tracking-wide font-['Italiana', serif]"
+                        onClick={() => handlePageNavigation(link.href)}
+                        className="block text-white/80 hover:text-white transition-all duration-300 font-light tracking-wide font-['Italiana', serif] text-left w-full"
                       >
                         {link.name}
-                      </Link>
+                      </button>
                     ))}
                   </div>
                 </div>
@@ -213,13 +230,13 @@ const Footer = () => {
                       { name: "Careers", href: "/careers" },
                       { name: "Press", href: "/press" }
                     ].map((link) => (
-                      <Link
+                      <button
                         key={link.name}
-                        to={link.href}
-                        className="block text-white/80 hover:text-white transition-all duration-300 font-light tracking-wide font-['Italiana', serif]"
+                        onClick={() => handlePageNavigation(link.href)}
+                        className="block text-white/80 hover:text-white transition-all duration-300 font-light tracking-wide font-['Italiana', serif] text-left w-full"
                       >
                         {link.name}
-                      </Link>
+                      </button>
                     ))}
                   </div>
                   
@@ -237,13 +254,13 @@ const Footer = () => {
                         { name: "Cookie Policy", href: "/cookies" },
                         { name: "Accessibility", href: "/accessibility" }
                       ].map((link) => (
-                        <Link
+                        <button
                           key={link.name}
-                          to={link.href}
-                          className="block text-white/80 hover:text-white transition-all duration-300 font-light tracking-wide font-['Italiana', serif]"
+                          onClick={() => handlePageNavigation(link.href)}
+                          className="block text-white/80 hover:text-white transition-all duration-300 font-light tracking-wide font-['Italiana', serif] text-left w-full"
                         >
                           {link.name}
-                        </Link>
+                        </button>
                       ))}
                     </div>
                   </div>
