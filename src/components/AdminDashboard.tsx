@@ -19,7 +19,8 @@ import {
   Package,
   TrendingUp,
   Users,
-  ShoppingCart
+  ShoppingCart,
+  Crown
 } from "lucide-react";
 import { supabaseUtils } from "@/hooks/useSupabase";
 import { Database } from "@/lib/supabase";
@@ -103,52 +104,76 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
     setIsLoading(false);
   };
 
-  const handleAddProduct = async () => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.name || !formData.category || !formData.price) {
+      setError("Please fill in all required fields");
+      return;
+    }
+
     try {
-      const { data, error } = await supabaseUtils.addProduct(formData as ProductInsert);
-      if (error) {
-        setError(error.message);
+      if (editingProductId) {
+        // Update existing product
+        const { error } = await supabaseUtils.updateProduct(editingProductId, formData);
+        if (error) {
+          setError(error.message);
+        } else {
+          setEditingProductId(null);
+          setEditingProduct(null);
+          resetForm();
+          loadProducts();
+        }
       } else {
-        await loadProducts();
-        setShowAddForm(false);
-        resetForm();
+        // Add new product
+        const { error } = await supabaseUtils.addProduct(formData);
+        if (error) {
+          setError(error.message);
+        } else {
+          resetForm();
+          loadProducts();
+        }
       }
     } catch (err) {
-      setError("Failed to add product");
+      setError("Failed to save product");
     }
   };
 
-  const handleEditProduct = async () => {
-    if (!editingProduct) return;
-    
-    try {
-      const { data, error } = await supabaseUtils.updateProduct(editingProduct.id, formData);
-      if (error) {
-        setError(error.message);
-      } else {
-        await loadProducts();
-        setEditingProduct(null);
-        setEditingProductId(null);
-        resetForm();
+  const handleDelete = async (productId: string) => {
+    if (window.confirm("Are you sure you want to delete this product?")) {
+      try {
+        const { error } = await supabaseUtils.deleteProduct(productId);
+        if (error) {
+          setError(error.message);
+        } else {
+          loadProducts();
+        }
+      } catch (err) {
+        setError("Failed to delete product");
       }
-    } catch (err) {
-      setError("Failed to update product");
     }
   };
 
-  const handleDeleteProduct = async (productId: string) => {
-    if (!confirm("Are you sure you want to delete this product?")) return;
-    
-    try {
-      const { error } = await supabaseUtils.deleteProduct(productId);
-      if (error) {
-        setError(error.message);
-      } else {
-        await loadProducts();
-      }
-    } catch (err) {
-      setError("Failed to delete product");
-    }
+  const startEdit = (product: Product) => {
+    setEditingProduct(product);
+    setEditingProductId(product.id);
+    setFormData({
+      name: product.name,
+      category: product.category,
+      price: product.price,
+      original_price: product.original_price,
+      description: product.description,
+      image_url: product.image_url,
+      colors: product.colors,
+      sizes: product.sizes,
+      is_new: product.is_new,
+      is_best_seller: product.is_best_seller,
+      product_code: product.product_code,
+      barcode_no: product.barcode_no,
+      design: product.design,
+      status: product.status,
+      section: product.section
+    });
+    setShowAddForm(true);
   };
 
   const resetForm = () => {
@@ -169,176 +194,287 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
       status: "IN STOCK",
       section: "featured_collections"
     });
-  };
-
-  const startEdit = (product: Product) => {
-    setEditingProduct(product);
-    setEditingProductId(product.id);
-    setFormData({
-      name: product.name,
-      category: product.category,
-      price: product.price,
-      original_price: product.original_price,
-      description: product.description,
-      image_url: product.image_url,
-      colors: product.colors,
-      sizes: product.sizes,
-      is_new: product.is_new,
-      is_best_seller: product.is_best_seller,
-      product_code: product.product_code || "",
-      barcode_no: product.barcode_no || "",
-      design: product.design || "",
-      status: product.status || "IN STOCK",
-      section: product.section || "featured_collections"
-    });
-    setShowAddForm(true);
-  };
-
-  const toggleSize = (size: string) => {
-    const currentSizes = formData.sizes || [];
-    const newSizes = currentSizes.includes(size)
-      ? currentSizes.filter(s => s !== size)
-      : [...currentSizes, size];
-    setFormData({ ...formData, sizes: newSizes });
-  };
-
-  const toggleColor = (color: string) => {
-    const currentColors = formData.colors || [];
-    const newColors = currentColors.includes(color)
-      ? currentColors.filter(c => c !== color)
-      : [...currentColors, color];
-    setFormData({ ...formData, colors: newColors });
+    setEditingProduct(null);
+    setEditingProductId(null);
+    setShowAddForm(false);
+    setError(null);
   };
 
   const handleLogout = () => {
-    // Clear authentication data and redirect to homepage
     clearAdminSession();
     onLogout();
-    navigate('/');
   };
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading dashboard...</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div 
+      className="min-h-screen"
+      style={{
+        background: 'linear-gradient(135deg, #0B0F14 0%, #1a1a1a 50%, #0B0F14 100%)',
+        color: '#F8F7F3'
+      }}
+    >
       {/* Header */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
-              <p className="text-gray-600">Manage your products and inventory</p>
+      <div 
+        className="border-b border-white/10 backdrop-blur-xl"
+        style={{
+          backgroundColor: 'rgba(11, 15, 20, 0.95)',
+          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)'
+        }}
+      >
+        <div className="w-full px-6 lg:px-8 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <div 
+                className="w-12 h-12 rounded-full flex items-center justify-center"
+                style={{
+                  backgroundColor: '#D4AF37',
+                  border: '2px solid #B8860B',
+                  boxShadow: '0 4px 20px rgba(212, 175, 55, 0.3)'
+                }}
+              >
+                <Crown className="w-6 h-6 text-black" />
+              </div>
+              <div>
+                <h1 
+                  className="text-2xl lg:text-3xl font-['Italiana'] tracking-wide"
+                  style={{ color: '#D4AF37' }}
+                >
+                  B3 Admin Dashboard
+                </h1>
+                <p className="text-white/70 text-sm font-light tracking-wide">
+                  Premium Ethnic Wear Management
+                </p>
+              </div>
             </div>
-            <Button onClick={handleLogout} variant="outline">
-              <LogOut className="h-4 w-4 mr-2" />
+            
+            <Button 
+              onClick={handleLogout}
+              className="px-6 py-2.5 text-sm font-medium transition-all duration-300 border hover:scale-105 hover:shadow-lg"
+              style={{
+                borderColor: '#C08E5D',
+                backgroundColor: 'transparent',
+                color: '#F8F7F3'
+              }}
+            >
+              <LogOut className="mr-2 h-4 w-4" />
               Logout
             </Button>
           </div>
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-8">
-        {error && (
-          <Alert variant="destructive" className="mb-6">
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        )}
+      {/* Main Content */}
+      <div className="w-full px-6 lg:px-8 py-8">
+        <div className="max-w-7xl mx-auto space-y-8">
+          {/* Stats Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <Card 
+              className="border-0 transition-all duration-300 hover:scale-105 hover:shadow-xl"
+              style={{
+                backgroundColor: 'rgba(212, 175, 55, 0.1)',
+                border: '1px solid rgba(212, 175, 55, 0.2)',
+                backdropFilter: 'blur(20px)'
+              }}
+            >
+              <CardContent className="p-6">
+                <div className="flex items-center space-x-4">
+                  <div 
+                    className="w-12 h-12 rounded-full flex items-center justify-center"
+                    style={{
+                      backgroundColor: '#D4AF37',
+                      border: '2px solid #B8860B'
+                    }}
+                  >
+                    <Package className="w-6 h-6 text-black" />
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold" style={{ color: '#D4AF37' }}>
+                      {products.length}
+                    </p>
+                    <p className="text-white/70 text-sm font-light">Total Products</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
-        <Tabs defaultValue="products" className="space-y-6">
-          <TabsList>
-            <TabsTrigger value="products">Products</TabsTrigger>
-            <TabsTrigger value="analytics">Analytics</TabsTrigger>
-          </TabsList>
+            <Card 
+              className="border-0 transition-all duration-300 hover:scale-105 hover:shadow-xl"
+              style={{
+                backgroundColor: 'rgba(212, 175, 55, 0.1)',
+                border: '1px solid rgba(212, 175, 55, 0.2)',
+                backdropFilter: 'blur(20px)'
+              }}
+            >
+              <CardContent className="p-6">
+                <div className="flex items-center space-x-4">
+                  <div 
+                    className="w-12 h-12 rounded-full flex items-center justify-center"
+                    style={{
+                      backgroundColor: '#D4AF37',
+                      border: '2px solid #B8860B'
+                    }}
+                  >
+                    <TrendingUp className="w-6 h-6 text-black" />
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold" style={{ color: '#D4AF37' }}>
+                      {products.filter(p => p.is_best_seller).length}
+                    </p>
+                    <p className="text-white/70 text-sm font-light">Best Sellers</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
-          <TabsContent value="products" className="space-y-6">
-            {/* Add Product Button */}
-            <div className="flex justify-between items-center">
-              <h2 className="text-xl font-semibold">Product Management</h2>
-              <Button 
-                onClick={() => {
-                  setShowAddForm(true);
-                  setEditingProduct(null);
-                  resetForm();
-                }}
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Add Product
-              </Button>
-            </div>
+            <Card 
+              className="border-0 transition-all duration-300 hover:scale-105 hover:shadow-xl"
+              style={{
+                backgroundColor: 'rgba(212, 175, 55, 0.1)',
+                border: '1px solid rgba(212, 175, 55, 0.2)',
+                backdropFilter: 'blur(20px)'
+              }}
+            >
+              <CardContent className="p-6">
+                <div className="flex items-center space-x-4">
+                  <div 
+                    className="w-12 h-12 rounded-full flex items-center justify-center"
+                    style={{
+                      backgroundColor: '#D4AF37',
+                      border: '2px solid #B8860B'
+                    }}
+                  >
+                    <ShoppingCart className="w-6 h-6 text-black" />
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold" style={{ color: '#D4AF37' }}>
+                      {products.filter(p => p.status === 'IN STOCK').length}
+                    </p>
+                    <p className="text-white/70 text-sm font-light">In Stock</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
-                         {/* Add Product Form - Only show at top when adding new product */}
-             {showAddForm && !editingProduct && (
-               <Card>
-                 <CardHeader>
-                   <CardTitle>Add New Product</CardTitle>
-                 </CardHeader>
-                 <CardContent className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Card 
+              className="border-0 transition-all duration-300 hover:scale-105 hover:shadow-xl"
+              style={{
+                backgroundColor: 'rgba(212, 175, 55, 0.1)',
+                border: '1px solid rgba(212, 175, 55, 0.2)',
+                backdropFilter: 'blur(20px)'
+              }}
+            >
+              <CardContent className="p-6">
+                <div className="flex items-center space-x-4">
+                  <div 
+                    className="w-12 h-12 rounded-full flex items-center justify-center"
+                    style={{
+                      backgroundColor: '#D4AF37',
+                      border: '2px solid #B8860B'
+                    }}
+                  >
+                    <Users className="w-6 h-6 text-black" />
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold" style={{ color: '#D4AF37' }}>
+                      {categories.length}
+                    </p>
+                    <p className="text-white/70 text-sm font-light">Categories</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex justify-between items-center">
+            <h2 
+              className="text-2xl lg:text-3xl font-['Italiana'] tracking-wide"
+              style={{ color: '#F8F7F3' }}
+            >
+              Product Management
+            </h2>
+            
+            <Button 
+              onClick={() => setShowAddForm(true)}
+              className="px-6 py-2.5 text-sm font-medium transition-all duration-300 border hover:scale-105 hover:shadow-lg"
+              style={{
+                borderColor: '#C08E5D',
+                backgroundColor: '#D4AF37',
+                color: '#0B0F14'
+              }}
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Add New Product
+            </Button>
+          </div>
+
+          {/* Error Display */}
+          {error && (
+            <Alert 
+              className="border-red-500/20"
+              style={{
+                backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                backdropFilter: 'blur(20px)'
+              }}
+            >
+              <AlertDescription className="text-red-400">{error}</AlertDescription>
+            </Alert>
+          )}
+
+          {/* Add/Edit Product Form */}
+          {showAddForm && (
+            <Card 
+              className="border-0 transition-all duration-300"
+              style={{
+                backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                border: '1px solid rgba(212, 175, 55, 0.2)',
+                backdropFilter: 'blur(20px)'
+              }}
+            >
+              <CardHeader>
+                <CardTitle 
+                  className="text-xl font-['Italiana'] tracking-wide"
+                  style={{ color: '#D4AF37' }}
+                >
+                  {editingProductId ? "Edit Product" : "Add New Product"}
+                </CardTitle>
+                <CardDescription className="text-white/70">
+                  {editingProductId ? "Update product information" : "Create a new product for your collection"}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Product Name */}
                     <div className="space-y-2">
-                      <Label htmlFor="name">Product Name</Label>
+                      <Label htmlFor="name" className="text-white/90 font-medium">
+                        Product Name *
+                      </Label>
                       <Input
                         id="name"
                         value={formData.name}
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                        className="border-white/20 bg-white/5 text-white placeholder:text-white/50 focus:border-yellow-500 focus:ring-yellow-500/20"
                         placeholder="Enter product name"
                         required
                       />
                     </div>
 
+                    {/* Category */}
                     <div className="space-y-2">
-                      <Label htmlFor="product_code">Product Code</Label>
-                      <Input
-                        id="product_code"
-                        value={formData.product_code}
-                        onChange={(e) => setFormData({ ...formData, product_code: e.target.value })}
-                        placeholder="e.g., B3SKU001"
-                        required
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="barcode_no">Barcode Number</Label>
-                      <Input
-                        id="barcode_no"
-                        value={formData.barcode_no}
-                        onChange={(e) => setFormData({ ...formData, barcode_no: e.target.value })}
-                        placeholder="e.g., 431574"
-                        required
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="design">Design</Label>
-                      <Input
-                        id="design"
-                        value={formData.design}
-                        onChange={(e) => setFormData({ ...formData, design: e.target.value })}
-                        placeholder="e.g., 1-MATERIAL, BLAZER, PANT"
-                        required
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="category">Category</Label>
-                      <Select 
-                        value={formData.category} 
+                      <Label htmlFor="category" className="text-white/90 font-medium">
+                        Category *
+                      </Label>
+                      <Select
+                        value={formData.category}
                         onValueChange={(value) => setFormData({ ...formData, category: value })}
                       >
-                        <SelectTrigger>
+                        <SelectTrigger className="border-white/20 bg-white/5 text-white focus:border-yellow-500 focus:ring-yellow-500/20">
                           <SelectValue placeholder="Select category" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="bg-gray-900 border-white/20">
                           {categories.map((category) => (
-                            <SelectItem key={category} value={category}>
+                            <SelectItem key={category} value={category} className="text-white hover:bg-yellow-500/20">
                               {category}
                             </SelectItem>
                           ))}
@@ -346,40 +482,55 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
                       </Select>
                     </div>
 
+                    {/* Price */}
                     <div className="space-y-2">
-                      <Label htmlFor="status">Status</Label>
-                      <Select 
-                        value={formData.status} 
-                        onValueChange={(value) => setFormData({ ...formData, status: value })}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select status" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {availableStatuses.map((status) => (
-                            <SelectItem key={status} value={status}>
-                              {status}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <Label htmlFor="price" className="text-white/90 font-medium">
+                        Price (₹) *
+                      </Label>
+                      <Input
+                        id="price"
+                        type="number"
+                        value={formData.price}
+                        onChange={(e) => setFormData({ ...formData, price: parseFloat(e.target.value) || 0 })}
+                        className="border-white/20 bg-white/5 text-white placeholder:text-white/50 focus:border-yellow-500 focus:ring-yellow-500/20"
+                        placeholder="0.00"
+                        required
+                      />
                     </div>
 
+                    {/* Original Price */}
                     <div className="space-y-2">
-                      <Label htmlFor="section">Section Placement</Label>
-                      <Select 
-                        value={formData.section} 
+                      <Label htmlFor="original_price" className="text-white/90 font-medium">
+                        Original Price (₹)
+                      </Label>
+                      <Input
+                        id="original_price"
+                        type="number"
+                        value={formData.original_price}
+                        onChange={(e) => setFormData({ ...formData, original_price: parseFloat(e.target.value) || 0 })}
+                        className="border-white/20 bg-white/5 text-white placeholder:text-white/50 focus:border-yellow-500 focus:ring-yellow-500/20"
+                        placeholder="0.00"
+                      />
+                    </div>
+
+                    {/* Section Placement */}
+                    <div className="space-y-2">
+                      <Label htmlFor="section" className="text-white/90 font-medium">
+                        Section Placement
+                      </Label>
+                      <Select
+                        value={formData.section}
                         onValueChange={(value) => setFormData({ ...formData, section: value })}
                       >
-                        <SelectTrigger>
+                        <SelectTrigger className="border-white/20 bg-white/5 text-white focus:border-yellow-500 focus:ring-yellow-500/20">
                           <SelectValue placeholder="Select section" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="bg-gray-900 border-white/20">
                           {sections.map((section) => (
-                            <SelectItem key={section.value} value={section.value}>
+                            <SelectItem key={section.value} value={section.value} className="text-white hover:bg-yellow-500/20">
                               <div>
                                 <div className="font-medium">{section.label}</div>
-                                <div className="text-xs text-gray-500">{section.description}</div>
+                                <div className="text-xs text-gray-400">{section.description}</div>
                               </div>
                             </SelectItem>
                           ))}
@@ -387,505 +538,359 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
                       </Select>
                     </div>
 
+                    {/* Status */}
                     <div className="space-y-2">
-                      <Label htmlFor="price">Price (₹)</Label>
-                      <Input
-                        id="price"
-                        type="number"
-                        value={formData.price}
-                        onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })}
-                        placeholder="0"
-                        required
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="original_price">Original Price (₹)</Label>
-                      <Input
-                        id="original_price"
-                        type="number"
-                        value={formData.original_price}
-                        onChange={(e) => setFormData({ ...formData, original_price: Number(e.target.value) })}
-                        placeholder="0"
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="image_url">Image URL</Label>
-                      <Input
-                        id="image_url"
-                        value={formData.image_url}
-                        onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
-                        placeholder="https://example.com/image.jpg"
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label>Product Flags</Label>
-                      <div className="flex gap-4">
-                        <label className="flex items-center space-x-2">
-                          <input
-                            type="checkbox"
-                            checked={formData.is_new}
-                            onChange={(e) => setFormData({ ...formData, is_new: e.target.checked })}
-                          />
-                          <span>New Product</span>
-                        </label>
-                        <label className="flex items-center space-x-2">
-                          <input
-                            type="checkbox"
-                            checked={formData.is_best_seller}
-                            onChange={(e) => setFormData({ ...formData, is_best_seller: e.target.checked })}
-                          />
-                          <span>Best Seller</span>
-                        </label>
-                      </div>
+                      <Label htmlFor="status" className="text-white/90 font-medium">
+                        Status
+                      </Label>
+                      <Select
+                        value={formData.status}
+                        onValueChange={(value) => setFormData({ ...formData, status: value })}
+                      >
+                        <SelectTrigger className="border-white/20 bg-white/5 text-white focus:border-yellow-500 focus:ring-yellow-500/20">
+                          <SelectValue placeholder="Select status" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-gray-900 border-white/20">
+                          {availableStatuses.map((status) => (
+                            <SelectItem key={status} value={status} className="text-white hover:bg-yellow-500/20">
+                              {status}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </div>
                   </div>
 
+                  {/* Description */}
                   <div className="space-y-2">
-                    <Label htmlFor="description">Description</Label>
+                    <Label htmlFor="description" className="text-white/90 font-medium">
+                      Description
+                    </Label>
                     <Textarea
                       id="description"
                       value={formData.description}
                       onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                      placeholder="Enter product description"
-                      rows={3}
+                      className="border-white/20 bg-white/5 text-white placeholder:text-white/50 focus:border-yellow-500 focus:ring-yellow-500/20 min-h-[100px]"
+                      placeholder="Enter product description..."
                     />
                   </div>
 
+                  {/* Image URL */}
                   <div className="space-y-2">
-                    <Label>Available Sizes</Label>
-                    <div className="flex flex-wrap gap-2">
-                      {availableSizes.map((size) => (
-                        <Button
-                          key={size}
-                          type="button"
-                          variant={formData.sizes?.includes(size) ? "default" : "outline"}
-                          size="sm"
-                          onClick={() => toggleSize(size)}
-                        >
-                          {size}
-                        </Button>
-                      ))}
+                    <Label htmlFor="image_url" className="text-white/90 font-medium">
+                      Image URL
+                    </Label>
+                    <Input
+                      id="image_url"
+                      value={formData.image_url}
+                      onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
+                      className="border-white/20 bg-white/5 text-white placeholder:text-white/50 focus:border-yellow-500 focus:ring-yellow-500/20"
+                      placeholder="https://example.com/image.jpg"
+                    />
+                  </div>
+
+                  {/* Colors and Sizes */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <Label className="text-white/90 font-medium">Colors</Label>
+                      <div className="flex flex-wrap gap-2">
+                        {availableColors.map((color) => (
+                          <button
+                            key={color}
+                            type="button"
+                            onClick={() => {
+                              const newColors = formData.colors?.includes(color)
+                                ? formData.colors.filter(c => c !== color)
+                                : [...(formData.colors || []), color];
+                              setFormData({ ...formData, colors: newColors });
+                            }}
+                            className={`px-3 py-1 rounded-full text-xs font-medium transition-all duration-200 ${
+                              formData.colors?.includes(color)
+                                ? 'bg-yellow-500 text-black'
+                                : 'bg-white/10 text-white/70 hover:bg-white/20'
+                            }`}
+                          >
+                            {color}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label className="text-white/90 font-medium">Sizes</Label>
+                      <div className="flex flex-wrap gap-2">
+                        {availableSizes.map((size) => (
+                          <button
+                            key={size}
+                            type="button"
+                            onClick={() => {
+                              const newSizes = formData.sizes?.includes(size)
+                                ? formData.sizes.filter(s => s !== size)
+                                : [...(formData.sizes || []), size];
+                              setFormData({ ...formData, sizes: newSizes });
+                            }}
+                            className={`px-3 py-1 rounded-full text-xs font-medium transition-all duration-200 ${
+                              formData.sizes?.includes(size)
+                                ? 'bg-yellow-500 text-black'
+                                : 'bg-white/10 text-white/70 hover:bg-white/20'
+                            }`}
+                          >
+                            {size}
+                          </button>
+                        ))}
+                      </div>
                     </div>
                   </div>
 
-                  <div className="space-y-2">
-                    <Label>Available Colors</Label>
-                    <div className="flex flex-wrap gap-2">
-                      {availableColors.map((color) => (
-                        <Button
-                          key={color}
-                          type="button"
-                          variant={formData.colors?.includes(color) ? "default" : "outline"}
-                          size="sm"
-                          onClick={() => toggleColor(color)}
-                        >
-                          {color}
-                        </Button>
-                      ))}
+                  {/* Additional Fields */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <Label htmlFor="product_code" className="text-white/90 font-medium">
+                        Product Code
+                      </Label>
+                      <Input
+                        id="product_code"
+                        value={formData.product_code}
+                        onChange={(e) => setFormData({ ...formData, product_code: e.target.value })}
+                        className="border-white/20 bg-white/5 text-white placeholder:text-white/50 focus:border-yellow-500 focus:ring-yellow-500/20"
+                        placeholder="Enter product code"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="barcode_no" className="text-white/90 font-medium">
+                        Barcode Number
+                      </Label>
+                      <Input
+                        id="barcode_no"
+                        value={formData.barcode_no}
+                        onChange={(e) => setFormData({ ...formData, barcode_no: e.target.value })}
+                        className="border-white/20 bg-white/5 text-white placeholder:text-white/50 focus:border-yellow-500 focus:ring-yellow-500/20"
+                        placeholder="Enter barcode number"
+                      />
                     </div>
                   </div>
 
-                                     <div className="flex gap-2">
-                     <Button 
-                       onClick={handleAddProduct}
-                       disabled={!formData.name || !formData.category || !formData.product_code || !formData.barcode_no || !formData.design || !formData.price}
-                     >
-                       <Save className="h-4 w-4 mr-2" />
-                       Add Product
-                     </Button>
-                     <Button 
-                       variant="outline" 
-                       onClick={() => {
-                         setShowAddForm(false);
-                         setEditingProduct(null);
-                         setEditingProductId(null);
-                         resetForm();
-                       }}
-                     >
-                       <X className="h-4 w-4 mr-2" />
-                       Cancel
-                     </Button>
-                   </div>
+                  {/* Design */}
+                  <div className="space-y-2">
+                    <Label htmlFor="design" className="text-white/90 font-medium">
+                      Design
+                    </Label>
+                    <Input
+                      id="design"
+                      value={formData.design}
+                      onChange={(e) => setFormData({ ...formData, design: e.target.value })}
+                      className="border-white/20 bg-white/5 text-white placeholder:text-white/50 focus:border-yellow-500 focus:ring-yellow-500/20"
+                      placeholder="Enter design details"
+                    />
+                  </div>
+
+                  {/* Checkboxes */}
+                  <div className="flex space-x-6">
+                    <label className="flex items-center space-x-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={formData.is_new}
+                        onChange={(e) => setFormData({ ...formData, is_new: e.target.checked })}
+                        className="w-4 h-4 text-yellow-500 bg-white/5 border-white/20 rounded focus:ring-yellow-500/20"
+                      />
+                      <span className="text-white/90 text-sm">New Arrival</span>
+                    </label>
+                    <label className="flex items-center space-x-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={formData.is_best_seller}
+                        onChange={(e) => setFormData({ ...formData, is_best_seller: e.target.checked })}
+                        className="w-4 h-4 text-yellow-500 bg-white/5 border-white/20 rounded focus:ring-yellow-500/20"
+                      />
+                      <span className="text-white/90 text-sm">Best Seller</span>
+                    </label>
+                  </div>
+
+                  {/* Form Actions */}
+                  <div className="flex justify-end space-x-4 pt-4">
+                    <Button
+                      type="button"
+                      onClick={resetForm}
+                      variant="outline"
+                      className="px-6 py-2.5 text-sm font-medium transition-all duration-300 border hover:scale-105 hover:shadow-lg"
+                      style={{
+                        borderColor: '#C08E5D',
+                        backgroundColor: 'transparent',
+                        color: '#F8F7F3'
+                      }}
+                    >
+                      <X className="mr-2 h-4 w-4" />
+                      Cancel
+                    </Button>
+                    <Button
+                      type="submit"
+                      className="px-6 py-2.5 text-sm font-medium transition-all duration-300 border hover:scale-105 hover:shadow-lg"
+                      style={{
+                        borderColor: '#C08E5D',
+                        backgroundColor: '#D4AF37',
+                        color: '#0B0F14'
+                      }}
+                    >
+                      <Save className="mr-2 h-4 w-4" />
+                      {editingProductId ? "Update Product" : "Add Product"}
+                    </Button>
+                  </div>
+                </form>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Products List */}
+          <div className="space-y-6">
+            <h3 
+              className="text-xl font-['Italiana'] tracking-wide"
+              style={{ color: '#F8F7F3' }}
+            >
+              All Products ({products.length})
+            </h3>
+            
+            {isLoading ? (
+              <div className="flex justify-center py-20">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2" style={{ borderColor: '#D4AF37' }}></div>
+              </div>
+            ) : products.length === 0 ? (
+              <Card 
+                className="border-0 text-center py-20"
+                style={{
+                  backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                  border: '1px solid rgba(212, 175, 55, 0.2)',
+                  backdropFilter: 'blur(20px)'
+                }}
+              >
+                <CardContent>
+                  <Package className="w-16 h-16 mx-auto mb-4 text-white/40" />
+                  <h4 className="text-lg font-medium text-white/70 mb-2">No products found</h4>
+                  <p className="text-white/50">Start by adding your first product to the collection.</p>
                 </CardContent>
               </Card>
+            ) : (
+              <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                {products.map((product) => (
+                  <Card 
+                    key={product.id}
+                    className="border-0 transition-all duration-300 hover:scale-105 hover:shadow-xl"
+                    style={{
+                      backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                      border: '1px solid rgba(212, 175, 55, 0.2)',
+                      backdropFilter: 'blur(20px)'
+                    }}
+                  >
+                    <CardContent className="p-6">
+                      <div className="space-y-4">
+                        {/* Product Image */}
+                        <div className="aspect-square rounded-lg overflow-hidden bg-white/5">
+                          {product.image_url ? (
+                            <img
+                              src={product.image_url}
+                              alt={product.name}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center">
+                              <Package className="w-12 h-12 text-white/20" />
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Product Info */}
+                        <div className="space-y-3">
+                          <div>
+                            <h4 className="font-medium text-white text-lg mb-1">{product.name}</h4>
+                            <p className="text-white/70 text-sm">{product.category}</p>
+                          </div>
+
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <p className="text-yellow-500 font-bold text-lg">₹{product.price}</p>
+                              {product.original_price && product.original_price > product.price && (
+                                <p className="text-white/50 text-sm line-through">₹{product.original_price}</p>
+                              )}
+                            </div>
+                            <Badge 
+                              className="font-medium"
+                              style={{
+                                backgroundColor: product.status === 'IN STOCK' ? '#10B981' : '#EF4444',
+                                color: 'white'
+                              }}
+                            >
+                              {product.status}
+                            </Badge>
+                          </div>
+
+                          {/* Section Badge */}
+                          <div>
+                            <span className="text-white/60 text-sm">Section: </span>
+                            <Badge variant="outline" className="ml-1">
+                              {sections.find(s => s.value === product.section)?.label || product.section || 'N/A'}
+                            </Badge>
+                          </div>
+
+                          {/* Tags */}
+                          <div className="flex flex-wrap gap-2">
+                            {product.is_new && (
+                              <Badge 
+                                className="text-xs"
+                                style={{
+                                  backgroundColor: '#3B82F6',
+                                  color: 'white'
+                                }}
+                              >
+                                New
+                              </Badge>
+                            )}
+                            {product.is_best_seller && (
+                              <Badge 
+                                className="text-xs"
+                                style={{
+                                  backgroundColor: '#F59E0B',
+                                  color: 'white'
+                                }}
+                              >
+                                Best Seller
+                              </Badge>
+                            )}
+                          </div>
+
+                          {/* Actions */}
+                          <div className="flex space-x-2 pt-2">
+                            <Button
+                              onClick={() => startEdit(product)}
+                              size="sm"
+                              className="flex-1 text-xs font-medium transition-all duration-200 hover:scale-105"
+                              style={{
+                                borderColor: '#C08E5D',
+                                backgroundColor: 'transparent',
+                                color: '#F8F7F3'
+                              }}
+                            >
+                              <Edit className="mr-1 h-3 w-3" />
+                              Edit
+                            </Button>
+                            <Button
+                              onClick={() => handleDelete(product.id)}
+                              size="sm"
+                              variant="destructive"
+                              className="flex-1 text-xs font-medium transition-all duration-200 hover:scale-105"
+                            >
+                              <Trash2 className="mr-1 h-3 w-3" />
+                              Delete
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
             )}
-
-                         {/* Products List */}
-             <div className="grid gap-4">
-               {products.map((product) => (
-                 <div key={product.id}>
-                   <Card>
-                     <CardContent className="p-6">
-                       <div className="flex justify-between items-start">
-                         <div className="flex-1">
-                           <div className="flex items-center gap-2 mb-2">
-                             <h3 className="text-lg font-semibold">{product.name}</h3>
-                             {product.is_new && <Badge variant="secondary">New</Badge>}
-                             {product.is_best_seller && <Badge variant="default">Best Seller</Badge>}
-                             <Badge variant={product.status === 'IN STOCK' ? 'default' : 'destructive'}>
-                               {product.status}
-                             </Badge>
-                           </div>
-                           <div className="grid grid-cols-2 gap-2 text-sm mb-2">
-                             <div>
-                               <span className="font-medium">Code:</span> {product.product_code || 'N/A'}
-                             </div>
-                             <div>
-                               <span className="font-medium">Barcode:</span> {product.barcode_no || 'N/A'}
-                             </div>
-                             <div>
-                               <span className="font-medium">Design:</span> {product.design || 'N/A'}
-                             </div>
-                             <div>
-                               <span className="font-medium">Category:</span> {product.category}
-                             </div>
-                             <div>
-                               <span className="font-medium">Section:</span> 
-                               <Badge variant="outline" className="ml-1">
-                                 {sections.find(s => s.value === product.section)?.label || product.section || 'N/A'}
-                               </Badge>
-                             </div>
-                           </div>
-                           <p className="text-sm text-gray-500 mb-3">{product.description}</p>
-                           <div className="flex items-center gap-4 text-sm">
-                             <span className="font-semibold">₹{product.price.toLocaleString()}</span>
-                             {product.original_price && product.original_price > product.price && (
-                               <span className="text-gray-500 line-through">₹{product.original_price.toLocaleString()}</span>
-                             )}
-                           </div>
-                           <div className="mt-2 flex flex-wrap gap-1">
-                             {product.sizes?.map((size) => (
-                               <Badge key={size} variant="outline" className="text-xs">
-                                 {size}
-                               </Badge>
-                             ))}
-                           </div>
-                         </div>
-                         <div className="flex items-center gap-2 ml-4">
-                           {product.image_url && (
-                             <img 
-                               src={product.image_url} 
-                               alt={product.name}
-                               className="w-16 h-16 object-cover rounded"
-                             />
-                           )}
-                           <div className="flex flex-col gap-2">
-                             <Button
-                               size="sm"
-                               variant="outline"
-                               onClick={() => startEdit(product)}
-                             >
-                               <Edit className="h-4 w-4" />
-                             </Button>
-                             <Button
-                               size="sm"
-                               variant="destructive"
-                               onClick={() => handleDeleteProduct(product.id)}
-                             >
-                               <Trash2 className="h-4 w-4" />
-                             </Button>
-                           </div>
-                         </div>
-                       </div>
-                     </CardContent>
-                   </Card>
-
-                   {/* Edit Form - Shows below the product when editing */}
-                   {editingProductId === product.id && (
-                     <Card className="mt-4 border-l-4 border-l-blue-500">
-                       <CardHeader>
-                         <CardTitle className="text-blue-600">Edit Product: {product.name}</CardTitle>
-                       </CardHeader>
-                       <CardContent className="space-y-4">
-                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                           <div className="space-y-2">
-                             <Label htmlFor={`edit-name-${product.id}`}>Product Name</Label>
-                             <Input
-                               id={`edit-name-${product.id}`}
-                               value={formData.name}
-                               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                               placeholder="Enter product name"
-                               required
-                             />
-                           </div>
-
-                           <div className="space-y-2">
-                             <Label htmlFor={`edit-product-code-${product.id}`}>Product Code</Label>
-                             <Input
-                               id={`edit-product-code-${product.id}`}
-                               value={formData.product_code}
-                               onChange={(e) => setFormData({ ...formData, product_code: e.target.value })}
-                               placeholder="e.g., B3SKU001"
-                               required
-                             />
-                           </div>
-
-                           <div className="space-y-2">
-                             <Label htmlFor={`edit-barcode-no-${product.id}`}>Barcode Number</Label>
-                             <Input
-                               id={`edit-barcode-no-${product.id}`}
-                               value={formData.barcode_no}
-                               onChange={(e) => setFormData({ ...formData, barcode_no: e.target.value })}
-                               placeholder="e.g., 431574"
-                               required
-                             />
-                           </div>
-
-                           <div className="space-y-2">
-                             <Label htmlFor={`edit-design-${product.id}`}>Design</Label>
-                             <Input
-                               id={`edit-design-${product.id}`}
-                               value={formData.design}
-                               onChange={(e) => setFormData({ ...formData, design: e.target.value })}
-                               placeholder="e.g., 1-MATERIAL, BLAZER, PANT"
-                               required
-                             />
-                           </div>
-
-                           <div className="space-y-2">
-                             <Label htmlFor={`edit-category-${product.id}`}>Category</Label>
-                             <Select 
-                               value={formData.category} 
-                               onValueChange={(value) => setFormData({ ...formData, category: value })}
-                             >
-                               <SelectTrigger>
-                                 <SelectValue placeholder="Select category" />
-                               </SelectTrigger>
-                               <SelectContent>
-                                 {categories.map((category) => (
-                                   <SelectItem key={category} value={category}>
-                                     {category}
-                                   </SelectItem>
-                                 ))}
-                               </SelectContent>
-                             </Select>
-                           </div>
-
-                           <div className="space-y-2">
-                             <Label htmlFor={`edit-status-${product.id}`}>Status</Label>
-                             <Select 
-                               value={formData.status} 
-                               onValueChange={(value) => setFormData({ ...formData, status: value })}
-                             >
-                               <SelectTrigger>
-                                 <SelectValue placeholder="Select status" />
-                               </SelectTrigger>
-                               <SelectContent>
-                                 {availableStatuses.map((status) => (
-                                   <SelectItem key={status} value={status}>
-                                     {status}
-                                   </SelectItem>
-                                 ))}
-                               </SelectContent>
-                             </Select>
-                           </div>
-
-                           <div className="space-y-2">
-                             <Label htmlFor={`edit-section-${product.id}`}>Section Placement</Label>
-                             <Select 
-                               value={formData.section} 
-                               onValueChange={(value) => setFormData({ ...formData, section: value })}
-                             >
-                               <SelectTrigger>
-                                 <SelectValue placeholder="Select section" />
-                               </SelectTrigger>
-                               <SelectContent>
-                                 {sections.map((section) => (
-                                   <SelectItem key={section.value} value={section.value}>
-                                     <div>
-                                       <div className="font-medium">{section.label}</div>
-                                       <div className="text-xs text-gray-500">{section.description}</div>
-                                     </div>
-                                   </SelectItem>
-                                 ))}
-                               </SelectContent>
-                             </Select>
-                           </div>
-
-                           <div className="space-y-2">
-                             <Label htmlFor={`edit-price-${product.id}`}>Price (₹)</Label>
-                             <Input
-                               id={`edit-price-${product.id}`}
-                               type="number"
-                               value={formData.price}
-                               onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })}
-                               placeholder="0"
-                               required
-                             />
-                           </div>
-
-                           <div className="space-y-2">
-                             <Label htmlFor={`edit-original-price-${product.id}`}>Original Price (₹)</Label>
-                             <Input
-                               id={`edit-original-price-${product.id}`}
-                               type="number"
-                               value={formData.original_price}
-                               onChange={(e) => setFormData({ ...formData, original_price: Number(e.target.value) })}
-                               placeholder="0"
-                             />
-                           </div>
-
-                           <div className="space-y-2">
-                             <Label htmlFor={`edit-image-url-${product.id}`}>Image URL</Label>
-                             <Input
-                               id={`edit-image-url-${product.id}`}
-                               value={formData.image_url}
-                               onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
-                               placeholder="https://example.com/image.jpg"
-                             />
-                           </div>
-
-                           <div className="space-y-2">
-                             <Label>Product Flags</Label>
-                             <div className="flex gap-4">
-                               <label className="flex items-center space-x-2">
-                                 <input
-                                   type="checkbox"
-                                   checked={formData.is_new}
-                                   onChange={(e) => setFormData({ ...formData, is_new: e.target.checked })}
-                                 />
-                                 <span>New Product</span>
-                               </label>
-                               <label className="flex items-center space-x-2">
-                                 <input
-                                   type="checkbox"
-                                   checked={formData.is_best_seller}
-                                   onChange={(e) => setFormData({ ...formData, is_best_seller: e.target.checked })}
-                                 />
-                                 <span>Best Seller</span>
-                               </label>
-                             </div>
-                           </div>
-                         </div>
-
-                         <div className="space-y-2">
-                           <Label htmlFor={`edit-description-${product.id}`}>Description</Label>
-                           <Textarea
-                             id={`edit-description-${product.id}`}
-                             value={formData.description}
-                             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                             placeholder="Enter product description"
-                             rows={3}
-                           />
-                         </div>
-
-                         <div className="space-y-2">
-                           <Label>Available Sizes</Label>
-                           <div className="flex flex-wrap gap-2">
-                             {availableSizes.map((size) => (
-                               <Button
-                                 key={size}
-                                 type="button"
-                                 variant={formData.sizes?.includes(size) ? "default" : "outline"}
-                                 size="sm"
-                                 onClick={() => toggleSize(size)}
-                               >
-                                 {size}
-                               </Button>
-                             ))}
-                           </div>
-                         </div>
-
-                         <div className="space-y-2">
-                           <Label>Available Colors</Label>
-                           <div className="flex flex-wrap gap-2">
-                             {availableColors.map((color) => (
-                               <Button
-                                 key={color}
-                                 type="button"
-                                 variant={formData.colors?.includes(color) ? "default" : "outline"}
-                                 size="sm"
-                                 onClick={() => toggleColor(color)}
-                               >
-                                 {color}
-                               </Button>
-                             ))}
-                           </div>
-                         </div>
-
-                         <div className="flex gap-2">
-                           <Button 
-                             onClick={handleEditProduct}
-                             disabled={!formData.name || !formData.category || !formData.product_code || !formData.barcode_no || !formData.design || !formData.price}
-                           >
-                             <Save className="h-4 w-4 mr-2" />
-                             Update Product
-                           </Button>
-                           <Button 
-                             variant="outline" 
-                             onClick={() => {
-                               setEditingProduct(null);
-                               setEditingProductId(null);
-                               resetForm();
-                             }}
-                           >
-                             <X className="h-4 w-4 mr-2" />
-                             Cancel
-                           </Button>
-                         </div>
-                       </CardContent>
-                     </Card>
-                   )}
-                 </div>
-               ))}
-             </div>
-          </TabsContent>
-
-          <TabsContent value="analytics" className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-              <Card>
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-gray-600">Total Products</p>
-                      <p className="text-2xl font-bold">{products.length}</p>
-                    </div>
-                    <Package className="h-8 w-8 text-blue-600" />
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-gray-600">New Products</p>
-                      <p className="text-2xl font-bold">{products.filter(p => p.is_new).length}</p>
-                    </div>
-                    <TrendingUp className="h-8 w-8 text-green-600" />
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-gray-600">Best Sellers</p>
-                      <p className="text-2xl font-bold">{products.filter(p => p.is_best_seller).length}</p>
-                    </div>
-                    <ShoppingCart className="h-8 w-8 text-purple-600" />
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-gray-600">Categories</p>
-                      <p className="text-2xl font-bold">{new Set(products.map(p => p.category)).size}</p>
-                    </div>
-                    <Users className="h-8 w-8 text-orange-600" />
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-        </Tabs>
+          </div>
+        </div>
       </div>
     </div>
   );

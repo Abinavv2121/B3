@@ -16,7 +16,7 @@ const Footer = () => {
     <footer className="relative overflow-hidden">
       {/* Top fade transition from previous section */}
       <div 
-        className="absolute top-0 left-0 right-0 h-32 z-20 pointer-events-none"
+        className="absolute top-0 left-0 right-0 h-16 z-20 pointer-events-none"
         style={{
           background: 'linear-gradient(180deg, rgba(26,26,26,0.8) 0%, rgba(26,26,26,0.6) 50%, rgba(26,26,26,0) 100%)'
         }}
@@ -37,94 +37,94 @@ const Footer = () => {
         
         <div className="relative z-10">
           {/* Main Footer Content */}
-          <div className="w-full px-4 lg:px-8 py-16 lg:py-20">
+          <div className="w-full px-4 lg:px-8 py-8 lg:py-12">
             <div className="max-w-7xl mx-auto">
-                              <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 lg:gap-12">
+              <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-8">
                 
                 {/* Brand Section */}
-                <div className="lg:col-span-1 space-y-6">
+                <div className="lg:col-span-1 space-y-4">
                   <div className="space-y-3">
                     <div className="flex items-center space-x-3">
                       <img 
                         src="/src/assets/brand-logo.png" 
                         alt="B3 Fashion Studio Logo" 
-                        className="h-20 w-auto"
+                        className="h-16 w-auto"
                       />
                       <div className="flex items-center space-x-2">
-                        <Crown className="w-6 h-6 text-yellow-500" />
-                        <span className="text-sm font-medium tracking-widest uppercase text-yellow-500">
+                        <Crown className="w-5 h-5 text-yellow-500" />
+                        <span className="text-xs font-medium tracking-widest uppercase text-yellow-500">
                           Premium Ethnic Wear
                         </span>
                       </div>
                     </div>
                     
-                    <p className="text-white/80 leading-relaxed font-light tracking-wide max-w-sm">
+                    <p className="text-white/80 leading-relaxed font-light tracking-wide max-w-sm text-sm">
                       Crafting timeless elegance through premium ethnic wear. Every piece tells a story of tradition, luxury, and contemporary sophistication.
                     </p>
                   </div>
 
                   {/* Contact Info */}
                   <div className="space-y-3">
-                    <div className="flex items-center space-x-4">
+                    <div className="flex items-center space-x-3">
                       <div 
-                        className="w-12 h-12 rounded-full flex items-center justify-center"
+                        className="w-10 h-10 rounded-full flex items-center justify-center"
                         style={{
                           backgroundColor: '#D4AF37',
                           border: '2px solid #B8860B'
                         }}
                       >
-                        <Phone className="w-5 h-5 text-black" />
+                        <Phone className="w-4 h-4 text-black" />
                       </div>
                       <div>
-                        <p className="text-white font-medium">+91 98765 43210</p>
-                        <p className="text-white/60 text-sm">24/7 Support</p>
+                        <p className="text-white font-medium text-sm">+91 98765 43210</p>
+                        <p className="text-white/60 text-xs">24/7 Support</p>
                       </div>
                     </div>
                     
-                    <div className="flex items-center space-x-4">
+                    <div className="flex items-center space-x-3">
                       <div 
-                        className="w-12 h-12 rounded-full flex items-center justify-center"
+                        className="w-10 h-10 rounded-full flex items-center justify-center"
                         style={{
                           backgroundColor: '#D4AF37',
                           border: '2px solid #B8860B'
                         }}
                       >
-                        <Mail className="w-5 h-5 text-black" />
+                        <Mail className="w-4 h-4 text-black" />
                       </div>
                       <div>
-                        <p className="text-white font-medium">hello@aval.com</p>
-                        <p className="text-white/60 text-sm">Email Support</p>
+                        <p className="text-white font-medium text-sm">hello@aval.com</p>
+                        <p className="text-white/60 text-xs">Email Support</p>
                       </div>
                     </div>
                     
-                    <div className="flex items-center space-x-4">
+                    <div className="flex items-center space-x-3">
                       <div 
-                        className="w-12 h-12 rounded-full flex items-center justify-center"
+                        className="w-10 h-10 rounded-full flex items-center justify-center"
                         style={{
                           backgroundColor: '#D4AF37',
                           border: '2px solid #B8860B'
                         }}
                       >
-                        <MapPin className="w-5 h-5 text-black" />
+                        <MapPin className="w-4 h-4 text-black" />
                       </div>
                       <div>
                         <a 
                           href="https://maps.google.com/?q=14,+285,+Purasaivakkam+High+Rd,+Perumalpet,+Purasaiwakkam,+Chennai,+Tamil+Nadu+600007"
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-white font-medium hover:text-yellow-400 transition-colors duration-300 cursor-pointer"
+                          className="text-white font-medium hover:text-yellow-400 transition-colors duration-300 cursor-pointer text-sm"
                         >
                           Chennai, Tamil Nadu
                         </a>
-                        <p className="text-white/60 text-sm">Head Office</p>
+                        <p className="text-white/60 text-xs">Head Office</p>
                       </div>
                     </div>
                   </div>
 
                   {/* Social Links */}
                   <div className="space-y-3">
-                    <h4 className="text-white font-medium tracking-wider">Follow Us</h4>
-                    <div className="flex space-x-4">
+                    <h4 className="text-white font-medium tracking-wider text-sm">Follow Us</h4>
+                    <div className="flex space-x-3">
                       {[
                         { icon: Facebook, href: "#", label: "Facebook" },
                         { icon: Twitter, href: "#", label: "Twitter" },
@@ -142,7 +142,7 @@ const Footer = () => {
                         <a
                           key={social.label}
                           href={social.href}
-                          className="w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110"
+                          className="w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110"
                           style={{
                             backgroundColor: 'rgba(255, 255, 255, 0.1)',
                             border: '1px solid rgba(255, 255, 255, 0.2)'
@@ -158,7 +158,7 @@ const Footer = () => {
                             e.currentTarget.style.boxShadow = 'none';
                           }}
                         >
-                          <social.icon className="w-5 h-5 text-white" />
+                          <social.icon className="w-4 h-4 text-white" />
                         </a>
                       ))}
                     </div>
@@ -166,14 +166,14 @@ const Footer = () => {
                 </div>
 
                 {/* Shop Links */}
-                <div className="space-y-6">
+                <div className="space-y-4">
                   <h4 
-                    className="text-xl font-['Playfair_Display'] font-medium tracking-wider"
+                    className="text-lg font-['Playfair_Display'] font-medium tracking-wider"
                     style={{ color: '#D4AF37' }}
                   >
                     Shop
                   </h4>
-                  <div className="space-y-4">
+                  <div className="space-y-3">
                     {[
                       { name: "Sarees", href: "/saree" },
                       { name: "Anarkalis", href: "/anarkali" },
@@ -185,7 +185,7 @@ const Footer = () => {
                       <button
                         key={link.name}
                         onClick={() => handlePageNavigation(link.href)}
-                        className="block text-white/80 hover:text-white transition-all duration-300 font-light tracking-wide font-['Italiana', serif] text-left w-full"
+                        className="block text-white/80 hover:text-white transition-all duration-300 font-light tracking-wide font-['Italiana', serif] text-left w-full text-sm"
                       >
                         {link.name}
                       </button>
@@ -194,9 +194,9 @@ const Footer = () => {
                 </div>
 
                 {/* Customer Care */}
-                <div className="space-y-6">
+                <div className="space-y-4">
                   <h4 
-                    className="text-xl font-['Playfair_Display'] font-medium tracking-wider"
+                    className="text-lg font-['Playfair_Display'] font-medium tracking-wider"
                     style={{ color: '#D4AF37' }}
                   >
                     Customer Care
@@ -211,7 +211,7 @@ const Footer = () => {
                       <button
                         key={link.name}
                         onClick={() => handlePageNavigation(link.href)}
-                        className="block text-white/80 hover:text-white transition-all duration-300 font-light tracking-wide font-['Italiana', serif] text-left w-full"
+                        className="block text-white/80 hover:text-white transition-all duration-300 font-light tracking-wide font-['Italiana', serif] text-left w-full text-sm"
                       >
                         {link.name}
                       </button>
@@ -220,9 +220,9 @@ const Footer = () => {
                 </div>
 
                 {/* Legal */}
-                <div className="space-y-6">
+                <div className="space-y-4">
                   <h4 
-                    className="text-xl font-['Playfair_Display'] font-medium tracking-wider"
+                    className="text-lg font-['Playfair_Display'] font-medium tracking-wider"
                     style={{ color: '#D4AF37' }}
                   >
                     Legal
@@ -237,7 +237,7 @@ const Footer = () => {
                       <button
                         key={link.name}
                         onClick={() => handlePageNavigation(link.href)}
-                        className="block text-white/80 hover:text-white transition-all duration-300 font-light tracking-wide font-['Italiana', serif] text-left w-full"
+                        className="block text-white/80 hover:text-white transition-all duration-300 font-light tracking-wide font-['Italiana', serif] text-left w-full text-sm"
                       >
                         {link.name}
                       </button>
@@ -245,8 +245,6 @@ const Footer = () => {
                   </div>
                 </div>
               </div>
-
-
             </div>
           </div>
 
@@ -257,27 +255,27 @@ const Footer = () => {
               backgroundColor: 'rgba(0, 0, 0, 0.8)'
             }}
           >
-            <div className="w-full px-4 lg:px-8 py-6">
+            <div className="w-full px-4 lg:px-8 py-4">
               <div className="max-w-7xl mx-auto">
-                <div className="flex flex-col lg:flex-row items-center justify-between space-y-4 lg:space-y-0">
+                <div className="flex flex-col lg:flex-row items-center justify-between space-y-3 lg:space-y-0">
                   <div className="text-center lg:text-left">
-                    <p className="text-white/60 font-light tracking-wide">
+                    <p className="text-white/60 font-light tracking-wide text-sm">
                       © 2024 Aval. All rights reserved. Crafted with elegance and precision.
                     </p>
                   </div>
                   
-                  <div className="flex items-center space-x-6 text-sm">
+                  <div className="flex items-center space-x-4 text-xs">
                     <span className="text-white/60">Made in India</span>
                     <span 
                       className="text-yellow-500"
-                      style={{ fontSize: '18px' }}
+                      style={{ fontSize: '16px' }}
                     >
                       •
                     </span>
                     <span className="text-white/60">Handcrafted Excellence</span>
                     <span 
                       className="text-yellow-500"
-                      style={{ fontSize: '18px' }}
+                      style={{ fontSize: '16px' }}
                     >
                       •
                     </span>
@@ -285,7 +283,7 @@ const Footer = () => {
                       to="/admin" 
                       className="text-white/60 hover:text-yellow-500 transition-colors duration-300 flex items-center space-x-2"
                     >
-                      <Crown className="w-4 h-4" />
+                      <Crown className="w-3 h-3" />
                       <span>Admin</span>
                     </Link>
                   </div>
