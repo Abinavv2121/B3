@@ -3,19 +3,88 @@ import { Crown, Star, Heart, Eye, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Link } from 'react-router-dom';
-import heroBridal from "@/assets/hero-bridal.jpg";
+import { supabaseUtils } from '@/hooks/useSupabase';
+import { Database } from '@/lib/supabase';
 
+type Product = Database['public']['Tables']['products']['Row'];
 
 const AutoScrollCarousel = () => {
-  // Product collection
-  const products = [
-    { id: 1, name: "Emerald Silk Lehenga", price: "₹45,999", originalPrice: "₹52,999", category: "Bridal Collection", rating: 4.9, reviews: 234, isFeatured: true, isNew: false, image: heroBridal },
-    { id: 2, name: "Royal Gold Saree", price: "₹28,999", originalPrice: "₹32,999", category: "Traditional Wear", rating: 4.8, reviews: 156, isFeatured: false, isNew: true, image: heroBridal },
-    { id: 3, name: "Burgundy Anarkali", price: "₹35,999", originalPrice: null, category: "Festive Wear", rating: 4.9, reviews: 89, isFeatured: true, isNew: false, image: heroBridal },
-    { id: 4, name: "Rose Pink Sharara", price: "₹22,999", originalPrice: "₹26,999", category: "Party Wear", rating: 4.7, reviews: 112, isFeatured: false, isNew: true, image: heroBridal },
-    { id: 5, name: "Navy Blue Gown", price: "₹38,999", originalPrice: null, category: "Evening Wear", rating: 4.8, reviews: 78, isFeatured: false, isNew: false, image: heroBridal },
-    { id: 6, name: "Cream Silk Ensemble", price: "₹42,999", originalPrice: "₹48,999", category: "Designer Collection", rating: 4.9, reviews: 203, isFeatured: true, isNew: false, image: heroBridal }
-  ];
+  const [products, setProducts] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    loadProducts();
+  }, []);
+
+  const loadProducts = async () => {
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabaseUtils.getCustomerFavourites();
+      if (error) {
+        setError(error.message);
+      } else {
+        setProducts(data || []);
+      }
+    } catch (err) {
+      setError("Failed to load products");
+    }
+    setIsLoading(false);
+  };
+
+  if (isLoading) {
+    return (
+      <section 
+        id="customer-favourites" 
+        className="w-full py-20 relative overflow-hidden starry-night-section"
+      >
+        <div className="absolute inset-0 starry-night-bg" />
+        <div className="absolute inset-0 twinkling-stars" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/30" />
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="text-center mb-12">
+            <h2 className="font-['Italiana'] text-4xl lg:text-5xl tracking-wide" 
+                style={{ 
+                  color: '#F8F7F3',
+                  textShadow: '0 2px 4px rgba(0,0,0,0.8)'
+                }}>
+              Customer <span style={{ color: '#D4AF37' }}>Favourites</span>
+            </h2>
+          </div>
+          <div className="flex justify-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section 
+        id="customer-favourites" 
+        className="w-full py-20 relative overflow-hidden starry-night-section"
+      >
+        <div className="absolute inset-0 starry-night-bg" />
+        <div className="absolute inset-0 twinkling-stars" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/30" />
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="text-center mb-12">
+            <h2 className="font-['Italiana'] text-4xl lg:text-5xl tracking-wide" 
+                style={{ 
+                  color: '#F8F7F3',
+                  textShadow: '0 2px 4px rgba(0,0,0,0.8)'
+                }}>
+              Customer <span style={{ color: '#D4AF37' }}>Favourites</span>
+            </h2>
+          </div>
+          <div className="text-center text-red-400">
+            <p>Error loading products: {error}</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section 
@@ -52,19 +121,19 @@ const AutoScrollCarousel = () => {
                 {/* Image container */}
                 <div className="relative aspect-[3/4] overflow-hidden rounded-lg mb-6">
                   <img
-                    src={item.image}
+                    src={item.image_url || "/placeholder.svg"}
                     alt={item.name}
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
                   
                   {/* Simple badges */}
                   <div className="absolute top-4 left-4 flex flex-col space-y-2">
-                    {item.isNew && (
+                    {item.is_new && (
                       <Badge className="bg-white/90 text-black text-xs px-3 py-1">
                         NEW
                       </Badge>
                     )}
-                    {item.isFeatured && (
+                    {item.is_best_seller && (
                       <Badge className="text-black text-xs px-3 py-1" style={{ backgroundColor: '#D4AF37' }}>
                         FEATURED
                       </Badge>
@@ -153,7 +222,7 @@ const AutoScrollCarousel = () => {
                             color: '#E8E3D9',
                             textShadow: '0 1px 2px rgba(0,0,0,0.5)'
                           }}>
-                      ({item.reviews} reviews)
+                      ({item.reviews || 0} reviews)
                     </span>
                   </div>
 
@@ -167,16 +236,16 @@ const AutoScrollCarousel = () => {
                             textShadow: '0 2px 4px rgba(0,0,0,0.8)',
                             letterSpacing: '0.02em'
                           }}>
-                      {item.price}
+                      ₹{item.price.toLocaleString()}
                     </span>
-                    {item.originalPrice && (
+                    {item.original_price && (
                       <span className="font-['Inter'] text-xl line-through font-light" 
                             style={{ 
                               color: '#C8C8C5', 
                               opacity: '0.7',
                               textShadow: '0 1px 2px rgba(0,0,0,0.5)'
                             }}>
-                        {item.originalPrice}
+                        ₹{item.original_price.toLocaleString()}
                       </span>
                     )}
                   </div>

@@ -98,10 +98,6 @@ const CategoryShowcase = () => {
     <section 
       className="section-padding relative overflow-hidden discover-style-section"
     >
-
-      
-
-      
       <div className="w-full px-8 lg:px-16 xl:px-24 relative z-10">
         {/* Minimalist Section Header */}
         <div className="text-center mb-12 max-w-4xl mx-auto">
@@ -161,8 +157,7 @@ const CategoryShowcase = () => {
 
                   {/* Floating Stats */}
                   <div className="absolute top-6 right-6 opacity-0 group-hover:opacity-100 transition-all duration-700 transform translate-x-4 group-hover:translate-x-0">
-                    <div 
-                      className="bg-white/95 backdrop-blur-sm rounded-xl px-4 py-2 text-sm font-medium border border-rose-200"
+                    <div className="bg-white/95 backdrop-blur-sm rounded-xl px-4 py-2 text-sm font-medium border border-rose-200"
                       style={{
                         boxShadow: '0 4px 20px rgba(183, 110, 121, 0.2)'
                       }}
@@ -231,8 +226,6 @@ const CategoryShowcase = () => {
           ))}
         </div>
       </div>
-      
-
     </section>
   );
 };

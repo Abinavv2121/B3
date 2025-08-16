@@ -90,6 +90,29 @@ export const supabaseUtils = {
     return { data, error }
   },
 
+  // Get products by section
+  async getProductsBySection(section: string) {
+    const { data, error } = await supabase
+      .from('products')
+      .select('*')
+      .eq('section', section)
+      .order('created_at', { ascending: false })
+    
+    return { data, error }
+  },
+
+  // Get customer favourites (best sellers)
+  async getCustomerFavourites() {
+    const { data, error } = await supabase
+      .from('products')
+      .select('*')
+      .eq('section', 'customer_favourites')
+      .order('created_at', { ascending: false })
+      .limit(6)
+    
+    return { data, error }
+  },
+
   // Admin functions for product management
   async addProduct(product: any) {
     const { data, error } = await supabase

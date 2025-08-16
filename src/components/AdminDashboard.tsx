@@ -54,7 +54,8 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
     product_code: "",
     barcode_no: "",
     design: "",
-    status: "IN STOCK"
+    status: "IN STOCK",
+    section: "featured_collections"
   });
 
   const categories = [
@@ -66,6 +67,17 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
     "Lehenga",
     "Saree",
     "Salwar Suit"
+  ];
+
+  const sections = [
+    { value: "customer_favourites", label: "Customer Favourites", description: "Appears in the Customer Favourites carousel" },
+    { value: "featured_collections", label: "Featured Collections", description: "Appears in the Featured Collections section" },
+    { value: "saree", label: "Saree Collection", description: "Appears in the Saree category showcase" },
+    { value: "anarkali", label: "Anarkali Collection", description: "Appears in the Anarkali category showcase" },
+    { value: "lehenga", label: "Lehenga Collection", description: "Appears in the Lehenga category showcase" },
+    { value: "salwar_suit", label: "Salwar Suit Collection", description: "Appears in the Salwar Suit category showcase" },
+    { value: "western_wear", label: "Western Wear Collection", description: "Appears in the Western Wear category showcase" },
+    { value: "bridal_collection", label: "Bridal Collection", description: "Appears in the Bridal Collection category showcase" }
   ];
 
   const availableSizes = ["XS", "S", "M", "L", "XL", "XXL", "Free Size", "NA-5", "30", "38", "NA"];
@@ -154,7 +166,8 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
       product_code: "",
       barcode_no: "",
       design: "",
-      status: "IN STOCK"
+      status: "IN STOCK",
+      section: "featured_collections"
     });
   };
 
@@ -175,7 +188,8 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
       product_code: product.product_code || "",
       barcode_no: product.barcode_no || "",
       design: product.design || "",
-      status: product.status || "IN STOCK"
+      status: product.status || "IN STOCK",
+      section: product.section || "featured_collections"
     });
     setShowAddForm(true);
   };
@@ -352,6 +366,28 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
                     </div>
 
                     <div className="space-y-2">
+                      <Label htmlFor="section">Section Placement</Label>
+                      <Select 
+                        value={formData.section} 
+                        onValueChange={(value) => setFormData({ ...formData, section: value })}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select section" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {sections.map((section) => (
+                            <SelectItem key={section.value} value={section.value}>
+                              <div>
+                                <div className="font-medium">{section.label}</div>
+                                <div className="text-xs text-gray-500">{section.description}</div>
+                              </div>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2">
                       <Label htmlFor="price">Price (₹)</Label>
                       <Input
                         id="price"
@@ -506,6 +542,12 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
                              <div>
                                <span className="font-medium">Category:</span> {product.category}
                              </div>
+                             <div>
+                               <span className="font-medium">Section:</span> 
+                               <Badge variant="outline" className="ml-1">
+                                 {sections.find(s => s.value === product.section)?.label || product.section || 'N/A'}
+                               </Badge>
+                             </div>
                            </div>
                            <p className="text-sm text-gray-500 mb-3">{product.description}</p>
                            <div className="flex items-center gap-4 text-sm">
@@ -635,6 +677,28 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
                                  {availableStatuses.map((status) => (
                                    <SelectItem key={status} value={status}>
                                      {status}
+                                   </SelectItem>
+                                 ))}
+                               </SelectContent>
+                             </Select>
+                           </div>
+
+                           <div className="space-y-2">
+                             <Label htmlFor={`edit-section-${product.id}`}>Section Placement</Label>
+                             <Select 
+                               value={formData.section} 
+                               onValueChange={(value) => setFormData({ ...formData, section: value })}
+                             >
+                               <SelectTrigger>
+                                 <SelectValue placeholder="Select section" />
+                               </SelectTrigger>
+                               <SelectContent>
+                                 {sections.map((section) => (
+                                   <SelectItem key={section.value} value={section.value}>
+                                     <div>
+                                       <div className="font-medium">{section.label}</div>
+                                       <div className="text-xs text-gray-500">{section.description}</div>
+                                     </div>
                                    </SelectItem>
                                  ))}
                                </SelectContent>

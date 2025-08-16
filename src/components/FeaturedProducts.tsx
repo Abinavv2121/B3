@@ -1,154 +1,120 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import ProductCard from "./ProductCard";
 import { Sparkles, ArrowRight, Filter, Crown } from "lucide-react";
-import heroBridal from "@/assets/hero-bridal.jpg";
-import festivalSaree from "@/assets/festival-saree.jpg";
-import anarkaliPurple from "@/assets/anarkali-purple.jpg";
-import shararaRoseGold from "@/assets/sharara-rose-gold.jpg";
+import { supabaseUtils } from "@/hooks/useSupabase";
+import { Database } from "@/lib/supabase";
 import shippingIcon from "/src/assets/shipping.png";
 import returnIcon from "/src/assets/return.png";
 import secureIcon from "/src/assets/secure.png";
 import emiIcon from "/src/assets/emi.png";
 
+type Product = Database['public']['Tables']['products']['Row'];
+
 const FeaturedProducts = () => {
   const [activeFilter, setActiveFilter] = useState("all");
+  const [products, setProducts] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const filters = [
-    { id: "all", name: "All", count: 24 },
-    { id: "bridal", name: "Bridal", count: 8 },
-    { id: "festival", name: "Festival", count: 6 },
-    { id: "special", name: "Special", count: 5 },
-    { id: "western", name: "Western", count: 5 }
+    { id: "all", name: "All", count: 0 },
+    { id: "Bridal Collection", name: "Bridal", count: 0 },
+    { id: "Festival Glory", name: "Festival", count: 0 },
+    { id: "Special Moments", name: "Special", count: 0 },
+    { id: "Western Edge", name: "Western", count: 0 }
   ];
 
-  const products = [
-    {
-      id: "1",
-      name: "Royal Emerald Bridal Lehenga",
-      category: "Bridal Collection",
-      price: 45999,
-      originalPrice: 52999,
-      image: heroBridal,
-      rating: 4.9,
-      reviews: 156,
-      isNew: false,
-      isBestSeller: true,
-      colors: ["#10B981", "#DC2626", "#7C3AED", "#F59E0B"],
-      sizes: ["S", "M", "L", "XL", "XXL"],
-      type: "bridal"
-    },
-    {
-      id: "2",
-      name: "Premium Silk Festival Saree",
-      category: "Festival Glory",
-      price: 18999,
-      originalPrice: 24999,
-      image: festivalSaree,
-      rating: 4.8,
-      reviews: 203,
-      isNew: false,
-      isBestSeller: true,
-      colors: ["#DC2626", "#F59E0B", "#10B981", "#7C3AED"],
-      sizes: ["Free Size"],
-      type: "festival"
-    },
-    {
-      id: "3",
-      name: "Elegant Purple Anarkali",
-      category: "Special Moments",
-      price: 12999,
-      originalPrice: 16999,
-      image: anarkaliPurple,
-      rating: 4.7,
-      reviews: 89,
-      isNew: true,
-      isBestSeller: false,
-      colors: ["#7C3AED", "#EC4899", "#10B981", "#F59E0B"],
-      sizes: ["XS", "S", "M", "L", "XL"],
-      type: "special"
-    },
-    {
-      id: "4",
-      name: "Rose Gold Sharara Set",
-      category: "Western Edge",
-      price: 8999,
-      originalPrice: 11999,
-      image: shararaRoseGold,
-      rating: 4.6,
-      reviews: 134,
-      isNew: true,
-      isBestSeller: false,
-      colors: ["#F59E0B", "#EC4899", "#10B981", "#7C3AED"],
-      sizes: ["S", "M", "L", "XL"],
-      type: "western"
-    },
-    {
-      id: "5",
-      name: "Majestic Red Bridal Lehenga",
-      category: "Bridal Collection",
-      price: 38999,
-      originalPrice: 45999,
-      image: heroBridal,
-      rating: 4.9,
-      reviews: 98,
-      isNew: false,
-      isBestSeller: true,
-      colors: ["#DC2626", "#10B981", "#7C3AED", "#F59E0B"],
-      sizes: ["S", "M", "L", "XL", "XXL"],
-      type: "bridal"
-    },
-    {
-      id: "6",
-      name: "Golden Festival Silk Saree",
-      category: "Festival Glory",
-      price: 15999,
-      originalPrice: 19999,
-      image: festivalSaree,
-      rating: 4.8,
-      reviews: 167,
-      isNew: false,
-      isBestSeller: false,
-      colors: ["#F59E0B", "#DC2626", "#10B981", "#7C3AED"],
-      sizes: ["Free Size"],
-      type: "festival"
-    },
-    {
-      id: "7",
-      name: "Designer Teal Anarkali",
-      category: "Special Moments",
-      price: 14999,
-      originalPrice: 18999,
-      image: anarkaliPurple,
-      rating: 4.7,
-      reviews: 76,
-      isNew: true,
-      isBestSeller: false,
-      colors: ["#06B6D4", "#EC4899", "#10B981", "#F59E0B"],
-      sizes: ["XS", "S", "M", "L", "XL"],
-      type: "special"
-    },
-    {
-      id: "8",
-      name: "Modern Palazzo Set",
-      category: "Western Edge",
-      price: 9999,
-      originalPrice: 13999,
-      image: shararaRoseGold,
-      rating: 4.5,
-      reviews: 123,
-      isNew: false,
-      isBestSeller: false,
-      colors: ["#EC4899", "#10B981", "#7C3AED", "#F59E0B"],
-      sizes: ["S", "M", "L", "XL"],
-      type: "western"
+  useEffect(() => {
+    loadProducts();
+  }, []);
+
+  const loadProducts = async () => {
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabaseUtils.getProducts();
+      if (error) {
+        setError(error.message);
+      } else {
+        setProducts(data || []);
+        // Update filter counts
+        filters.forEach(filter => {
+          if (filter.id === "all") {
+            filter.count = data?.length || 0;
+          } else {
+            filter.count = data?.filter(p => p.category === filter.id).length || 0;
+          }
+        });
+      }
+    } catch (err) {
+      setError("Failed to load products");
     }
-  ];
+    setIsLoading(false);
+  };
 
   const filteredProducts = activeFilter === "all" 
     ? products 
-    : products.filter(product => product.type === activeFilter);
+    : products.filter(product => product.category === activeFilter);
+
+  // Transform database products to match ProductCard interface
+  const transformedProducts = filteredProducts.map(product => ({
+    id: product.id,
+    name: product.name,
+    category: product.category,
+    price: product.price,
+    originalPrice: product.original_price,
+    image: product.image_url || "/placeholder.svg",
+    rating: product.rating || 4.5, // Use database rating or default
+    reviews: product.reviews || Math.floor(Math.random() * 200) + 50, // Use database reviews or random
+    isNew: product.is_new,
+    isBestSeller: product.is_best_seller,
+    colors: product.colors || ["#DC2626", "#10B981", "#7C3AED", "#F59E0B"],
+    sizes: product.sizes || ["S", "M", "L", "XL"],
+    type: product.category.toLowerCase().replace(/\s+/g, '-')
+  }));
+
+  if (isLoading) {
+    return (
+      <section className="section-padding relative overflow-hidden bg-royal-silk">
+        <div className="w-full px-4 lg:px-8 relative z-10">
+          <div className="text-center mb-12 max-w-4xl mx-auto">
+            <h2 className="text-3xl lg:text-4xl font-['Italiana'] tracking-wide" 
+                style={{ 
+                  color: '#F8F7F3',
+                  textShadow: '0 2px 4px rgba(0,0,0,0.8)'
+                }}>
+              Featured <span style={{ color: '#D4AF37' }}>Collections</span>
+            </h2>
+          </div>
+          <div className="flex justify-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section className="section-padding relative overflow-hidden bg-royal-silk">
+        <div className="w-full px-4 lg:px-8 relative z-10">
+          <div className="text-center mb-12 max-w-4xl mx-auto">
+            <h2 className="text-3xl lg:text-4xl font-['Italiana'] tracking-wide" 
+                style={{ 
+                  color: '#F8F7F3',
+                  textShadow: '0 2px 4px rgba(0,0,0,0.8)'
+                }}>
+              Featured <span style={{ color: '#D4AF37' }}>Collections</span>
+            </h2>
+          </div>
+          <div className="text-center text-red-400">
+            <p>Error loading products: {error}</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="section-padding relative overflow-hidden bg-royal-silk">
@@ -186,17 +152,23 @@ const FeaturedProducts = () => {
         </div>
 
         {/* Products Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-8 lg:gap-10 mb-20 w-full">
-          {filteredProducts.map((product, index) => (
-            <div
-              key={product.id}
-              className="animate-fade-in"
-              style={{ animationDelay: `${index * 0.1}s` }}
-            >
-              <ProductCard product={product} />
-            </div>
-          ))}
-        </div>
+        {transformedProducts.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-8 lg:gap-10 mb-20 w-full">
+            {transformedProducts.map((product, index) => (
+              <div
+                key={product.id}
+                className="animate-fade-in"
+                style={{ animationDelay: `${index * 0.1}s` }}
+              >
+                <ProductCard product={product} />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-20">
+            <p className="text-white/70 text-lg">No products found in this category.</p>
+          </div>
+        )}
 
         {/* Feature Benefits Section */}
         <div className="mt-24">

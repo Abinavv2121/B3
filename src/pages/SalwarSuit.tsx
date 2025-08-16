@@ -1,159 +1,269 @@
+import { useState, useEffect } from "react";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
+import ProductCard from "@/components/ProductCard";
+import { supabaseUtils } from "@/hooks/useSupabase";
+import { Database } from "@/lib/supabase";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { ArrowRight, Star, Heart, Eye, Share2, ShoppingBag } from "lucide-react";
+
+type Product = Database['public']['Tables']['products']['Row'];
 
 const SalwarSuit = () => {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [activeFilter, setActiveFilter] = useState("all");
+
+  const filters = [
+    { id: "all", name: "All Salwar Suits", count: 0 },
+    { id: "Designer", name: "Designer Suits", count: 0 },
+    { id: "Casual", name: "Casual Suits", count: 0 },
+    { id: "Party", name: "Party Wear", count: 0 },
+    { id: "Bridal", name: "Bridal Suits", count: 0 },
+    { id: "Festival", name: "Festival Suits", count: 0 }
+  ];
+
+  useEffect(() => {
+    loadProducts();
+  }, []);
+
+  const loadProducts = async () => {
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabaseUtils.getProductsBySection('salwar_suit');
+      if (error) {
+        setError(error.message);
+      } else {
+        setProducts(data || []);
+        // Update filter counts
+        filters.forEach(filter => {
+          if (filter.id === "all") {
+            filter.count = data?.length || 0;
+          } else {
+            filter.count = data?.filter(p => p.design?.includes(filter.id) || p.name.includes(filter.id)).length || 0;
+          }
+        });
+      }
+    } catch (err) {
+      setError("Failed to load products");
+    }
+    setIsLoading(false);
+  };
+
+  const filteredProducts = activeFilter === "all" 
+    ? products 
+    : products.filter(product => 
+        product.design?.includes(activeFilter) || product.name.includes(activeFilter)
+      );
+
+  // Transform database products to match ProductCard interface
+  const transformedProducts = filteredProducts.map(product => ({
+    id: product.id,
+    name: product.name,
+    category: product.category,
+    price: product.price,
+    originalPrice: product.original_price,
+    image: product.image_url || "/placeholder.svg",
+    rating: product.rating || 4.5,
+    reviews: product.reviews || Math.floor(Math.random() * 200) + 50,
+    isNew: product.is_new,
+    isBestSeller: product.is_best_seller,
+    colors: product.colors || ["#DC2626", "#10B981", "#7C3AED", "#F59E0B"],
+    sizes: product.sizes || ["S", "M", "L", "XL"],
+    type: "salwar_suit"
+  }));
+
   return (
-    <div className="m-0 p-0">
+    <div className="min-h-screen m-0 p-0">
       <Navigation />
       <main className="m-0 p-0">
-        {/* Hero Section for Salwar Suit */}
-        <section className="relative h-screen flex items-center justify-center bg-gradient-to-br from-emerald-50 to-teal-100">
-          <div className="absolute inset-0 bg-black/20"></div>
-          <div className="relative z-10 text-center space-y-6">
-            <h1 className="text-6xl lg:text-8xl font-serif font-bold text-white">
-              <span className="text-cultural">SALWAR SUIT</span>
-              <br />
-              <span className="text-foreground">COLLECTION</span>
+        {/* Hero Section */}
+        <section className="relative h-screen flex items-center justify-center overflow-hidden">
+          {/* Background Image */}
+          <div className="absolute inset-0">
+            <img
+              src="/src/assets/salwarsuit.jpg"
+              alt="Salwar Suit Collection"
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-black/60"></div>
+          </div>
+          
+          {/* Content */}
+          <div className="relative z-10 text-center space-y-8 px-4">
+            <h1 className="text-5xl lg:text-7xl font-['Italiana'] tracking-wide" 
+                style={{ 
+                  color: '#F8F7F3',
+                  textShadow: '0 2px 4px rgba(0,0,0,0.8)'
+                }}>
+              SALWAR <span style={{ color: '#D4AF37' }}>SUIT</span>
             </h1>
-            <p className="text-white text-xl lg:text-2xl font-light tracking-widest opacity-90">
+            <p className="text-xl lg:text-2xl font-light tracking-wide text-white/90 max-w-2xl mx-auto">
               Comfort Meets Style in Perfect Harmony
             </p>
+            <div className="flex justify-center space-x-4">
+              <Button className="btn-premium">
+                Explore Collection
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </div>
           </div>
         </section>
 
-        {/* Salwar Suit Categories */}
-        <section className="section-padding bg-white">
-          <div className="container-premium">
-            <div className="text-center space-y-6 mb-16">
-              <h2 className="text-4xl lg:text-6xl font-serif font-bold">
-                <span className="text-cultural">Discover Our</span>
-                <br />
-                <span className="text-foreground">Salwar Suit Collection</span>
+        {/* Gold Divider */}
+        <div 
+          className="w-full h-0"
+          style={{
+            borderTop: '1px solid rgba(212,175,55,0.15)',
+            boxShadow: '0 -12px 24px rgba(0,0,0,0.6) inset'
+          }}
+        />
+
+        {/* Products Section */}
+        <section className="section-padding relative overflow-hidden bg-royal-silk">
+          <div className="w-full px-4 lg:px-8 relative z-10">
+            {/* Section Header */}
+            <div className="text-center mb-12 max-w-4xl mx-auto">
+              <h2 className="text-3xl lg:text-4xl font-['Italiana'] tracking-wide" 
+                  style={{ 
+                    color: '#F8F7F3',
+                    textShadow: '0 2px 4px rgba(0,0,0,0.8)'
+                  }}>
+                Discover Our <span style={{ color: '#D4AF37' }}>Salwar Suit Collection</span>
               </h2>
-              <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-                From traditional suits to contemporary designs, explore our versatile collection 
-                that offers the perfect blend of comfort, style, and elegance for every occasion.
+              <p className="mt-4 text-white/70 text-lg max-w-2xl mx-auto">
+                Versatile salwar suits perfect for daily wear and special occasions, combining comfort 
+                with contemporary elegance for the modern Indian woman.
               </p>
             </div>
 
-            {/* Salwar Suit Categories Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {/* Traditional Salwar Suits */}
-              <div className="group cursor-pointer">
-                <div className="bg-gradient-to-br from-emerald-100 to-teal-200 rounded-lg p-8 text-center hover:shadow-lg transition-all duration-300">
-                  <div className="w-24 h-24 bg-emerald-300 rounded-full mx-auto mb-4 flex items-center justify-center">
-                    <span className="text-2xl">🕉️</span>
-                  </div>
-                  <h3 className="text-2xl font-serif font-bold text-gray-800 mb-2">Traditional Suits</h3>
-                  <p className="text-gray-600 mb-4">Classic traditional designs</p>
-                  <p className="text-lg font-semibold text-cultural">Starting ₹8,999</p>
-                </div>
+            {/* Filter Tabs */}
+            <div className="flex justify-center mb-12">
+              <div className="flex items-center space-x-2 px-6 py-3 bg-black/95 backdrop-blur-xl rounded-lg border-b border-gray-200 shadow-sm">
+                {filters.map((filter) => (
+                  <button
+                    key={filter.id}
+                    onClick={() => setActiveFilter(filter.id)}
+                    className={`font-italiana text-sm font-medium uppercase tracking-wide transition-all duration-300 whitespace-nowrap px-6 py-2.5 rounded-lg hover:bg-white/10 border border-transparent hover:border-white/20 ${
+                      activeFilter === filter.id
+                        ? 'text-white bg-white/15 border-white/30'
+                        : 'text-white/70 hover:text-white'
+                    }`}
+                  >
+                    {filter.name}
+                    <span className="ml-2 text-xs opacity-80 normal-case">({filter.count})</span>
+                  </button>
+                ))}
               </div>
+            </div>
 
-              {/* Designer Salwar Suits */}
-              <div className="group cursor-pointer">
-                <div className="bg-gradient-to-br from-purple-100 to-indigo-200 rounded-lg p-8 text-center hover:shadow-lg transition-all duration-300">
-                  <div className="w-24 h-24 bg-purple-300 rounded-full mx-auto mb-4 flex items-center justify-center">
-                    <span className="text-2xl">✨</span>
-                  </div>
-                  <h3 className="text-2xl font-serif font-bold text-gray-800 mb-2">Designer Suits</h3>
-                  <p className="text-gray-600 mb-4">Exclusive designer collections</p>
-                  <p className="text-lg font-semibold text-cultural">Starting ₹15,999</p>
-                </div>
+            {/* Products Grid */}
+            {isLoading ? (
+              <div className="flex justify-center py-20">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
               </div>
-
-              {/* Party Wear Suits */}
-              <div className="group cursor-pointer">
-                <div className="bg-gradient-to-br from-pink-100 to-rose-200 rounded-lg p-8 text-center hover:shadow-lg transition-all duration-300">
-                  <div className="w-24 h-24 bg-pink-300 rounded-full mx-auto mb-4 flex items-center justify-center">
-                    <span className="text-2xl">🎉</span>
-                  </div>
-                  <h3 className="text-2xl font-serif font-bold text-gray-800 mb-2">Party Wear</h3>
-                  <p className="text-gray-600 mb-4">Glamorous party and festive wear</p>
-                  <p className="text-lg font-semibold text-cultural">Starting ₹12,999</p>
-                </div>
+            ) : error ? (
+              <div className="text-center py-20">
+                <p className="text-red-400">Error loading products: {error}</p>
               </div>
-
-              {/* Casual Salwar Suits */}
-              <div className="group cursor-pointer">
-                <div className="bg-gradient-to-br from-blue-100 to-cyan-200 rounded-lg p-8 text-center hover:shadow-lg transition-all duration-300">
-                  <div className="w-24 h-24 bg-blue-300 rounded-full mx-auto mb-4 flex items-center justify-center">
-                    <span className="text-2xl">🌿</span>
+            ) : transformedProducts.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-8 lg:gap-10 mb-20 w-full">
+                {transformedProducts.map((product, index) => (
+                  <div
+                    key={product.id}
+                    className="animate-fade-in"
+                    style={{ animationDelay: `${index * 0.1}s` }}
+                  >
+                    <ProductCard product={product} />
                   </div>
-                  <h3 className="text-2xl font-serif font-bold text-gray-800 mb-2">Casual Suits</h3>
-                  <p className="text-gray-600 mb-4">Comfortable everyday wear</p>
-                  <p className="text-lg font-semibold text-cultural">Starting ₹6,999</p>
-                </div>
+                ))}
               </div>
-
-              {/* Office Wear Suits */}
-              <div className="group cursor-pointer">
-                <div className="bg-gradient-to-br from-gray-100 to-slate-200 rounded-lg p-8 text-center hover:shadow-lg transition-all duration-300">
-                  <div className="w-24 h-24 bg-gray-300 rounded-full mx-auto mb-4 flex items-center justify-center">
-                    <span className="text-2xl">💼</span>
-                  </div>
-                  <h3 className="text-2xl font-serif font-bold text-gray-800 mb-2">Office Wear</h3>
-                  <p className="text-gray-600 mb-4">Professional and elegant</p>
-                  <p className="text-lg font-semibold text-cultural">Starting ₹9,999</p>
-                </div>
+            ) : (
+              <div className="text-center py-20">
+                <p className="text-white/70 text-lg">No salwar suits found in this category.</p>
               </div>
+            )}
+          </div>
+        </section>
 
-              {/* Wedding Suits */}
-              <div className="group cursor-pointer">
-                <div className="bg-gradient-to-br from-red-100 to-pink-200 rounded-lg p-8 text-center hover:shadow-lg transition-all duration-300">
-                  <div className="w-24 h-24 bg-red-300 rounded-full mx-auto mb-4 flex items-center justify-center">
-                    <span className="text-2xl">👰</span>
+        {/* Gold Divider */}
+        <div 
+          className="w-full h-0"
+          style={{
+            borderTop: '1px solid rgba(212,175,55,0.15)',
+            boxShadow: '0 -12px 24px rgba(0,0,0,0.6) inset'
+          }}
+        />
+
+        {/* Features Section */}
+        <section className="section-padding relative overflow-hidden bg-royal-silk">
+          <div className="w-full px-4 lg:px-8 relative z-10">
+            <div className="py-16 rounded-3xl" style={{ 
+              background: 'linear-gradient(145deg, rgba(26, 28, 31, 0.8) 0%, rgba(15, 17, 20, 0.9) 100%)',
+              border: '1px solid rgba(212, 175, 55, 0.2)',
+              boxShadow: '0 10px 30px rgba(0, 0, 0, 0.4)'
+            }}>
+              <div className="w-full px-4 lg:px-8">
+                <div className="text-center mb-12">
+                  <h3 className="text-3xl lg:text-4xl font-['Playfair_Display'] font-light tracking-wider mb-4" style={{ color: '#F8F7F3' }}>
+                    WHY CHOOSE OUR SALWAR SUITS
+                  </h3>
+                  <div className="mx-auto w-[120px]">
+                    <div className="divider-gold" />
                   </div>
-                  <h3 className="text-2xl font-serif font-bold text-gray-800 mb-2">Wedding Suits</h3>
-                  <p className="text-gray-600 mb-4">Elegant wedding collections</p>
-                  <p className="text-lg font-semibold text-cultural">Starting ₹18,999</p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center max-w-6xl mx-auto">
+                  <div className="space-y-4 group">
+                    <div className="flex justify-center mb-6">
+                      <div className="w-24 h-24 rounded-full flex items-center justify-center transition-all duration-500 group-hover:scale-110 bg-black border border-gray-600">
+                        <span className="text-3xl">🌟</span>
+                      </div>
+                    </div>
+                    <div className="text-xl font-['Italiana'] font-medium tracking-wider" style={{ color: '#F8F7F3' }}>
+                      Versatile Design
+                    </div>
+                    <div className="text-sm font-light tracking-wide" style={{ color: '#C8C8C5' }}>
+                      Perfect for both casual daily wear and special occasions
+                    </div>
+                  </div>
+
+                  <div className="space-y-4 group">
+                    <div className="flex justify-center mb-6">
+                      <div className="w-24 h-24 rounded-full flex items-center justify-center transition-all duration-500 group-hover:scale-110 bg-black border border-gray-600">
+                        <span className="text-3xl">💎</span>
+                      </div>
+                    </div>
+                    <div className="text-xl font-['Italiana'] font-medium tracking-wider" style={{ color: '#F8F7F3' }}>
+                      Premium Comfort
+                    </div>
+                    <div className="text-sm font-light tracking-wide" style={{ color: '#C8C8C5' }}>
+                      Crafted from breathable fabrics for all-day comfort
+                    </div>
+                  </div>
+
+                  <div className="space-y-4 group">
+                    <div className="flex justify-center mb-6">
+                      <div className="w-24 h-24 rounded-full flex items-center justify-center transition-all duration-500 group-hover:scale-110 bg-black border border-gray-600">
+                        <span className="text-3xl">🎨</span>
+                      </div>
+                    </div>
+                    <div className="text-xl font-['Italiana'] font-medium tracking-wider" style={{ color: '#F8F7F3' }}>
+                      Contemporary Style
+                    </div>
+                    <div className="text-sm font-light tracking-wide" style={{ color: '#C8C8C5' }}>
+                      Modern designs that blend tradition with contemporary fashion
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </section>
-
-        {/* Why Choose Our Salwar Suits */}
-        <section className="section-padding bg-gray-50">
-          <div className="container-premium">
-            <div className="text-center space-y-6 mb-16">
-              <h2 className="text-4xl lg:text-6xl font-serif font-bold">
-                <span className="text-cultural">Why Choose</span>
-                <br />
-                <span className="text-foreground">Our Salwar Suits</span>
-              </h2>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="text-center space-y-4">
-                <div className="w-16 h-16 bg-cultural rounded-full mx-auto flex items-center justify-center">
-                  <span className="text-2xl text-white">🎯</span>
-                </div>
-                <h3 className="text-xl font-serif font-bold">Perfect Fit</h3>
-                <p className="text-gray-600">Tailored to perfection with comfortable cuts that flatter every body type.</p>
-              </div>
-
-              <div className="text-center space-y-4">
-                <div className="w-16 h-16 bg-cultural rounded-full mx-auto flex items-center justify-center">
-                  <span className="text-2xl text-white">🌟</span>
-                </div>
-                <h3 className="text-xl font-serif font-bold">Versatile Style</h3>
-                <p className="text-gray-600">From casual to formal, our suits are perfect for every occasion and setting.</p>
-              </div>
-
-              <div className="text-center space-y-4">
-                <div className="w-16 h-16 bg-cultural rounded-full mx-auto flex items-center justify-center">
-                  <span className="text-2xl text-white">💎</span>
-                </div>
-                <h3 className="text-xl font-serif font-bold">Quality Craftsmanship</h3>
-                <p className="text-gray-600">Meticulously crafted with attention to detail and premium materials.</p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <Footer />
       </main>
+      <Footer />
     </div>
   );
 };

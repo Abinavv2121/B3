@@ -51,6 +51,7 @@ export type Database = {
           barcode_no: string | null
           design: string | null
           status: string
+          section: string
           created_at: string
           updated_at: string
         }
@@ -72,6 +73,7 @@ export type Database = {
           barcode_no?: string
           design?: string
           status?: string
+          section?: string
           created_at?: string
           updated_at?: string
         }
@@ -93,6 +95,7 @@ export type Database = {
           barcode_no?: string
           design?: string
           status?: string
+          section?: string
           created_at?: string
           updated_at?: string
         }
