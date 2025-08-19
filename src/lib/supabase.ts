@@ -47,6 +47,8 @@ export type Database = {
           is_best_seller: boolean
           colors: string[]
           sizes: string[]
+          primary_color: string | null
+          additional_images: string[]
           product_code: string | null
           barcode_no: string | null
           design: string | null
@@ -69,6 +71,8 @@ export type Database = {
           is_best_seller?: boolean
           colors?: string[]
           sizes?: string[]
+          primary_color?: string
+          additional_images?: string[]
           product_code?: string
           barcode_no?: string
           design?: string
@@ -91,6 +95,8 @@ export type Database = {
           is_best_seller?: boolean
           colors?: string[]
           sizes?: string[]
+          primary_color?: string
+          additional_images?: string[]
           product_code?: string
           barcode_no?: string
           design?: string

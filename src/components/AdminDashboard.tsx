@@ -9,6 +9,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ImageUpload } from "@/components/ImageUpload";
+import { MultiImageUpload } from "@/components/MultiImageUpload";
 import { 
   Plus, 
   Edit, 
@@ -50,13 +52,15 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
     image_url: "",
     colors: [],
     sizes: [],
+    primary_color: "",
     is_new: false,
     is_best_seller: false,
     product_code: "",
     barcode_no: "",
     design: "",
     status: "IN STOCK",
-    section: "featured_collections"
+    section: "featured_collections",
+    additional_images: []
   });
 
   const categories = [
@@ -115,21 +119,21 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
       if (editingProductId) {
         // Update existing product
         const { error } = await supabaseUtils.updateProduct(editingProductId, formData);
-        if (error) {
-          setError(error.message);
-        } else {
+      if (error) {
+        setError(error.message);
+      } else {
           setEditingProductId(null);
           setEditingProduct(null);
-          resetForm();
+        resetForm();
           loadProducts();
         }
       } else {
         // Add new product
         const { error } = await supabaseUtils.addProduct(formData);
-        if (error) {
-          setError(error.message);
-        } else {
-          resetForm();
+      if (error) {
+        setError(error.message);
+      } else {
+        resetForm();
           loadProducts();
         }
       }
@@ -140,15 +144,15 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
 
   const handleDelete = async (productId: string) => {
     if (window.confirm("Are you sure you want to delete this product?")) {
-      try {
-        const { error } = await supabaseUtils.deleteProduct(productId);
-        if (error) {
-          setError(error.message);
-        } else {
+    try {
+      const { error } = await supabaseUtils.deleteProduct(productId);
+      if (error) {
+        setError(error.message);
+      } else {
           loadProducts();
-        }
-      } catch (err) {
-        setError("Failed to delete product");
+      }
+    } catch (err) {
+      setError("Failed to delete product");
       }
     }
   };
@@ -165,13 +169,15 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
       image_url: product.image_url,
       colors: product.colors,
       sizes: product.sizes,
+      primary_color: product.primary_color,
       is_new: product.is_new,
       is_best_seller: product.is_best_seller,
       product_code: product.product_code,
       barcode_no: product.barcode_no,
       design: product.design,
       status: product.status,
-      section: product.section
+      section: product.section,
+      additional_images: product.additional_images || []
     });
     setShowAddForm(true);
   };
@@ -186,13 +192,15 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
       image_url: "",
       colors: [],
       sizes: [],
+      primary_color: "",
       is_new: false,
       is_best_seller: false,
       product_code: "",
       barcode_no: "",
       design: "",
       status: "IN STOCK",
-      section: "featured_collections"
+      section: "featured_collections",
+      additional_images: []
     });
     setEditingProduct(null);
     setEditingProductId(null);
@@ -205,7 +213,7 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
     onLogout();
   };
 
-  return (
+    return (
     <div 
       className="min-h-screen"
       style={{
@@ -234,7 +242,7 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
               >
                 <Crown className="w-6 h-6 text-black" />
               </div>
-              <div>
+            <div>
                 <h1 
                   className="text-2xl lg:text-3xl font-['Italiana'] tracking-wide"
                   style={{ color: '#D4AF37' }}
@@ -244,7 +252,7 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
                 <p className="text-white/70 text-sm font-light tracking-wide">
                   Premium Ethnic Wear Management
                 </p>
-              </div>
+            </div>
             </div>
             
             <Button 
@@ -386,7 +394,7 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
           </div>
 
           {/* Action Buttons */}
-          <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center">
             <h2 
               className="text-2xl lg:text-3xl font-['Italiana'] tracking-wide"
               style={{ color: '#F8F7F3' }}
@@ -394,7 +402,7 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
               Product Management
             </h2>
             
-            <Button 
+              <Button 
               onClick={() => setShowAddForm(true)}
               className="px-6 py-2.5 text-sm font-medium transition-all duration-300 border hover:scale-105 hover:shadow-lg"
               style={{
@@ -405,8 +413,8 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
             >
               <Plus className="mr-2 h-4 w-4" />
               Add New Product
-            </Button>
-          </div>
+              </Button>
+            </div>
 
           {/* Error Display */}
           {error && (
@@ -431,7 +439,7 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
                 backdropFilter: 'blur(20px)'
               }}
             >
-              <CardHeader>
+                 <CardHeader>
                 <CardTitle 
                   className="text-xl font-['Italiana'] tracking-wide"
                   style={{ color: '#D4AF37' }}
@@ -441,7 +449,7 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
                 <CardDescription className="text-white/70">
                   {editingProductId ? "Update product information" : "Create a new product for your collection"}
                 </CardDescription>
-              </CardHeader>
+                 </CardHeader>
               <CardContent>
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -518,7 +526,7 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
                       <Label htmlFor="section" className="text-white/90 font-medium">
                         Section Placement
                       </Label>
-                      <Select
+                      <Select 
                         value={formData.section}
                         onValueChange={(value) => setFormData({ ...formData, section: value })}
                       >
@@ -543,8 +551,8 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
                       <Label htmlFor="status" className="text-white/90 font-medium">
                         Status
                       </Label>
-                      <Select
-                        value={formData.status}
+                      <Select 
+                        value={formData.status} 
                         onValueChange={(value) => setFormData({ ...formData, status: value })}
                       >
                         <SelectTrigger className="border-white/20 bg-white/5 text-white focus:border-yellow-500 focus:ring-yellow-500/20">
@@ -559,10 +567,10 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
                         </SelectContent>
                       </Select>
                     </div>
-                  </div>
+                    </div>
 
                   {/* Description */}
-                  <div className="space-y-2">
+                    <div className="space-y-2">
                     <Label htmlFor="description" className="text-white/90 font-medium">
                       Description
                     </Label>
@@ -572,32 +580,57 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
                       onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                       className="border-white/20 bg-white/5 text-white placeholder:text-white/50 focus:border-yellow-500 focus:ring-yellow-500/20 min-h-[100px]"
                       placeholder="Enter product description..."
-                    />
-                  </div>
+                      />
+                    </div>
 
-                  {/* Image URL */}
-                  <div className="space-y-2">
-                    <Label htmlFor="image_url" className="text-white/90 font-medium">
-                      Image URL
-                    </Label>
-                    <Input
-                      id="image_url"
-                      value={formData.image_url}
-                      onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
-                      className="border-white/20 bg-white/5 text-white placeholder:text-white/50 focus:border-yellow-500 focus:ring-yellow-500/20"
-                      placeholder="https://example.com/image.jpg"
+                  {/* Product Image Upload */}
+                    <MultiImageUpload
+                      onImagesChanged={(urls) => {
+                        console.log('AdminDashboard onImagesChanged called with:', urls);
+                        if (urls.length > 0) {
+                          const newFormData = { 
+                            ...formData, 
+                            image_url: urls[0], 
+                            additional_images: urls.slice(1) 
+                          };
+                          console.log('Setting new form data:', newFormData);
+                          setFormData(newFormData);
+                        } else {
+                          const newFormData = { 
+                            ...formData, 
+                            image_url: "", 
+                            additional_images: [] 
+                          };
+                          console.log('Clearing form data:', newFormData);
+                          setFormData(newFormData);
+                        }
+                      }}
+                      currentImages={[formData.image_url, ...(formData.additional_images || [])].filter(Boolean)}
                     />
-                  </div>
+
+                  {/* Primary Color */}
+                    <div className="space-y-2">
+                      <Label htmlFor="primary_color" className="text-white/90 font-medium">
+                        Primary Color
+                      </Label>
+                      <Input
+                        id="primary_color"
+                        value={formData.primary_color || ""}
+                        onChange={(e) => setFormData({ ...formData, primary_color: e.target.value })}
+                        className="border-white/20 bg-white/5 text-white placeholder:text-white/50 focus:border-yellow-500 focus:ring-yellow-500/20"
+                        placeholder="e.g., Red, Blue, Gold, etc."
+                      />
+                    </div>
 
                   {/* Colors and Sizes */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <Label className="text-white/90 font-medium">Colors</Label>
-                      <div className="flex flex-wrap gap-2">
-                        {availableColors.map((color) => (
+                    <div className="flex flex-wrap gap-2">
+                      {availableColors.map((color) => (
                           <button
-                            key={color}
-                            type="button"
+                          key={color}
+                          type="button"
                             onClick={() => {
                               const newColors = formData.colors?.includes(color)
                                 ? formData.colors.filter(c => c !== color)
@@ -609,12 +642,12 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
                                 ? 'bg-yellow-500 text-black'
                                 : 'bg-white/10 text-white/70 hover:bg-white/20'
                             }`}
-                          >
-                            {color}
+                        >
+                          {color}
                           </button>
-                        ))}
-                      </div>
+                      ))}
                     </div>
+                  </div>
 
                     <div className="space-y-2">
                       <Label className="text-white/90 font-medium">Sizes</Label>
@@ -623,7 +656,7 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
                           <button
                             key={size}
                             type="button"
-                            onClick={() => {
+                       onClick={() => {
                               const newSizes = formData.sizes?.includes(size)
                                 ? formData.sizes.filter(s => s !== size)
                                 : [...(formData.sizes || []), size];
@@ -635,82 +668,82 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
                                 : 'bg-white/10 text-white/70 hover:bg-white/20'
                             }`}
                           >
-                            {size}
+                                 {size}
                           </button>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
+                             ))}
+                           </div>
+                         </div>
+                           </div>
 
                   {/* Additional Fields */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
+                           <div className="space-y-2">
                       <Label htmlFor="product_code" className="text-white/90 font-medium">
                         Product Code
                       </Label>
-                      <Input
+                             <Input
                         id="product_code"
-                        value={formData.product_code}
-                        onChange={(e) => setFormData({ ...formData, product_code: e.target.value })}
+                               value={formData.product_code}
+                               onChange={(e) => setFormData({ ...formData, product_code: e.target.value })}
                         className="border-white/20 bg-white/5 text-white placeholder:text-white/50 focus:border-yellow-500 focus:ring-yellow-500/20"
                         placeholder="Enter product code"
-                      />
-                    </div>
+                             />
+                           </div>
 
-                    <div className="space-y-2">
+                           <div className="space-y-2">
                       <Label htmlFor="barcode_no" className="text-white/90 font-medium">
                         Barcode Number
                       </Label>
-                      <Input
+                             <Input
                         id="barcode_no"
-                        value={formData.barcode_no}
-                        onChange={(e) => setFormData({ ...formData, barcode_no: e.target.value })}
+                               value={formData.barcode_no}
+                               onChange={(e) => setFormData({ ...formData, barcode_no: e.target.value })}
                         className="border-white/20 bg-white/5 text-white placeholder:text-white/50 focus:border-yellow-500 focus:ring-yellow-500/20"
                         placeholder="Enter barcode number"
-                      />
+                             />
                     </div>
-                  </div>
+                           </div>
 
                   {/* Design */}
-                  <div className="space-y-2">
+                           <div className="space-y-2">
                     <Label htmlFor="design" className="text-white/90 font-medium">
                       Design
                     </Label>
-                    <Input
+                             <Input
                       id="design"
-                      value={formData.design}
-                      onChange={(e) => setFormData({ ...formData, design: e.target.value })}
+                               value={formData.design}
+                               onChange={(e) => setFormData({ ...formData, design: e.target.value })}
                       className="border-white/20 bg-white/5 text-white placeholder:text-white/50 focus:border-yellow-500 focus:ring-yellow-500/20"
                       placeholder="Enter design details"
-                    />
-                  </div>
+                             />
+                           </div>
 
                   {/* Checkboxes */}
                   <div className="flex space-x-6">
                     <label className="flex items-center space-x-2 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={formData.is_new}
-                        onChange={(e) => setFormData({ ...formData, is_new: e.target.checked })}
+                                 <input
+                                   type="checkbox"
+                                   checked={formData.is_new}
+                                   onChange={(e) => setFormData({ ...formData, is_new: e.target.checked })}
                         className="w-4 h-4 text-yellow-500 bg-white/5 border-white/20 rounded focus:ring-yellow-500/20"
-                      />
+                                 />
                       <span className="text-white/90 text-sm">New Arrival</span>
-                    </label>
+                               </label>
                     <label className="flex items-center space-x-2 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={formData.is_best_seller}
-                        onChange={(e) => setFormData({ ...formData, is_best_seller: e.target.checked })}
+                                 <input
+                                   type="checkbox"
+                                   checked={formData.is_best_seller}
+                                   onChange={(e) => setFormData({ ...formData, is_best_seller: e.target.checked })}
                         className="w-4 h-4 text-yellow-500 bg-white/5 border-white/20 rounded focus:ring-yellow-500/20"
-                      />
+                                 />
                       <span className="text-white/90 text-sm">Best Seller</span>
-                    </label>
-                  </div>
+                               </label>
+                         </div>
 
                   {/* Form Actions */}
                   <div className="flex justify-end space-x-4 pt-4">
-                    <Button
-                      type="button"
+                               <Button
+                                 type="button"
                       onClick={resetForm}
                       variant="outline"
                       className="px-6 py-2.5 text-sm font-medium transition-all duration-300 border hover:scale-105 hover:shadow-lg"
@@ -722,8 +755,8 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
                     >
                       <X className="mr-2 h-4 w-4" />
                       Cancel
-                    </Button>
-                    <Button
+                               </Button>
+                               <Button
                       type="submit"
                       className="px-6 py-2.5 text-sm font-medium transition-all duration-300 border hover:scale-105 hover:shadow-lg"
                       style={{
@@ -734,8 +767,8 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
                     >
                       <Save className="mr-2 h-4 w-4" />
                       {editingProductId ? "Update Product" : "Add Product"}
-                    </Button>
-                  </div>
+                               </Button>
+                           </div>
                 </form>
               </CardContent>
             </Card>
@@ -767,8 +800,8 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
                   <Package className="w-16 h-16 mx-auto mb-4 text-white/40" />
                   <h4 className="text-lg font-medium text-white/70 mb-2">No products found</h4>
                   <p className="text-white/50">Start by adding your first product to the collection.</p>
-                </CardContent>
-              </Card>
+                       </CardContent>
+                     </Card>
             ) : (
               <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
                 {products.map((product) => (
@@ -798,20 +831,27 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
                           )}
                         </div>
 
+                        {/* Additional Images Count */}
+                        {product.additional_images && product.additional_images.length > 0 && (
+                          <div className="absolute top-2 right-2 bg-yellow-500 text-black text-xs px-2 py-1 rounded-full font-medium">
+                            +{product.additional_images.length}
+                          </div>
+                        )}
+
                         {/* Product Info */}
                         <div className="space-y-3">
-                          <div>
+                    <div>
                             <h4 className="font-medium text-white text-lg mb-1">{product.name}</h4>
                             <p className="text-white/70 text-sm">{product.category}</p>
-                          </div>
+                    </div>
 
-                          <div className="flex items-center justify-between">
-                            <div>
+                  <div className="flex items-center justify-between">
+                    <div>
                               <p className="text-yellow-500 font-bold text-lg">₹{product.price}</p>
                               {product.original_price && product.original_price > product.price && (
                                 <p className="text-white/50 text-sm line-through">₹{product.original_price}</p>
                               )}
-                            </div>
+                    </div>
                             <Badge 
                               className="font-medium"
                               style={{
@@ -821,15 +861,25 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
                             >
                               {product.status}
                             </Badge>
-                          </div>
+                  </div>
 
                           {/* Section Badge */}
-                          <div>
+                    <div>
                             <span className="text-white/60 text-sm">Section: </span>
                             <Badge variant="outline" className="ml-1">
                               {sections.find(s => s.value === product.section)?.label || product.section || 'N/A'}
                             </Badge>
-                          </div>
+                    </div>
+
+                          {/* Primary Color */}
+                          {product.primary_color && (
+                            <div>
+                              <span className="text-white/60 text-sm">Primary Color: </span>
+                              <Badge variant="outline" className="ml-1">
+                                {product.primary_color}
+                              </Badge>
+                            </div>
+                          )}
 
                           {/* Tags */}
                           <div className="flex flex-wrap gap-2">
@@ -855,7 +905,7 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
                                 Best Seller
                               </Badge>
                             )}
-                          </div>
+                  </div>
 
                           {/* Actions */}
                           <div className="flex space-x-2 pt-2">
@@ -881,13 +931,13 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
                               <Trash2 className="mr-1 h-3 w-3" />
                               Delete
                             </Button>
-                          </div>
+                    </div>
                         </div>
-                      </div>
-                    </CardContent>
-                  </Card>
+                  </div>
+                </CardContent>
+              </Card>
                 ))}
-              </div>
+            </div>
             )}
           </div>
         </div>

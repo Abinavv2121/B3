@@ -65,6 +65,7 @@ const FeaturedProducts = () => {
     price: product.price,
     originalPrice: product.original_price,
     image: product.image_url || "/placeholder.svg",
+    additionalImages: product.additional_images || [],
     rating: product.rating || 4.5, // Use database rating or default
     reviews: product.reviews || Math.floor(Math.random() * 200) + 50, // Use database reviews or random
     isNew: product.is_new,

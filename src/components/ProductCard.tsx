@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { useFavourites } from "@/contexts/FavouritesContext";
 import { useCart } from "@/contexts/CartContext";
+import { ProductImageGallery } from "@/components/ProductImageGallery";
 
 interface ProductCardProps {
   product: {
@@ -15,6 +16,7 @@ interface ProductCardProps {
     price: number;
     originalPrice?: number;
     image: string;
+    additionalImages?: string[];
     rating: number;
     reviews: number;
     isNew?: boolean;
@@ -95,14 +97,14 @@ const ProductCard = ({ product }: ProductCardProps) => {
       <div className="card-premium hover-lift transition-all duration-300 overflow-hidden">
         {/* Image Container */}
         <div className="relative aspect-[3/4] overflow-hidden">
-          <img
-            src={product.image}
-            alt={product.name}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+          <ProductImageGallery
+            images={[product.image, ...(product.additionalImages || [])]}
+            productName={product.name}
+            className="w-full h-full"
           />
           
           {/* Overlay */}
-          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300"></div>
+          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 pointer-events-none"></div>
           
           {/* Badges */}
           <div className="absolute top-3 left-3 flex flex-col space-y-2">
