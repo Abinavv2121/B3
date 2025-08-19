@@ -90,6 +90,7 @@ const Wishlist = () => {
   const addSelectedToCart = () => {
     if (selectedIds.size === 0) return;
     const selected = filteredSorted.filter(f => selectedIds.has(f.id));
+    
     selected.forEach(item => {
       addToCart({
         id: item.id,
@@ -102,6 +103,7 @@ const Wishlist = () => {
         selectedColor: item.colors[0],
       });
     });
+    
     toast({ title: "Added to cart", description: `${selected.length} item(s) added to your cart` });
     clearSelection();
   };

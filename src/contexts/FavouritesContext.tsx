@@ -49,7 +49,7 @@ export const FavouritesProvider: React.FC<FavouritesProviderProps> = ({ children
       try {
         const parsed = JSON.parse(savedFavourites);
         // Convert string dates back to Date objects
-        const favouritesWithDates = parsed.map((item: any) => ({
+        const favouritesWithDates = parsed.map((item: Omit<FavouriteItem, 'addedAt'> & { addedAt: string }) => ({
           ...item,
           addedAt: new Date(item.addedAt)
         }));

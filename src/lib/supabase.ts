@@ -100,6 +100,59 @@ export type Database = {
           updated_at?: string
         }
       }
+      user_wishlist: {
+        Row: {
+          id: string
+          user_id: string
+          product_id: string
+          product_name: string
+          category: string
+          price: number
+          original_price: number | null
+          image_url: string
+          rating: number
+          reviews: number
+          is_new: boolean
+          is_best_seller: boolean
+          colors: string[]
+          sizes: string[]
+          added_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          product_id: string
+          product_name: string
+          category: string
+          price: number
+          original_price?: number | null
+          image_url: string
+          rating?: number
+          reviews?: number
+          is_new?: boolean
+          is_best_seller?: boolean
+          colors?: string[]
+          sizes?: string[]
+          added_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          product_id?: string
+          product_name?: string
+          category?: string
+          price?: number
+          original_price?: number | null
+          image_url?: string
+          rating?: number
+          reviews?: number
+          is_new?: boolean
+          is_best_seller?: boolean
+          colors?: string[]
+          sizes?: string[]
+          added_at?: string
+        }
+      }
       categories: {
         Row: {
           id: string

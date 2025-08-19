@@ -147,5 +147,70 @@ export const supabaseUtils = {
       .eq('id', id)
     
     return { data, error }
+  },
+
+  // User wishlist functions
+  async getUserWishlist(userId: string) {
+    const { data, error } = await supabase
+      .from('user_wishlist')
+      .select('*')
+      .eq('user_id', userId)
+      .order('added_at', { ascending: false })
+    
+    return { data, error }
+  },
+
+  async addToWishlist(userId: string, product: any) {
+    const { data, error } = await supabase
+      .from('user_wishlist')
+      .insert([{
+        user_id: userId,
+        product_id: product.id,
+        product_name: product.name,
+        category: product.category,
+        price: product.price,
+        original_price: product.originalPrice || null,
+        image_url: product.image,
+        rating: product.rating || 0,
+        reviews: product.reviews || 0,
+        is_new: product.isNew || false,
+        is_best_seller: product.isBestSeller || false,
+        colors: product.colors || [],
+        sizes: product.sizes || [],
+        added_at: new Date().toISOString()
+      }])
+      .select()
+    
+    return { data, error }
+  },
+
+  async removeFromWishlist(userId: string, productId: string) {
+    const { data, error } = await supabase
+      .from('user_wishlist')
+      .delete()
+      .eq('user_id', userId)
+      .eq('product_id', productId)
+    
+    return { data, error }
+  },
+
+  async clearUserWishlist(userId: string) {
+    const { data, error } = await supabase
+      .from('user_wishlist')
+      .delete()
+      .eq('user_id', userId)
+    
+    return { data, error }
+  },
+
+  async isInWishlist(userId: string, productId: string) {
+    const { data, error } = await supabase
+      .from('user_wishlist')
+      .select('id')
+      .eq('user_id', userId)
+      .eq('product_id', productId)
+      .single()
+    
+    return { isInWishlist: !!data, error }
   }
 } 

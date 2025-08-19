@@ -58,6 +58,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
         colors: product.colors,
         sizes: product.sizes,
       });
+      
       toast({
         title: "Added to wishlist",
         description: `${product.name} has been added to your wishlist`,
