@@ -1,22 +1,25 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
-import ProductCard from "@/components/ProductCard";
+import ProductGrid from "@/components/ProductGrid";
+import { GoldDivider } from "@/components/ui/gold-divider";
 import { supabaseUtils } from "@/hooks/useSupabase";
-import { Database } from "@/lib/supabase";
-import { Badge } from "@/components/ui/badge";
+import { ProductRow, FilterOption } from "@/types";
+import { PRODUCT_CONFIG } from "@/constants";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Star, Heart, Eye, Share2, ShoppingBag } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
-type Product = Database['public']['Tables']['products']['Row'];
-
+/**
+ * Saree category page with optimized structure and reusable components
+ */
 const Saree = () => {
-  const [products, setProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState<ProductRow[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeFilter, setActiveFilter] = useState("all");
 
-  const filters = [
+  // Memoize filters to prevent unnecessary re-renders
+  const filters: FilterOption[] = useMemo(() => [
     { id: "all", name: "All Sarees", count: 0 },
     { id: "Silk", name: "Silk Sarees", count: 0 },
     { id: "Georgette", name: "Georgette Sarees", count: 0 },
@@ -24,57 +27,44 @@ const Saree = () => {
     { id: "Bridal", name: "Bridal Sarees", count: 0 },
     { id: "Party", name: "Party Wear", count: 0 },
     { id: "Casual", name: "Casual Sarees", count: 0 }
-  ];
+  ], []);
 
-  useEffect(() => {
-    loadProducts();
-  }, []);
-
-  const loadProducts = async () => {
+  const loadProducts = useCallback(async () => {
     setIsLoading(true);
     try {
-      const { data, error } = await supabaseUtils.getProductsBySection('saree');
+      const { data, error } = await supabaseUtils.getProductsBySection(PRODUCT_CONFIG.CATEGORIES.SAREES);
       if (error) {
         setError(error.message);
       } else {
         setProducts(data || []);
-        // Update filter counts
-        filters.forEach(filter => {
-          if (filter.id === "all") {
-            filter.count = data?.length || 0;
-          } else {
-            filter.count = data?.filter(p => p.design?.includes(filter.id) || p.name.includes(filter.id)).length || 0;
-          }
-        });
       }
     } catch (err) {
       setError("Failed to load products");
     }
     setIsLoading(false);
-  };
+  }, []);
 
-  const filteredProducts = activeFilter === "all" 
-    ? products 
-    : products.filter(product => 
-        product.design?.includes(activeFilter) || product.name.includes(activeFilter)
-      );
+  useEffect(() => {
+    loadProducts();
+  }, [loadProducts]);
 
-  // Transform database products to match ProductCard interface
-  const transformedProducts = filteredProducts.map(product => ({
-    id: product.id,
-    name: product.name,
-    category: product.category,
-    price: product.price,
-    originalPrice: product.original_price,
-    image: product.image_url || "/placeholder.svg",
-    rating: product.rating || 4.5,
-    reviews: product.reviews || Math.floor(Math.random() * 200) + 50,
-    isNew: product.is_new,
-    isBestSeller: product.is_best_seller,
-    colors: product.colors || ["#DC2626", "#10B981", "#7C3AED", "#F59E0B"],
-    sizes: product.sizes || ["Free Size"],
-    type: "saree"
-  }));
+  const handleFilterChange = useCallback((filterId: string) => {
+    setActiveFilter(filterId);
+  }, []);
+
+  // Update filter counts when products change
+  const updatedFilters = useMemo(() => {
+    return filters.map(filter => {
+      if (filter.id === "all") {
+        return { ...filter, count: products.length };
+      } else {
+        const count = products.filter(p => 
+          p.design?.includes(filter.id) || p.name.includes(filter.id)
+        ).length;
+        return { ...filter, count };
+      }
+    });
+  }, [filters, products]);
 
   return (
     <div className="min-h-screen m-0 p-0">
@@ -118,90 +108,21 @@ const Saree = () => {
           </div>
         </section>
 
-        {/* Gold Divider */}
-        <div 
-          className="w-full h-0"
-          style={{
-            borderTop: '1px solid rgba(212,175,55,0.15)',
-            boxShadow: '0 -12px 24px rgba(0,0,0,0.6) inset'
-          }}
-        />
+        <GoldDivider />
 
         {/* Products Section */}
-        <section className="section-padding relative overflow-hidden bg-royal-silk">
-          <div className="w-full px-4 lg:px-8 relative z-10">
-            {/* Section Header */}
-            <div className="text-center mb-12 max-w-4xl mx-auto">
-              <h2 className="text-3xl lg:text-4xl font-['Italiana'] tracking-wide" 
-                  style={{ 
-                    color: '#F8F7F3',
-                    textShadow: '0 2px 4px rgba(0,0,0,0.8)'
-                  }}>
-                Discover Our <span style={{ color: '#D4AF37' }}>Saree Collection</span>
-              </h2>
-              <p className="mt-4 text-white/70 text-lg max-w-2xl mx-auto">
-                From handwoven silk to contemporary georgette, explore our curated collection of sarees 
-                that celebrate the timeless beauty of Indian tradition.
-              </p>
-            </div>
-
-            {/* Filter Tabs */}
-            <div className="flex justify-center mb-12">
-              <div className="flex items-center space-x-2 px-6 py-3 bg-black/95 backdrop-blur-xl rounded-lg border-b border-gray-200 shadow-sm">
-                {filters.map((filter) => (
-                  <button
-                    key={filter.id}
-                    onClick={() => setActiveFilter(filter.id)}
-                    className={`font-italiana text-sm font-medium uppercase tracking-wide transition-all duration-300 whitespace-nowrap px-6 py-2.5 rounded-lg hover:bg-white/10 border border-transparent hover:border-white/20 ${
-                      activeFilter === filter.id
-                        ? 'text-white bg-white/15 border-white/30'
-                        : 'text-white/70 hover:text-white'
-                    }`}
-                  >
-                    {filter.name}
-                    <span className="ml-2 text-xs opacity-80 normal-case">({filter.count})</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Products Grid */}
-            {isLoading ? (
-              <div className="flex justify-center py-20">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-              </div>
-            ) : error ? (
-              <div className="text-center py-20">
-                <p className="text-red-400">Error loading products: {error}</p>
-              </div>
-            ) : transformedProducts.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-8 lg:gap-10 mb-20 w-full">
-                {transformedProducts.map((product, index) => (
-                  <div
-                    key={product.id}
-                    className="animate-fade-in"
-                    style={{ animationDelay: `${index * 0.1}s` }}
-                  >
-                    <ProductCard product={product} />
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-20">
-                <p className="text-white/70 text-lg">No sarees found in this category.</p>
-              </div>
-            )}
-          </div>
-        </section>
-
-        {/* Gold Divider */}
-        <div 
-          className="w-full h-0"
-          style={{
-            borderTop: '1px solid rgba(212,175,55,0.15)',
-            boxShadow: '0 -12px 24px rgba(0,0,0,0.6) inset'
-          }}
+        <ProductGrid
+          products={products}
+          isLoading={isLoading}
+          error={error}
+          filters={updatedFilters}
+          activeFilter={activeFilter}
+          onFilterChange={handleFilterChange}
+          title="Discover Our Saree Collection"
+          subtitle="From handwoven silk to contemporary georgette, explore our curated collection of sarees that celebrate the timeless beauty of Indian tradition."
         />
+
+        <GoldDivider />
 
         {/* Features Section */}
         <section className="section-padding relative overflow-hidden bg-royal-silk">

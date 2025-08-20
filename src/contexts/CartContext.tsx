@@ -1,16 +1,7 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-
-interface CartItem {
-  id: string;
-  name: string;
-  category: string;
-  price: number;
-  originalPrice?: number;
-  image: string;
-  quantity: number;
-  selectedSize?: string;
-  selectedColor?: string;
-}
+import React, { createContext, useContext, useCallback, useMemo } from 'react';
+import { CartItem } from '@/types';
+import { useLocalStorage } from '@/hooks/useLocalStorage';
+import { STORAGE_KEYS } from '@/constants';
 
 interface CartContextType {
   cartItems: CartItem[];
@@ -20,6 +11,8 @@ interface CartContextType {
   clearCart: () => void;
   cartTotal: number;
   cartCount: number;
+  isInCart: (itemId: string, selectedSize?: string, selectedColor?: string) => boolean;
+  getItemQuantity: (itemId: string, selectedSize?: string, selectedColor?: string) => number;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -37,26 +30,9 @@ interface CartProviderProps {
 }
 
 export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [cartItems, setCartItems] = useLocalStorage<CartItem[]>(STORAGE_KEYS.CART, []);
 
-  // Load cart from localStorage on mount
-  useEffect(() => {
-    const savedCart = localStorage.getItem('cart');
-    if (savedCart) {
-      try {
-        setCartItems(JSON.parse(savedCart));
-      } catch (error) {
-        console.error('Error loading cart from localStorage:', error);
-      }
-    }
-  }, []);
-
-  // Save cart to localStorage whenever it changes
-  useEffect(() => {
-    localStorage.setItem('cart', JSON.stringify(cartItems));
-  }, [cartItems]);
-
-  const addToCart = (item: Omit<CartItem, 'quantity'>) => {
+  const addToCart = useCallback((item: Omit<CartItem, 'quantity'>) => {
     setCartItems(prevItems => {
       const existingItem = prevItems.find(cartItem => 
         cartItem.id === item.id && 
@@ -78,13 +54,13 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
         return [...prevItems, { ...item, quantity: 1 }];
       }
     });
-  };
+  }, [setCartItems]);
 
-  const removeFromCart = (itemId: string) => {
+  const removeFromCart = useCallback((itemId: string) => {
     setCartItems(prevItems => prevItems.filter(item => item.id !== itemId));
-  };
+  }, [setCartItems]);
 
-  const updateQuantity = (itemId: string, quantity: number) => {
+  const updateQuantity = useCallback((itemId: string, quantity: number) => {
     if (quantity <= 0) {
       removeFromCart(itemId);
       return;
@@ -95,16 +71,41 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
         item.id === itemId ? { ...item, quantity } : item
       )
     );
-  };
+  }, [setCartItems, removeFromCart]);
 
-  const clearCart = () => {
+  const clearCart = useCallback(() => {
     setCartItems([]);
-  };
+  }, [setCartItems]);
 
-  const cartTotal = cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
-  const cartCount = cartItems.reduce((count, item) => count + item.quantity, 0);
+  const isInCart = useCallback((itemId: string, selectedSize?: string, selectedColor?: string) => {
+    return cartItems.some(item => 
+      item.id === itemId && 
+      item.selectedSize === selectedSize && 
+      item.selectedColor === selectedColor
+    );
+  }, [cartItems]);
 
-  const value: CartContextType = {
+  const getItemQuantity = useCallback((itemId: string, selectedSize?: string, selectedColor?: string) => {
+    const item = cartItems.find(item => 
+      item.id === itemId && 
+      item.selectedSize === selectedSize && 
+      item.selectedColor === selectedColor
+    );
+    return item?.quantity || 0;
+  }, [cartItems]);
+
+  // Memoize expensive calculations
+  const cartTotal = useMemo(() => 
+    cartItems.reduce((total, item) => total + (item.price * item.quantity), 0), 
+    [cartItems]
+  );
+  
+  const cartCount = useMemo(() => 
+    cartItems.reduce((count, item) => count + item.quantity, 0), 
+    [cartItems]
+  );
+
+  const value: CartContextType = useMemo(() => ({
     cartItems,
     addToCart,
     removeFromCart,
@@ -112,7 +113,19 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     clearCart,
     cartTotal,
     cartCount,
-  };
+    isInCart,
+    getItemQuantity,
+  }), [
+    cartItems,
+    addToCart,
+    removeFromCart,
+    updateQuantity,
+    clearCart,
+    cartTotal,
+    cartCount,
+    isInCart,
+    getItemQuantity,
+  ]);
 
   return (
     <CartContext.Provider value={value}>
