@@ -4,159 +4,44 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
+import { supabaseUtils } from "@/hooks/useSupabase";
+import { Database } from "@/lib/supabase";
 
-interface Product {
-  id: string;
-  name: string;
-  category: string;
-  price: number;
-  originalPrice: number;
-  image: string;
-  rating: number;
-  reviews: number;
-  isNew: boolean;
-  isBestSeller: boolean;
-  colors: string[];
-  sizes: string[];
-  type: string;
-}
+type Product = Database['public']['Tables']['products']['Row'];
 
 const SearchModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [searchResults, setSearchResults] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
 
-  // Mock product database - in a real app this would come from an API
-  const allProducts: Product[] = [
-    {
-      id: "1",
-      name: "Royal Emerald Bridal Lehenga",
-      category: "Bridal Collection",
-      price: 45999,
-      originalPrice: 52999,
-      image: "/src/assets/hero-bridal.jpg",
-      rating: 4.9,
-      reviews: 156,
-      isNew: false,
-      isBestSeller: true,
-      colors: ["#10B981", "#DC2626", "#7C3AED", "#F59E0B"],
-      sizes: ["S", "M", "L", "XL", "XXL"],
-      type: "bridal"
-    },
-    {
-      id: "2",
-      name: "Premium Silk Festival Saree",
-      category: "Festival Glory",
-      price: 18999,
-      originalPrice: 24999,
-      image: "/src/assets/festival-saree.jpg",
-      rating: 4.8,
-      reviews: 203,
-      isNew: false,
-      isBestSeller: true,
-      colors: ["#DC2626", "#F59E0B", "#10B981", "#7C3AED"],
-      sizes: ["Free Size"],
-      type: "festival"
-    },
-    {
-      id: "3",
-      name: "Elegant Purple Anarkali",
-      category: "Special Moments",
-      price: 12999,
-      originalPrice: 16999,
-      image: "/src/assets/anarkali-purple.jpg",
-      rating: 4.7,
-      reviews: 89,
-      isNew: true,
-      isBestSeller: false,
-      colors: ["#7C3AED", "#EC4899", "#10B981", "#F59E0B"],
-      sizes: ["XS", "S", "M", "L", "XL"],
-      type: "special"
-    },
-    {
-      id: "4",
-      name: "Rose Gold Sharara Set",
-      category: "Western Edge",
-      price: 8999,
-      originalPrice: 11999,
-      image: "/src/assets/sharara-rose-gold.jpg",
-      rating: 4.6,
-      reviews: 134,
-      isNew: true,
-      isBestSeller: false,
-      colors: ["#F59E0B", "#EC4899", "#10B981", "#7C3AED"],
-      sizes: ["S", "M", "L", "XL"],
-      type: "western"
-    },
-    {
-      id: "5",
-      name: "Majestic Red Bridal Lehenga",
-      category: "Bridal Collection",
-      price: 38999,
-      originalPrice: 45999,
-      image: "/src/assets/hero-bridal.jpg",
-      rating: 4.9,
-      reviews: 98,
-      isNew: false,
-      isBestSeller: true,
-      colors: ["#DC2626", "#10B981", "#7C3AED", "#F59E0B"],
-      sizes: ["S", "M", "L", "XL", "XXL"],
-      type: "bridal"
-    },
-    {
-      id: "6",
-      name: "Golden Festival Silk Saree",
-      category: "Festival Glory",
-      price: 15999,
-      originalPrice: 19999,
-      image: "/src/assets/festival-saree.jpg",
-      rating: 4.8,
-      reviews: 167,
-      isNew: false,
-      isBestSeller: false,
-      colors: ["#F59E0B", "#DC2626", "#10B981", "#7C3AED"],
-      sizes: ["Free Size"],
-      type: "festival"
-    },
-    {
-      id: "7",
-      name: "Designer Teal Anarkali",
-      category: "Special Moments",
-      price: 14999,
-      originalPrice: 18999,
-      image: "/src/assets/anarkali-purple.jpg",
-      rating: 4.7,
-      reviews: 76,
-      isNew: true,
-      isBestSeller: false,
-      colors: ["#06B6D4", "#EC4899", "#10B981", "#F59E0B"],
-      sizes: ["XS", "S", "M", "L", "XL"],
-      type: "special"
-    },
-    {
-      id: "8",
-      name: "Modern Palazzo Set",
-      category: "Western Edge",
-      price: 9999,
-      originalPrice: 13999,
-      image: "/src/assets/sharara-rose-gold.jpg",
-      rating: 4.5,
-      reviews: 123,
-      isNew: false,
-      isBestSeller: false,
-      colors: ["#EC4899", "#10B981", "#7C3AED", "#F59E0B"],
-      sizes: ["S", "M", "L", "XL"],
-      type: "western"
+  // Fetch all products from Supabase
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const { data, error } = await supabaseUtils.getProducts();
+        if (error) {
+          console.error('Error fetching products:', error);
+          return;
+        }
+        setAllProducts(data || []);
+      } catch (err) {
+        console.error('Failed to fetch products:', err);
+      }
+    };
+
+    if (isOpen) {
+      fetchProducts();
     }
-  ];
+  }, [isOpen]);
 
   const categories = [
     { id: "all", name: "All Categories" },
-    { id: "bridal", name: "Bridal Collection" },
-    { id: "festival", name: "Festival Glory" },
-    { id: "special", name: "Special Moments" },
-    { id: "western", name: "Western Edge" }
+    { id: "Bridal Collection", name: "Bridal Collection" },
+    { id: "Festival Glory", name: "Festival Glory" },
+    { id: "Special Moments", name: "Special Moments" },
+    { id: "Western Edge", name: "Western Edge" }
   ];
 
   // Search functionality
@@ -177,15 +62,15 @@ const SearchModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void
         // Filter by search query
         if (searchQuery.trim()) {
           filtered = filtered.filter(product =>
-            product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            product.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            product.type.toLowerCase().includes(searchQuery.toLowerCase())
+            product.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            product.category?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            product.section?.toLowerCase().includes(searchQuery.toLowerCase())
           );
         }
         
         // Filter by category
         if (selectedCategory !== "all") {
-          filtered = filtered.filter(product => product.type === selectedCategory);
+          filtered = filtered.filter(product => product.category === selectedCategory);
         }
         
         setSearchResults(filtered);
@@ -194,7 +79,7 @@ const SearchModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void
     };
 
     performSearch();
-  }, [searchQuery, selectedCategory, isOpen]);
+  }, [searchQuery, selectedCategory, isOpen, allProducts]);
 
   // Close modal on escape key
   useEffect(() => {
@@ -227,9 +112,9 @@ const SearchModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void
       
       {/* Modal */}
       <div className="fixed inset-0 z-50 flex items-start justify-center pt-20 px-4">
-        <div className="bg-white rounded-lg shadow-2xl w-full max-w-4xl max-h-[80vh] overflow-hidden">
+        <div className="bg-white rounded-lg shadow-2xl w-full max-w-4xl max-h-[80vh] overflow-hidden flex flex-col">
           {/* Header */}
-          <div className="flex items-center justify-between p-6 border-b border-gray-200">
+          <div className="flex items-center justify-between p-6 border-b border-gray-200 flex-shrink-0">
             <h2 className="text-2xl font-serif font-bold text-gray-900">
               Search Products
             </h2>
@@ -242,7 +127,7 @@ const SearchModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void
           </div>
 
           {/* Search Input */}
-          <div className="p-6 border-b border-gray-200">
+          <div className="p-6 border-b border-gray-200 flex-shrink-0">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
               <Input
@@ -257,7 +142,7 @@ const SearchModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void
           </div>
 
           {/* Category Filters */}
-          <div className="p-6 border-b border-gray-200">
+          <div className="p-6 border-b border-gray-200 flex-shrink-0">
             <div className="flex items-center space-x-2 mb-4">
               <Filter className="h-4 w-4 text-gray-600" />
               <span className="text-sm font-medium text-gray-700">Filter by Category:</span>
@@ -280,8 +165,8 @@ const SearchModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void
             </div>
           </div>
 
-          {/* Search Results */}
-          <div className="flex-1 overflow-y-auto p-6">
+          {/* Search Results - Scrollable Area */}
+          <div className="flex-1 overflow-y-auto p-6 min-h-0">
             {isLoading ? (
               <div className="text-center py-8">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cultural mx-auto"></div>
@@ -311,24 +196,24 @@ const SearchModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void
               </div>
             ) : (
               <div>
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center justify-between mb-4 sticky top-0 bg-white py-2">
                   <h3 className="text-lg font-medium text-gray-900">
                     {searchResults.length} product{searchResults.length !== 1 ? 's' : ''} found
                   </h3>
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pb-4">
                   {searchResults.map((product) => (
                     <Link
                       key={product.id}
-                      to={`/${product.type}`}
+                      to={`/${product.section?.toLowerCase().replace(/\s+/g, '-') || 'featured'}`}
                       onClick={onClose}
                       className="group block bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-all duration-300"
                     >
                       <div className="aspect-[4/5] overflow-hidden">
                         <img
-                          src={product.image}
-                          alt={product.name}
+                          src={product.image_url || "/placeholder.svg"}
+                          alt={product.name || "Product"}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         />
                       </div>
@@ -336,36 +221,36 @@ const SearchModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void
                       <div className="p-4">
                         <div className="flex items-start justify-between mb-2">
                           <h4 className="font-medium text-gray-900 line-clamp-2 group-hover:text-cultural transition-colors">
-                            {product.name}
+                            {product.name || "Unnamed Product"}
                           </h4>
                           <div className="flex items-center space-x-1 ml-2">
-                            {product.isNew && (
+                            {product.is_new && (
                               <Badge className="bg-green-100 text-green-800 text-xs">New</Badge>
                             )}
-                            {product.isBestSeller && (
+                            {product.is_best_seller && (
                               <Badge className="bg-amber-100 text-amber-800 text-xs">Best Seller</Badge>
                             )}
                           </div>
                         </div>
                         
-                        <p className="text-sm text-gray-600 mb-2">{product.category}</p>
+                        <p className="text-sm text-gray-600 mb-2">{product.category || "Uncategorized"}</p>
                         
                         <div className="flex items-center justify-between">
                           <div className="flex items-center space-x-2">
                             <span className="text-lg font-semibold text-gray-900">
-                              ₹{product.price.toLocaleString()}
+                              ₹{product.price?.toLocaleString() || "0"}
                             </span>
-                            {product.originalPrice > product.price && (
+                            {product.original_price && product.original_price > (product.price || 0) && (
                               <span className="text-sm text-gray-500 line-through">
-                                ₹{product.originalPrice.toLocaleString()}
+                                ₹{product.original_price.toLocaleString()}
                               </span>
                             )}
                           </div>
                           
                           <div className="flex items-center space-x-1">
-                            <span className="text-sm text-gray-600">{product.rating}</span>
+                            <span className="text-sm text-gray-600">{product.rating || "0"}</span>
                             <span className="text-yellow-400">★</span>
-                            <span className="text-xs text-gray-500">({product.reviews})</span>
+                            <span className="text-xs text-gray-500">({product.reviews || "0"})</span>
                           </div>
                         </div>
                       </div>

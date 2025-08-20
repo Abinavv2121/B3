@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface ProductImageGalleryProps {
   images: string[];
@@ -9,20 +9,22 @@ interface ProductImageGalleryProps {
 
 export const ProductImageGallery = ({ images, productName, className = "" }: ProductImageGalleryProps) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [isZoomed, setIsZoomed] = useState(false);
-  const [hoverTimeout, setHoverTimeout] = useState<NodeJS.Timeout | null>(null);
+  const [isTransitioning, setIsTransitioning] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Auto-rotate images on hover with 2-second delay
+  // Auto-rotate images on hover - ONLY for this specific instance
   useEffect(() => {
     if (images.length <= 1) return;
 
     const startRotation = () => {
       if (intervalRef.current) return; // Prevent multiple intervals
       intervalRef.current = setInterval(() => {
+        setIsTransitioning(true);
         setCurrentImageIndex((prev) => (prev + 1) % images.length);
+        // Remove transition effect after animation completes
+        setTimeout(() => setIsTransitioning(false), 300);
       }, 2000); // 2 seconds as requested
     };
 
@@ -33,23 +35,20 @@ export const ProductImageGallery = ({ images, productName, className = "" }: Pro
       }
     };
 
-    // Start rotation after 2-second delay on hover
+    // Start rotation immediately on hover - ONLY for this container
     const handleMouseEnter = () => {
       setIsHovering(true);
-      const timeout = setTimeout(startRotation, 2000);
-      setHoverTimeout(timeout);
+      startRotation(); // Start immediately, no delay
     };
 
     const handleMouseLeave = () => {
       setIsHovering(false);
-      if (hoverTimeout) {
-        clearTimeout(hoverTimeout);
-        setHoverTimeout(null);
-      }
       stopRotation();
       setCurrentImageIndex(0); // Reset to first image
+      setIsTransitioning(false);
     };
 
+    // Only attach listeners to this specific container
     const element = containerRef.current;
     if (element) {
       element.addEventListener('mouseenter', handleMouseEnter);
@@ -59,18 +58,16 @@ export const ProductImageGallery = ({ images, productName, className = "" }: Pro
         element.removeEventListener('mouseenter', handleMouseEnter);
         element.removeEventListener('mouseleave', handleMouseLeave);
         stopRotation();
-        if (hoverTimeout) clearTimeout(hoverTimeout);
       };
     }
-  }, [images.length, hoverTimeout]);
+  }, [images.length, productName, images]);
 
   // Cleanup on unmount
   useEffect(() => {
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
-      if (hoverTimeout) clearTimeout(hoverTimeout);
     };
-  }, [hoverTimeout]);
+  }, []);
 
   if (!images || images.length === 0) {
     return (
@@ -83,8 +80,7 @@ export const ProductImageGallery = ({ images, productName, className = "" }: Pro
   if (images.length === 1) {
     return (
       <div 
-        className={`aspect-square bg-white/5 rounded-lg overflow-hidden cursor-pointer transition-transform duration-300 hover:scale-105 ${className}`}
-        onClick={() => setIsZoomed(true)}
+        className={`aspect-square bg-white/5 rounded-lg overflow-hidden transition-transform duration-300 hover:scale-105 ${className}`}
       >
         <img
           src={images[0]}
@@ -99,20 +95,16 @@ export const ProductImageGallery = ({ images, productName, className = "" }: Pro
     <>
       {/* Main Image Display */}
       <div 
-        className={`aspect-square bg-white/5 rounded-lg overflow-hidden cursor-pointer transition-all duration-300 hover:scale-105 ${className}`}
-        onClick={() => setIsZoomed(true)}
+        className={`aspect-square bg-white/5 rounded-lg overflow-hidden transition-all duration-300 hover:scale-105 ${className}`}
         ref={containerRef}
       >
         <img
           key={currentImageIndex}
           src={images[currentImageIndex]}
           alt={`${productName} - Image ${currentImageIndex + 1}`}
-          className={`w-full h-full object-cover transition-all duration-700 ${
-            isHovering && images.length > 1 ? 'animate-pulse' : ''
+          className={`w-full h-full object-cover transition-all duration-300 ${
+            isTransitioning ? 'scale-105' : 'scale-100'
           }`}
-          style={{
-            opacity: isHovering && images.length > 1 ? 0.9 : 1
-          }}
         />
         
         {/* Image Counter */}
@@ -120,9 +112,9 @@ export const ProductImageGallery = ({ images, productName, className = "" }: Pro
           {currentImageIndex + 1} / {images.length}
         </div>
 
-        {/* Hover Indicator */}
+        {/* Hover Indicator - Only show when this specific product is hovering */}
         {isHovering && images.length > 1 && (
-          <div className="absolute top-2 left-2 bg-yellow-500/80 text-black text-xs px-2 py-1 rounded-full font-medium animate-pulse">
+          <div className="absolute top-2 left-2 bg-yellow-500/80 text-black text-xs px-2 py-1 rounded-full font-medium">
             Auto-rotating
           </div>
         )}
@@ -158,7 +150,10 @@ export const ProductImageGallery = ({ images, productName, className = "" }: Pro
           {images.map((image, index) => (
             <button
               key={index}
-              onClick={() => setCurrentImageIndex(index)}
+              onClick={(e) => {
+                e.stopPropagation();
+                setCurrentImageIndex(index);
+              }}
               className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all duration-200 ${
                 index === currentImageIndex
                   ? 'border-yellow-500 scale-110'
@@ -172,60 +167,6 @@ export const ProductImageGallery = ({ images, productName, className = "" }: Pro
               />
             </button>
           ))}
-        </div>
-      )}
-
-      {/* Zoom Modal */}
-      {isZoomed && (
-        <div 
-          className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4"
-          onClick={() => setIsZoomed(false)}
-        >
-          <div className="relative max-w-4xl max-h-full">
-            {/* Close Button */}
-            <button
-              onClick={() => setIsZoomed(false)}
-              className="absolute top-4 right-4 w-10 h-10 bg-black/50 text-white rounded-full flex items-center justify-center hover:bg-black/70 transition-colors duration-200 z-10"
-            >
-              <X className="w-5 h-5" />
-            </button>
-
-            {/* Main Image */}
-            <img
-              src={images[currentImageIndex]}
-              alt={`${productName} - Image ${currentImageIndex + 1}`}
-              className="max-w-full max-h-full object-contain"
-            />
-
-            {/* Navigation in Zoom Mode */}
-            {images.length > 1 && (
-              <>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
-                  }}
-                  className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-black/50 text-white rounded-full flex items-center justify-center hover:bg-black/70 transition-colors duration-200"
-                >
-                  <ChevronLeft className="w-6 h-6" />
-                </button>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setCurrentImageIndex((prev) => (prev + 1) % images.length);
-                  }}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-black/50 text-white rounded-full flex items-center justify-center hover:bg-black/70 transition-colors duration-200"
-                >
-                  <ChevronRight className="w-6 h-6" />
-                </button>
-
-                {/* Image Counter */}
-                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/70 text-white px-4 py-2 rounded-full">
-                  {currentImageIndex + 1} / {images.length}
-                </div>
-              </>
-            )}
-          </div>
         </div>
       )}
     </>
