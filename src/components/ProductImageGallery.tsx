@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface ProductImageGalleryProps {
@@ -9,46 +9,40 @@ interface ProductImageGalleryProps {
 
 export const ProductImageGallery = ({ images, productName, className = "" }: ProductImageGalleryProps) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [isTransitioning, setIsTransitioning] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Auto-rotate images on hover - ONLY for this specific instance
+  // Memoize functions to prevent unnecessary re-renders
+  const startRotation = useCallback(() => {
+    if (intervalRef.current) return;
+    intervalRef.current = setInterval(() => {
+      setCurrentImageIndex((prev) => (prev + 1) % images.length);
+    }, 2000);
+  }, [images.length]);
+
+  const stopRotation = useCallback(() => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+  }, []);
+
+  const handleMouseEnter = useCallback(() => {
+    setIsHovering(true);
+    startRotation();
+  }, [startRotation]);
+
+  const handleMouseLeave = useCallback(() => {
+    setIsHovering(false);
+    stopRotation();
+    setCurrentImageIndex(0);
+  }, [stopRotation]);
+
+  // Optimized useEffect with proper cleanup
   useEffect(() => {
     if (images.length <= 1) return;
 
-    const startRotation = () => {
-      if (intervalRef.current) return; // Prevent multiple intervals
-      intervalRef.current = setInterval(() => {
-        setIsTransitioning(true);
-        setCurrentImageIndex((prev) => (prev + 1) % images.length);
-        // Remove transition effect after animation completes
-        setTimeout(() => setIsTransitioning(false), 300);
-      }, 2000); // 2 seconds as requested
-    };
-
-    const stopRotation = () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
-    };
-
-    // Start rotation immediately on hover - ONLY for this container
-    const handleMouseEnter = () => {
-      setIsHovering(true);
-      startRotation(); // Start immediately, no delay
-    };
-
-    const handleMouseLeave = () => {
-      setIsHovering(false);
-      stopRotation();
-      setCurrentImageIndex(0); // Reset to first image
-      setIsTransitioning(false);
-    };
-
-    // Only attach listeners to this specific container
     const element = containerRef.current;
     if (element) {
       element.addEventListener('mouseenter', handleMouseEnter);
@@ -60,7 +54,7 @@ export const ProductImageGallery = ({ images, productName, className = "" }: Pro
         stopRotation();
       };
     }
-  }, [images.length, productName, images]);
+  }, [images.length, handleMouseEnter, handleMouseLeave, stopRotation]);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -86,6 +80,7 @@ export const ProductImageGallery = ({ images, productName, className = "" }: Pro
           src={images[0]}
           alt={productName}
           className="w-full h-full object-cover"
+          loading="lazy"
         />
       </div>
     );
@@ -102,9 +97,8 @@ export const ProductImageGallery = ({ images, productName, className = "" }: Pro
           key={currentImageIndex}
           src={images[currentImageIndex]}
           alt={`${productName} - Image ${currentImageIndex + 1}`}
-          className={`w-full h-full object-cover transition-all duration-300 ${
-            isTransitioning ? 'scale-105' : 'scale-100'
-          }`}
+          className="w-full h-full object-cover"
+          loading="lazy"
         />
         
         {/* Image Counter */}
@@ -164,6 +158,7 @@ export const ProductImageGallery = ({ images, productName, className = "" }: Pro
                 src={image}
                 alt={`${productName} thumbnail ${index + 1}`}
                 className="w-full h-full object-cover"
+                loading="lazy"
               />
             </button>
           ))}

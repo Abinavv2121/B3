@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import brandLogo from "/src/assets/brand-logo.png";
 import wishlistIcon from "/src/assets/wishlist.png";
@@ -9,8 +9,9 @@ import SearchModal from "./SearchModal";
 import { useFavourites } from "@/contexts/FavouritesContext";
 import { useCart } from "@/contexts/CartContext";
 import { Badge } from "@/components/ui/badge";
+import { memo } from "react";
 
-const Navigation = () => {
+const Navigation = memo(() => {
   const navigate = useNavigate();
   const [isVisible, setIsVisible] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
@@ -19,49 +20,80 @@ const Navigation = () => {
   const { favouritesCount } = useFavourites();
   const { cartCount } = useCart();
 
-  // Scroll event handler
-  useEffect(() => {
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      
-      // Always show navigation, but add background when scrolling
-      setIsVisible(true);
-      
-      // Check if supportive toolbar has reached the bottom of hero section
-      const heroSection = document.getElementById('hero-section');
-      if (heroSection) {
-        const heroRect = heroSection.getBoundingClientRect();
-        const supportiveToolbarHeight = 56; // h-14 = 56px
-        const navigationHeight = 80; // h-20 = 80px
-        const totalHeaderHeight = navigationHeight + supportiveToolbarHeight;
-        
-        // When hero bottom is at or above the total header height, make opaque
-        const shouldBeOpaque = heroRect.bottom <= totalHeaderHeight;
-        setIsInCustomerFavs(shouldBeOpaque);
-      }
-      
+  // Memoize navigation functions
+  const handleWishlistClick = useCallback(() => {
+    navigate('/wishlist');
+  }, [navigate]);
 
+  const handleCartClick = useCallback(() => {
+    navigate('/cart');
+  }, [navigate]);
+
+  const handleSearchClick = useCallback(() => {
+    setIsSearchOpen(true);
+  }, []);
+
+  const handleSearchClose = useCallback(() => {
+    setIsSearchOpen(false);
+  }, []);
+
+  // Throttled scroll handler for better performance
+  const handleScroll = useCallback(() => {
+    const currentScrollY = window.scrollY;
+    
+    // Always show navigation, but add background when scrolling
+    setIsVisible(true);
+    
+    // Check if supportive toolbar has reached the bottom of hero section
+    const heroSection = document.getElementById('hero-section');
+    if (heroSection) {
+      const heroRect = heroSection.getBoundingClientRect();
+      const supportiveToolbarHeight = 56; // h-14 = 56px
+      const navigationHeight = 80; // h-20 = 80px
+      const totalHeaderHeight = navigationHeight + supportiveToolbarHeight;
       
-      setLastScrollY(currentScrollY);
+      // When hero bottom is at or above the total header height, make opaque
+      const shouldBeOpaque = heroRect.bottom <= totalHeaderHeight;
+      setIsInCustomerFavs(shouldBeOpaque);
+    }
+    
+    setLastScrollY(currentScrollY);
+  }, []);
+
+  // Scroll event handler with throttling
+  useEffect(() => {
+    let ticking = false;
+    
+    const throttledScroll = () => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          handleScroll();
+          ticking = false;
+        });
+        ticking = true;
+      }
     };
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('scroll', throttledScroll, { passive: true });
     
     return () => {
-      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('scroll', throttledScroll);
     };
-  }, [lastScrollY]);
+  }, [handleScroll]);
+
+  // Memoize header styles to prevent unnecessary re-renders
+  const headerStyles = useMemo(() => ({
+    backgroundColor: isInCustomerFavs 
+      ? 'rgba(0, 0, 0, 0.95)' 
+      : 'rgba(255, 255, 255, 0.1)',
+    backdropFilter: isInCustomerFavs ? 'blur(20px)' : 'blur(12px)'
+  }), [isInCustomerFavs]);
 
   return (
     <>
       <header 
         className="fixed top-0 -left-[50px] w-[calc(100vw+100px)] z-50 backdrop-blur-md border-b border-border shadow-sm transition-all duration-500"
-        style={{
-          backgroundColor: isInCustomerFavs 
-            ? 'rgba(0, 0, 0, 0.95)' 
-            : 'rgba(255, 255, 255, 0.1)',
-          backdropFilter: isInCustomerFavs ? 'blur(20px)' : 'blur(12px)'
-        }}
+        style={headerStyles}
       >
       <div className="w-[calc(100%+100px)] relative h-20 px-4">
         <div className="absolute inset-0 flex items-center py-6 px-16">
@@ -88,7 +120,7 @@ const Navigation = () => {
           {/* Right side buttons */}
           <div className="flex-1 flex items-center justify-end space-x-4 pr-24">
             <button 
-              onClick={() => navigate('/wishlist')}
+              onClick={handleWishlistClick}
               className="relative flex items-center justify-center p-3 hover:bg-white/10 rounded-lg transition-colors cursor-pointer"
             >
               <img 
@@ -103,7 +135,7 @@ const Navigation = () => {
               )}
             </button>
             <button 
-              onClick={() => setIsSearchOpen(true)}
+              onClick={handleSearchClick}
               className="flex items-center justify-center p-3 hover:bg-white/10 rounded-lg transition-colors cursor-pointer"
             >
               <img 
@@ -113,7 +145,7 @@ const Navigation = () => {
               />
             </button>
             <button 
-              onClick={() => navigate('/cart')}
+              onClick={handleCartClick}
               className="relative flex items-center justify-center p-3 hover:bg-white/10 rounded-lg transition-colors cursor-pointer"
             >
               <img 
@@ -136,10 +168,10 @@ const Navigation = () => {
       {/* Search Modal */}
       <SearchModal 
         isOpen={isSearchOpen} 
-        onClose={() => setIsSearchOpen(false)} 
+        onClose={handleSearchClose} 
       />
     </>
   );
-};
+});
 
 export default Navigation;

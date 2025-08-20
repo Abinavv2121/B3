@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { X, Search, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,45 +6,46 @@ import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
 import { supabaseUtils } from "@/hooks/useSupabase";
 import { Database } from "@/lib/supabase";
+import { memo } from "react";
 
 type Product = Database['public']['Tables']['products']['Row'];
 
-const SearchModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
+const SearchModal = memo(({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [searchResults, setSearchResults] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [allProducts, setAllProducts] = useState<Product[]>([]);
 
-  // Fetch all products from Supabase
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const { data, error } = await supabaseUtils.getProducts();
-        if (error) {
-          console.error('Error fetching products:', error);
-          return;
-        }
-        setAllProducts(data || []);
-      } catch (err) {
-        console.error('Failed to fetch products:', err);
-      }
-    };
-
-    if (isOpen) {
-      fetchProducts();
-    }
-  }, [isOpen]);
-
-  const categories = [
+  const categories = useMemo(() => [
     { id: "all", name: "All Categories" },
     { id: "Bridal Collection", name: "Bridal Collection" },
     { id: "Festival Glory", name: "Festival Glory" },
     { id: "Special Moments", name: "Special Moments" },
     { id: "Western Edge", name: "Western Edge" }
-  ];
+  ], []);
 
-  // Search functionality
+  // Fetch all products from Supabase
+  const fetchProducts = useCallback(async () => {
+    try {
+      const { data, error } = await supabaseUtils.getProducts();
+      if (error) {
+        console.error('Error fetching products:', error);
+        return;
+      }
+      setAllProducts(data || []);
+    } catch (err) {
+      console.error('Failed to fetch products:', err);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (isOpen) {
+      fetchProducts();
+    }
+  }, [isOpen, fetchProducts]);
+
+  // Search functionality with debouncing
   useEffect(() => {
     if (!isOpen) {
       setSearchQuery("");
@@ -81,11 +82,23 @@ const SearchModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void
     performSearch();
   }, [searchQuery, selectedCategory, isOpen, allProducts]);
 
+  const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  }, []);
+
+  const handleCategorySelect = useCallback((categoryId: string) => {
+    setSelectedCategory(categoryId);
+  }, []);
+
+  const handleClose = useCallback(() => {
+    onClose();
+  }, [onClose]);
+
   // Close modal on escape key
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
-        onClose();
+        handleClose();
       }
     };
 
@@ -98,7 +111,7 @@ const SearchModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void
       document.removeEventListener("keydown", handleEscape);
       document.body.style.overflow = "unset";
     };
-  }, [isOpen, onClose]);
+  }, [isOpen, handleClose]);
 
   if (!isOpen) return null;
 
@@ -134,7 +147,7 @@ const SearchModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void
                 type="text"
                 placeholder="Search for products, categories, or styles..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={handleSearchChange}
                 className="pl-10 pr-4 py-3 text-lg border-gray-300 focus:border-cultural focus:ring-cultural"
                 autoFocus
               />
@@ -157,7 +170,7 @@ const SearchModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void
                       ? 'bg-cultural text-white' 
                       : 'hover:bg-gray-100'
                   }`}
-                  onClick={() => setSelectedCategory(category.id)}
+                  onClick={() => handleCategorySelect(category.id)}
                 >
                   {category.name}
                 </Badge>
@@ -264,6 +277,6 @@ const SearchModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void
       </div>
     </>
   );
-};
+});
 
 export default SearchModal; 

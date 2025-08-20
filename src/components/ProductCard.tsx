@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Heart, ShoppingBag, Star, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -7,6 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useFavourites } from "@/contexts/FavouritesContext";
 import { useCart } from "@/contexts/CartContext";
 import { ProductImageGallery } from "@/components/ProductImageGallery";
+import { memo } from "react";
 
 interface ProductCardProps {
   product: {
@@ -27,7 +28,7 @@ interface ProductCardProps {
   };
 }
 
-const ProductCard = ({ product }: ProductCardProps) => {
+const ProductCard = memo(({ product }: ProductCardProps) => {
   const [selectedColor, setSelectedColor] = useState(product.colors[0]);
   const [selectedSize, setSelectedSize] = useState(product.sizes[0]);
   const [showQuickView, setShowQuickView] = useState(false);
@@ -36,9 +37,20 @@ const ProductCard = ({ product }: ProductCardProps) => {
   const { addToFavourites, removeFromFavourites, isInFavourites } = useFavourites();
   const { addToCart } = useCart();
 
-  const isWishlisted = isInFavourites(product.id);
+  const isWishlisted = useMemo(() => isInFavourites(product.id), [isInFavourites, product.id]);
 
-  const handleWishlist = (e: React.MouseEvent) => {
+  // Memoize expensive calculations
+  const discountPercentage = useMemo(() => 
+    product.originalPrice 
+      ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
+      : 0
+  , [product.originalPrice, product.price]);
+
+  const allImages = useMemo(() => 
+    [product.image, ...(product.additionalImages || [])]
+  , [product.image, product.additionalImages]);
+
+  const handleWishlist = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     if (isWishlisted) {
@@ -67,9 +79,9 @@ const ProductCard = ({ product }: ProductCardProps) => {
         description: `${product.name} has been added to your wishlist`,
       });
     }
-  };
+  }, [isWishlisted, removeFromFavourites, addToFavourites, product, toast]);
 
-  const handleQuickAdd = (e: React.MouseEvent) => {
+  const handleQuickAdd = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     
@@ -88,18 +100,41 @@ const ProductCard = ({ product }: ProductCardProps) => {
       title: "Added to cart",
       description: `${product.name} has been added to your cart`,
     });
-  };
+  }, [addToCart, product, selectedSize, selectedColor, toast]);
 
-  const handleProductClick = (e: React.MouseEvent) => {
+  const handleProductClick = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     setShowQuickView(true);
-  };
+  }, []);
 
-  const discountPercentage = product.originalPrice 
-    ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
-    : 0;
+  const handleColorSelect = useCallback((color: string) => (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setSelectedColor(color);
+  }, []);
 
-  const allImages = [product.image, ...(product.additionalImages || [])];
+  const handleSizeSelect = useCallback((size: string) => {
+    setSelectedSize(size);
+  }, []);
+
+  const handleCloseQuickView = useCallback(() => {
+    setShowQuickView(false);
+  }, []);
+
+  const handleImageNavigation = useCallback((direction: 'prev' | 'next') => {
+    setCurrentImageIndex((prev) => {
+      if (direction === 'prev') {
+        return (prev - 1 + allImages.length) % allImages.length;
+      } else {
+        return (prev + 1) % allImages.length;
+      }
+    });
+  }, [allImages.length]);
+
+  const handleThumbnailClick = useCallback((index: number) => (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setCurrentImageIndex(index);
+  }, []);
 
   return (
     <>
@@ -168,11 +203,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
                       selectedColor === color ? 'border-white scale-110' : 'border-white/50'
                     } transition-all duration-200`}
                     style={{ backgroundColor: color }}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setSelectedColor(color);
-                    }}
+                    onClick={handleColorSelect(color)}
                   />
                 ))}
               </div>
@@ -244,7 +275,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
       {showQuickView && (
         <div 
           className="fixed inset-0 z-50 flex items-center justify-center p-4"
-          onClick={() => setShowQuickView(false)}
+          onClick={handleCloseQuickView}
         >
           {/* Backdrop with blur effect */}
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
@@ -256,7 +287,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
           >
             {/* Close Button */}
             <button
-              onClick={() => setShowQuickView(false)}
+              onClick={handleCloseQuickView}
               className="absolute top-4 right-4 w-10 h-10 bg-black/20 text-white rounded-full flex items-center justify-center hover:bg-black/40 transition-colors duration-200 z-10"
             >
               <X className="w-5 h-5" />
@@ -276,13 +307,13 @@ const ProductCard = ({ product }: ProductCardProps) => {
                   {allImages.length > 1 && (
                     <>
                       <button
-                        onClick={() => setCurrentImageIndex((prev) => (prev - 1 + allImages.length) % allImages.length)}
+                        onClick={() => handleImageNavigation('prev')}
                         className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-black/50 text-white rounded-full flex items-center justify-center hover:bg-black/70 transition-colors duration-200"
                       >
                         <ChevronLeft className="w-4 h-4" />
                       </button>
                       <button
-                        onClick={() => setCurrentImageIndex((prev) => (prev + 1) % allImages.length)}
+                        onClick={() => handleImageNavigation('next')}
                         className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-black/50 text-white rounded-full flex items-center justify-center hover:bg-black/70 transition-colors duration-200"
                       >
                         <ChevronRight className="w-4 h-4" />
@@ -297,7 +328,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
                     {allImages.map((image, index) => (
                       <button
                         key={index}
-                        onClick={() => setCurrentImageIndex(index)}
+                        onClick={handleThumbnailClick(index)}
                         className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all duration-200 ${
                           index === currentImageIndex
                             ? 'border-yellow-500 scale-110'
@@ -365,7 +396,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
                     {product.sizes.map((size, index) => (
                       <button
                         key={index}
-                        onClick={() => setSelectedSize(size)}
+                        onClick={() => handleSizeSelect(size)}
                         className={`px-4 py-2 rounded-lg border-2 transition-all duration-200 ${
                           selectedSize === size
                             ? 'border-yellow-500 bg-yellow-50 text-yellow-700'
@@ -386,7 +417,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
                       {product.colors.map((color, index) => (
                         <button
                           key={index}
-                          onClick={() => setSelectedColor(color)}
+                          onClick={() => handleColorSelect(color)}
                           className={`w-8 h-8 rounded-full border-2 transition-all duration-200 ${
                             selectedColor === color ? 'border-yellow-500 scale-110' : 'border-gray-300'
                           }`}
@@ -422,6 +453,6 @@ const ProductCard = ({ product }: ProductCardProps) => {
       )}
     </>
   );
-};
+});
 
 export default ProductCard;

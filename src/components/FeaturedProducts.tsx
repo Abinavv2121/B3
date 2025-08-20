@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import ProductCard from "./ProductCard";
@@ -9,28 +9,25 @@ import shippingIcon from "/src/assets/shipping.png";
 import returnIcon from "/src/assets/return.png";
 import secureIcon from "/src/assets/secure.png";
 import emiIcon from "/src/assets/emi.png";
+import { memo } from "react";
 
 type Product = Database['public']['Tables']['products']['Row'];
 
-const FeaturedProducts = () => {
+const FeaturedProducts = memo(() => {
   const [activeFilter, setActiveFilter] = useState("all");
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const filters = [
+  const filters = useMemo(() => [
     { id: "all", name: "All", count: 0 },
     { id: "Bridal Collection", name: "Bridal", count: 0 },
     { id: "Festival Glory", name: "Festival", count: 0 },
     { id: "Special Moments", name: "Special", count: 0 },
     { id: "Western Edge", name: "Western", count: 0 }
-  ];
+  ], []);
 
-  useEffect(() => {
-    loadProducts();
-  }, []);
-
-  const loadProducts = async () => {
+  const loadProducts = useCallback(async () => {
     setIsLoading(true);
     try {
       const { data, error } = await supabaseUtils.getProducts();
@@ -51,29 +48,41 @@ const FeaturedProducts = () => {
       setError("Failed to load products");
     }
     setIsLoading(false);
-  };
+  }, [filters]);
 
-  const filteredProducts = activeFilter === "all" 
-    ? products 
-    : products.filter(product => product.category === activeFilter);
+  useEffect(() => {
+    loadProducts();
+  }, [loadProducts]);
+
+  const handleFilterChange = useCallback((filterId: string) => {
+    setActiveFilter(filterId);
+  }, []);
+
+  const filteredProducts = useMemo(() => 
+    activeFilter === "all" 
+      ? products 
+      : products.filter(product => product.category === activeFilter)
+  , [activeFilter, products]);
 
   // Transform database products to match ProductCard interface
-  const transformedProducts = filteredProducts.map(product => ({
-    id: product.id,
-    name: product.name,
-    category: product.category,
-    price: product.price,
-    originalPrice: product.original_price,
-    image: product.image_url || "/placeholder.svg",
-    additionalImages: product.additional_images || [],
-    rating: product.rating || 4.5, // Use database rating or default
-    reviews: product.reviews || Math.floor(Math.random() * 200) + 50, // Use database reviews or random
-    isNew: product.is_new,
-    isBestSeller: product.is_best_seller,
-    colors: product.colors || ["#DC2626", "#10B981", "#7C3AED", "#F59E0B"],
-    sizes: product.sizes || ["S", "M", "L", "XL"],
-    type: product.category.toLowerCase().replace(/\s+/g, '-')
-  }));
+  const transformedProducts = useMemo(() => 
+    filteredProducts.map(product => ({
+      id: product.id,
+      name: product.name,
+      category: product.category,
+      price: product.price,
+      originalPrice: product.original_price,
+      image: product.image_url || "/placeholder.svg",
+      additionalImages: product.additional_images || [],
+      rating: product.rating || 4.5,
+      reviews: product.reviews || Math.floor(Math.random() * 200) + 50,
+      isNew: product.is_new,
+      isBestSeller: product.is_best_seller,
+      colors: product.colors || ["#DC2626", "#10B981", "#7C3AED", "#F59E0B"],
+      sizes: product.sizes || ["S", "M", "L", "XL"],
+      type: product.category.toLowerCase().replace(/\s+/g, '-')
+    }))
+  , [filteredProducts]);
 
   if (isLoading) {
     return (
@@ -138,7 +147,7 @@ const FeaturedProducts = () => {
             {filters.map((filter) => (
               <button
                 key={filter.id}
-                onClick={() => setActiveFilter(filter.id)}
+                onClick={() => handleFilterChange(filter.id)}
                 className={`font-italiana text-sm font-medium uppercase tracking-wide transition-all duration-300 whitespace-nowrap px-6 py-2.5 rounded-lg hover:bg-white/10 border border-transparent hover:border-white/20 ${
                   activeFilter === filter.id
                     ? 'text-white bg-white/15 border-white/30'
@@ -267,6 +276,6 @@ const FeaturedProducts = () => {
       </div>
     </section>
   );
-};
+});
 
 export default FeaturedProducts;
