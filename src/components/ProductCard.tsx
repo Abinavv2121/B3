@@ -27,13 +27,19 @@ interface ProductCardProps {
 }
 
 const ProductCard = memo(({ product }: ProductCardProps) => {
-  const { addToCart } = useCart();
+  const { addToCart, isInCart } = useCart();
   const { addToFavourites, removeFromFavourites, isInFavourites } = useFavourites();
   const { toast } = useToast();
   const [showQuickView, setShowQuickView] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [selectedColor, setSelectedColor] = useState(product.colors[0]);
   const [selectedSize, setSelectedSize] = useState(product.sizes[0]);
+
+  // Check if this product is already in cart
+  const isProductInCart = useMemo(() => 
+    isInCart(product.id, selectedSize, selectedColor), 
+    [isInCart, product.id, selectedSize, selectedColor]
+  );
 
   // Memoized computations
   const discountPercentage = useMemo(() => {
@@ -72,6 +78,17 @@ const ProductCard = memo(({ product }: ProductCardProps) => {
 
   const handleQuickAdd = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
+    
+    // Check if product is already in cart
+    if (isProductInCart) {
+      toast({
+        title: 'Product already in cart',
+        description: `"${product.name}" is already in your cart.`,
+        variant: 'default',
+      });
+      return;
+    }
+    
     console.log('Adding to cart:', {
       id: product.id,
       name: product.name,
@@ -97,7 +114,7 @@ const ProductCard = memo(({ product }: ProductCardProps) => {
       description: `Item "${product.name}" added to cart.`,
       variant: 'default',
     });
-  }, [addToCart, product.id, product.name, product.price, product.image, product.category, product.originalPrice, selectedColor, selectedSize, toast]);
+  }, [addToCart, product.id, product.name, product.price, product.image, product.category, product.originalPrice, selectedColor, selectedSize, toast, isProductInCart]);
 
   const handleProductClick = useCallback(() => {
     setShowQuickView(true);
@@ -178,13 +195,18 @@ const ProductCard = memo(({ product }: ProductCardProps) => {
             </div>
 
             {/* Quick Shop Overlay */}
-            <div className="absolute bottom-3 left-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-4 group-hover:translate-y-0">
+            <div className="absolute bottom-3 left-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-4 group-hover:translate-x-0">
               <Button
-                className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white border-0 shadow-lg"
+                className={`flex-1 border-0 shadow-lg ${
+                  isProductInCart 
+                    ? 'bg-gray-400 cursor-not-allowed' 
+                    : 'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600'
+                }`}
                 onClick={handleQuickAdd}
+                disabled={isProductInCart}
               >
                 <ShoppingBag className="mr-2 h-4 w-4" />
-                Quick Add
+                {isProductInCart ? 'Already in Cart' : 'Quick Add'}
               </Button>
             </div>
 
@@ -421,11 +443,16 @@ const ProductCard = memo(({ product }: ProductCardProps) => {
                   {/* Action Buttons */}
                   <div className="flex space-x-3 pt-4">
                     <Button 
-                      className="flex-1 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white border-0 shadow-lg"
+                      className={`flex-1 border-0 shadow-lg ${
+                        isProductInCart 
+                          ? 'bg-gray-400 cursor-not-allowed' 
+                          : 'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600'
+                      }`}
                       onClick={handleQuickAdd}
+                      disabled={isProductInCart}
                     >
                       <ShoppingBag className="mr-2 h-5 w-5" />
-                      Add to Cart
+                      {isProductInCart ? 'Already in Cart' : 'Add to Cart'}
                     </Button>
                     <Button 
                       variant="outline" 

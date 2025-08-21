@@ -38,6 +38,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     setCartItems(prevItems => {
       console.log('CartContext: Previous cart items:', prevItems);
       
+      // Check if this exact product (same ID, size, and color) is already in cart
       const existingItem = prevItems.find(cartItem => 
         cartItem.id === item.id && 
         cartItem.selectedSize === item.selectedSize && 
@@ -45,20 +46,13 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
       );
 
       if (existingItem) {
-        console.log('CartContext: Item already exists, increasing quantity');
-        // If item already exists with same size and color, increase quantity
-        const newItems = prevItems.map(cartItem =>
-          cartItem.id === item.id && 
-          cartItem.selectedSize === item.selectedSize && 
-          cartItem.selectedColor === item.selectedColor
-            ? { ...cartItem, quantity: cartItem.quantity + 1 }
-            : cartItem
-        );
-        console.log('CartContext: New cart items after quantity increase:', newItems);
-        return newItems;
+        console.log('CartContext: Product already in cart - cannot add duplicate');
+        // Product already exists in cart - don't add duplicate
+        // Return the same cart items unchanged
+        return prevItems;
       } else {
-        console.log('CartContext: Adding new item to cart');
-        // Add new item with quantity 1
+        console.log('CartContext: Adding new unique product to cart');
+        // Add new unique product with quantity 1
         const newItems = [...prevItems, { ...item, quantity: 1 }];
         console.log('CartContext: New cart items after adding:', newItems);
         return newItems;
