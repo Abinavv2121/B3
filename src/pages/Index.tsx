@@ -1,9 +1,9 @@
 import Navigation from "@/components/Navigation";
 import SupportiveToolbar from "@/components/SupportiveToolbar";
 import HeroSection from "@/components/HeroSection";
-import AutoScrollCarousel from "@/components/AutoScrollCarousel";
-import CategoryShowcase from "@/components/CategoryShowcase";
-import FeaturedProducts from "@/components/FeaturedProducts";
+import { AutoScrollCarousel } from "@/components/AutoScrollCarousel";
+import { CategoryShowcase } from "@/components/CategoryShowcase";
+import { FeaturedProducts } from "@/components/FeaturedProducts";
 import Footer from "@/components/Footer";
 import { GoldDivider } from "@/components/ui/gold-divider";
 

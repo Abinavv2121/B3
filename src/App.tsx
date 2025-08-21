@@ -1,59 +1,85 @@
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { FavouritesProvider } from "@/contexts/FavouritesContext";
-import { CartProvider } from "@/contexts/CartContext";
-import Index from "./pages/Index";
-import Saree from "./pages/Saree";
-import Anarkali from "./pages/Anarkali";
-import Lehenga from "./pages/Lehenga";
-import SalwarSuit from "./pages/SalwarSuit";
-import Western from "./pages/Western";
-import Bridal from "./pages/Bridal";
-import Festival from "./pages/Festival";
-import Special from "./pages/Special";
-import Cart from "./pages/Cart";
-import Checkout from "./pages/Checkout";
-import OrderSuccess from "./pages/OrderSuccess";
-import Wishlist from "./pages/Wishlist";
-import Admin from "./pages/Admin";
-import NotFound from "./pages/NotFound";
+import React, { Suspense, lazy, memo } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { CartProvider } from '@/contexts/CartContext';
+import { FavouritesProvider } from '@/contexts/FavouritesContext';
+import { Toaster } from '@/components/ui/toaster';
 
-const queryClient = new QueryClient();
+// Lazy load components for code splitting
+const Index = lazy(() => import('@/pages/Index'));
+const Saree = lazy(() => import('@/pages/Saree'));
+const Anarkali = lazy(() => import('@/pages/Anarkali'));
+const Lehenga = lazy(() => import('@/pages/Lehenga'));
+const SalwarSuit = lazy(() => import('@/pages/SalwarSuit'));
+const Western = lazy(() => import('@/pages/Western'));
+const Bridal = lazy(() => import('@/pages/Bridal'));
+const Cart = lazy(() => import('@/pages/Cart'));
+const Wishlist = lazy(() => import('@/pages/Wishlist'));
+const Checkout = lazy(() => import('@/pages/Checkout'));
+const OrderSuccess = lazy(() => import('@/pages/OrderSuccess'));
+const Admin = lazy(() => import('@/pages/Admin'));
+const NotFound = lazy(() => import('@/pages/NotFound'));
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <FavouritesProvider>
+// Loading component
+const LoadingSpinner = memo(() => (
+  <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 to-slate-800">
+    <div className="text-center">
+      <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-amber-400 mx-auto mb-4"></div>
+      <p className="text-slate-300 text-lg">Loading...</p>
+    </div>
+  </div>
+));
+
+LoadingSpinner.displayName = 'LoadingSpinner';
+
+// Error boundary component
+const ErrorFallback = memo(() => (
+  <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 to-slate-800">
+    <div className="text-center">
+      <h1 className="text-2xl font-bold text-red-400 mb-4">Something went wrong</h1>
+      <p className="text-slate-300 mb-4">Please refresh the page to try again</p>
+      <button 
+        onClick={() => window.location.reload()} 
+        className="px-6 py-3 bg-amber-500 hover:bg-amber-600 text-white rounded-lg transition-colors"
+      >
+        Refresh Page
+      </button>
+    </div>
+  </div>
+));
+
+ErrorFallback.displayName = 'ErrorFallback';
+
+const App = memo(() => {
+  return (
+    <Router>
       <CartProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/saree" element={<Saree />} />
-              <Route path="/anarkali" element={<Anarkali />} />
-              <Route path="/lehenga" element={<Lehenga />} />
-              <Route path="/salwar-suit" element={<SalwarSuit />} />
-              <Route path="/western" element={<Western />} />
-              <Route path="/bridal" element={<Bridal />} />
-              <Route path="/festival" element={<Festival />} />
-              <Route path="/special" element={<Special />} />
-              <Route path="/cart" element={<Cart />} />
-              <Route path="/checkout" element={<Checkout />} />
-              <Route path="/order-success" element={<OrderSuccess />} />
-              <Route path="/wishlist" element={<Wishlist />} />
-              <Route path="/admin" element={<Admin />} />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
-        </TooltipProvider>
+        <FavouritesProvider>
+          <div className="App">
+            <Suspense fallback={<LoadingSpinner />}>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/saree" element={<Saree />} />
+                <Route path="/anarkali" element={<Anarkali />} />
+                <Route path="/lehenga" element={<Lehenga />} />
+                <Route path="/salwar-suit" element={<SalwarSuit />} />
+                <Route path="/western" element={<Western />} />
+                <Route path="/bridal" element={<Bridal />} />
+                <Route path="/cart" element={<Cart />} />
+                <Route path="/wishlist" element={<Wishlist />} />
+                <Route path="/checkout" element={<Checkout />} />
+                <Route path="/order-success" element={<OrderSuccess />} />
+                <Route path="/admin" element={<Admin />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </Suspense>
+            <Toaster />
+          </div>
+        </FavouritesProvider>
       </CartProvider>
-    </FavouritesProvider>
-  </QueryClientProvider>
-);
+    </Router>
+  );
+});
+
+App.displayName = 'App';
 
 export default App;

@@ -1,104 +1,138 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import ProductCard from "./ProductCard";
-import { Sparkles, ArrowRight, Filter, Crown } from "lucide-react";
-import { supabaseUtils } from "@/hooks/useSupabase";
-import { Database } from "@/lib/supabase";
-import shippingIcon from "/src/assets/shipping.png";
-import returnIcon from "/src/assets/return.png";
-import secureIcon from "/src/assets/secure.png";
-import emiIcon from "/src/assets/emi.png";
-import { memo } from "react";
+import React, { useState, useEffect, useCallback, useMemo, memo } from 'react';
+import ProductCard from '@/components/ProductCard';
+import { supabaseUtils } from '@/hooks/useSupabase';
+import shippingIcon from '/src/assets/shipping.png';
+import returnIcon from '/src/assets/return.png';
+import secureIcon from '/src/assets/secure.png';
+import emiIcon from '/src/assets/emi.png';
 
-type Product = Database['public']['Tables']['products']['Row'];
+interface Product {
+  id: string;
+  name: string;
+  price: number;
+  original_price?: number;
+  image_url: string;
+  category: string;
+  rating: number;
+  reviews: number;
+  is_new?: boolean;
+  is_best_seller?: boolean;
+  colors: string[];
+  sizes: string[];
+  additional_images?: string[];
+}
+
+interface Filter {
+  id: string;
+  name: string;
+  count: number;
+}
 
 const FeaturedProducts = memo(() => {
-  const [activeFilter, setActiveFilter] = useState("all");
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [activeFilter, setActiveFilter] = useState('all');
 
-  const filters = useMemo(() => [
-    { id: "all", name: "All", count: 0 },
-    { id: "Bridal Collection", name: "Bridal", count: 0 },
-    { id: "Festival Glory", name: "Festival", count: 0 },
-    { id: "Special Moments", name: "Special", count: 0 },
-    { id: "Western Edge", name: "Western", count: 0 }
-  ], []);
+  // Memoized filters array
+  const filters = useMemo((): Filter[] => {
+    if (!products.length) return [];
+    
+    const allCount = products.length;
+    const newCount = products.filter(p => p.is_new).length;
+    const bestSellerCount = products.filter(p => p.is_best_seller).length;
+    const discountedCount = products.filter(p => p.original_price && p.original_price > p.price).length;
 
+    return [
+      { id: 'all', name: 'All Products', count: allCount },
+      { id: 'new', name: 'New Arrivals', count: newCount },
+      { id: 'best-seller', name: 'Best Sellers', count: bestSellerCount },
+      { id: 'discounted', name: 'On Sale', count: discountedCount },
+    ];
+  }, [products]);
+
+  // Memoized load products function
   const loadProducts = useCallback(async () => {
-    setIsLoading(true);
     try {
+      setIsLoading(true);
+      setError(null);
       const { data, error } = await supabaseUtils.getProducts();
       if (error) {
         setError(error.message);
       } else {
         setProducts(data || []);
-        // Update filter counts
-        filters.forEach(filter => {
-          if (filter.id === "all") {
-            filter.count = data?.length || 0;
-          } else {
-            filter.count = data?.filter(p => p.category === filter.id).length || 0;
-          }
-        });
       }
     } catch (err) {
-      setError("Failed to load products");
+      setError(err instanceof Error ? err.message : 'Failed to load products');
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
-  }, [filters]);
+  }, []);
 
+  // Load products on mount
   useEffect(() => {
     loadProducts();
   }, [loadProducts]);
 
+  // Memoized filter change handler
   const handleFilterChange = useCallback((filterId: string) => {
     setActiveFilter(filterId);
   }, []);
 
-  const filteredProducts = useMemo(() => 
-    activeFilter === "all" 
-      ? products 
-      : products.filter(product => product.category === activeFilter)
-  , [activeFilter, products]);
+  // Memoized filtered products
+  const filteredProducts = useMemo(() => {
+    if (activeFilter === 'all') return products;
+    
+    return products.filter(product => {
+      switch (activeFilter) {
+        case 'new':
+          return product.is_new;
+        case 'best-seller':
+          return product.is_best_seller;
+        case 'discounted':
+          return product.original_price && product.original_price > product.price;
+        default:
+          return true;
+      }
+    });
+  }, [products, activeFilter]);
 
-  // Transform database products to match ProductCard interface
-  const transformedProducts = useMemo(() => 
-    filteredProducts.map(product => ({
+  // Memoized transformed products
+  const transformedProducts = useMemo(() => {
+    return filteredProducts.map(product => ({
       id: product.id,
       name: product.name,
-      category: product.category,
       price: product.price,
       originalPrice: product.original_price,
-      image: product.image_url || "/placeholder.svg",
-      additionalImages: product.additional_images || [],
-      rating: product.rating || 4.5,
-      reviews: product.reviews || Math.floor(Math.random() * 200) + 50,
+      image: product.image_url,
+      category: product.category,
+      rating: product.rating,
+      reviews: product.reviews,
       isNew: product.is_new,
       isBestSeller: product.is_best_seller,
-      colors: product.colors || ["#DC2626", "#10B981", "#7C3AED", "#F59E0B"],
-      sizes: product.sizes || ["S", "M", "L", "XL"],
-      type: product.category.toLowerCase().replace(/\s+/g, '-')
-    }))
-  , [filteredProducts]);
+      colors: product.colors || ['#000000'],
+      sizes: product.sizes || ['M'],
+      additionalImages: product.additional_images || [],
+    }));
+  }, [filteredProducts]);
 
   if (isLoading) {
     return (
-      <section className="section-padding relative overflow-hidden bg-royal-silk">
+      <section className="section-padding relative overflow-hidden" style={{ 
+        background: 'linear-gradient(180deg, #0F172A 0%, #1E293B 20%, #334155 40%, #475569 60%, #64748B 80%, #94A3B8 100%)'
+      }}>
         <div className="w-full px-4 lg:px-8 relative z-10">
-          <div className="text-center mb-12 max-w-4xl mx-auto">
-            <h2 className="text-3xl lg:text-4xl font-['Italiana'] tracking-wide" 
+          <div className="text-center mb-16 max-w-4xl mx-auto">
+            <h2 className="text-4xl lg:text-5xl font-['Italiana'] tracking-wide mb-6" 
                 style={{ 
-                  color: '#F8F7F3',
-                  textShadow: '0 2px 4px rgba(0,0,0,0.8)'
+                  color: '#F8FAFC',
+                  textShadow: '0 2px 4px rgba(0,0,0,0.3)'
                 }}>
-              Featured <span style={{ color: '#D4AF37' }}>Collections</span>
+              Featured <span style={{ color: '#EAB308' }}>Collections</span>
             </h2>
           </div>
           <div className="flex justify-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-400"></div>
           </div>
         </div>
       </section>
@@ -107,15 +141,17 @@ const FeaturedProducts = memo(() => {
 
   if (error) {
     return (
-      <section className="section-padding relative overflow-hidden bg-royal-silk">
+      <section className="section-padding relative overflow-hidden" style={{ 
+        background: 'linear-gradient(180deg, #0F172A 0%, #1E293B 20%, #334155 40%, #475569 60%, #64748B 80%, #94A3B8 100%)'
+      }}>
         <div className="w-full px-4 lg:px-8 relative z-10">
-          <div className="text-center mb-12 max-w-4xl mx-auto">
-            <h2 className="text-3xl lg:text-4xl font-['Italiana'] tracking-wide" 
+          <div className="text-center mb-16 max-w-4xl mx-auto">
+            <h2 className="text-4xl lg:text-5xl font-['Italiana'] tracking-wide mb-6" 
                 style={{ 
-                  color: '#F8F7F3',
-                  textShadow: '0 2px 4px rgba(0,0,0,0.8)'
+                  color: '#F8FAFC',
+                  textShadow: '0 2px 4px rgba(0,0,0,0.3)'
                 }}>
-              Featured <span style={{ color: '#D4AF37' }}>Collections</span>
+              Featured <span style={{ color: '#EAB308' }}>Collections</span>
             </h2>
           </div>
           <div className="text-center text-red-400">
@@ -127,31 +163,44 @@ const FeaturedProducts = memo(() => {
   }
 
   return (
-    <section className="section-padding relative overflow-hidden bg-royal-silk">
+    <section className="section-padding relative overflow-hidden" style={{ 
+      background: 'linear-gradient(180deg, #0F172A 0%, #1E293B 20%, #334155 40%, #475569 60%, #64748B 80%, #94A3B8 100%)'
+    }}>
+      {/* Subtle, organic texture overlay */}
+      <div className="absolute inset-0 opacity-10">
+        <div className="absolute inset-0" style={{
+          backgroundImage: `radial-gradient(circle at 20% 80%, rgba(139, 92, 246, 0.3) 0%, transparent 50%),
+                           radial-gradient(circle at 80% 20%, rgba(236, 72, 153, 0.3) 0%, transparent 50%),
+                           radial-gradient(circle at 40% 40%, rgba(34, 197, 94, 0.2) 0%, transparent 50%)`
+        }}></div>
+      </div>
 
       <div className="w-full px-4 lg:px-8 relative z-10">
-        {/* Minimalist Section Header */}
-        <div className="text-center mb-12 max-w-4xl mx-auto">
-          <h2 className="text-3xl lg:text-4xl font-['Italiana'] tracking-wide" 
+        {/* Refined Section Header */}
+        <div className="text-center mb-16 max-w-4xl mx-auto">
+          <h2 className="text-4xl lg:text-5xl font-['Italiana'] tracking-wide mb-6" 
               style={{ 
-                color: '#F8F7F3',
-                textShadow: '0 2px 4px rgba(0,0,0,0.8)'
+                color: '#F8FAFC',
+                textShadow: '0 2px 4px rgba(0,0,0,0.3)'
               }}>
-            Featured <span style={{ color: '#D4AF37' }}>Collections</span>
+            Featured <span style={{ color: '#EAB308' }}>Collections</span>
           </h2>
+          <p className="text-xl text-slate-300 font-light max-w-2xl mx-auto">
+            Discover our curated selection of timeless elegance
+          </p>
         </div>
 
-        {/* Filter Tabs */}
-        <div className="flex justify-center mb-12">
-          <div className="flex items-center space-x-2 px-6 py-3 bg-black/95 backdrop-blur-xl rounded-lg border-b border-gray-200 shadow-sm">
+        {/* Refined Filter Tabs */}
+        <div className="flex justify-center mb-16">
+          <div className="flex items-center space-x-3 px-8 py-4 bg-slate-800/60 backdrop-blur-xl rounded-2xl border border-slate-600/40 shadow-xl">
             {filters.map((filter) => (
               <button
                 key={filter.id}
                 onClick={() => handleFilterChange(filter.id)}
-                className={`font-italiana text-sm font-medium uppercase tracking-wide transition-all duration-300 whitespace-nowrap px-6 py-2.5 rounded-lg hover:bg-white/10 border border-transparent hover:border-white/20 ${
+                className={`font-italiana text-sm font-medium uppercase tracking-wide whitespace-nowrap px-6 py-3 rounded-xl transition-all duration-300 hover:scale-105 ${
                   activeFilter === filter.id
-                    ? 'text-white bg-white/15 border-white/30'
-                    : 'text-white/70 hover:text-white'
+                    ? 'text-slate-900 bg-gradient-to-r from-amber-400 to-yellow-500 border border-amber-300 shadow-lg'
+                    : 'text-slate-300 hover:text-amber-300 hover:bg-slate-700/60 border border-transparent hover:border-slate-500/60'
                 }`}
               >
                 {filter.name}
@@ -176,96 +225,96 @@ const FeaturedProducts = memo(() => {
           </div>
         ) : (
           <div className="text-center py-20">
-            <p className="text-white/70 text-lg">No products found in this category.</p>
+            <p className="text-slate-300 text-lg">No products found in this category.</p>
           </div>
         )}
 
-        {/* Feature Benefits Section */}
+        {/* Refined Feature Benefits Section */}
         <div className="mt-24">
-          <div className="py-16 rounded-3xl" style={{ 
-            background: 'linear-gradient(145deg, rgba(26, 28, 31, 0.8) 0%, rgba(15, 17, 20, 0.9) 100%)',
-            border: '1px solid rgba(212, 175, 55, 0.2)',
-            boxShadow: '0 10px 30px rgba(0, 0, 0, 0.4)'
-          }}>
+          <div className="py-20 rounded-3xl bg-gradient-to-br from-slate-800/80 to-slate-700/80 backdrop-blur-xl border border-slate-600/40 shadow-2xl">
             <div className="w-full px-4 lg:px-8">
-              <div className="text-center mb-12">
-                <h3 className="text-3xl lg:text-4xl font-['Playfair_Display'] font-light tracking-wider mb-4" style={{ color: '#F8F7F3' }}>
+              <div className="text-center mb-16">
+                <h3 className="text-4xl lg:text-5xl font-['Playfair_Display'] font-light tracking-wider mb-6" style={{ color: '#F8FAFC' }}>
                   PREMIUM SERVICES
                 </h3>
-                <div className="mx-auto w-[120px]">
-                  <div className="divider-gold" />
+                <div className="mx-auto w-[140px]">
+                  <div className="h-1.5 bg-gradient-to-r from-amber-400 to-yellow-500 rounded-full shadow-lg" />
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-8 text-center max-w-6xl mx-auto">
-                <div className="space-y-4 group">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-10 text-center max-w-6xl mx-auto">
+                <div className="space-y-6 group">
                   <div className="flex justify-center mb-6">
-                    <div className="w-24 h-24 rounded-full flex items-center justify-center transition-all duration-500 group-hover:scale-110 bg-black border border-gray-600">
+                    <div className="w-28 h-28 rounded-full flex items-center justify-center transition-all duration-500 group-hover:scale-110 bg-gradient-to-br from-slate-700 to-slate-600 border border-slate-500 shadow-xl">
                       <img
                         src={shippingIcon}
                         alt="Free Shipping"
-                        className="w-12 h-12 object-contain"
+                        className="w-14 h-14 object-contain"
+                        loading="lazy"
                       />
                     </div>
                   </div>
-                  <div className="text-xl font-['Italiana'] font-medium tracking-wider" style={{ color: '#F8F7F3' }}>
+                  <div className="text-2xl font-['Italiana'] font-medium tracking-wider" style={{ color: '#F8FAFC' }}>
                     Free Shipping
                   </div>
-                  <div className="text-sm font-light tracking-wide" style={{ color: '#C8C8C5' }}>
+                  <div className="text-base font-light tracking-wide" style={{ color: '#CBD5E1' }}>
                     On orders above ₹29,999
                   </div>
                 </div>
 
-                <div className="space-y-4 group">
+                <div className="space-y-6 group">
                   <div className="flex justify-center mb-6">
-                    <div className="w-24 h-24 rounded-full flex items-center justify-center transition-all duration-500 group-hover:scale-110 bg-black border border-gray-600">
+                    <div className="w-28 h-28 rounded-full flex items-center justify-center transition-all duration-500 group-hover:scale-110 bg-gradient-to-br from-slate-700 to-slate-600 border border-slate-500 shadow-xl">
                       <img
                         src={returnIcon}
                         alt="Easy Returns"
-                        className="w-12 h-12 object-contain"
+                        className="w-14 h-14 object-contain"
+                        loading="lazy"
                       />
                     </div>
                   </div>
-                  <div className="text-xl font-['Italiana'] font-medium tracking-wider" style={{ color: '#F8F7F3' }}>
+                  <div className="text-2xl font-['Italiana'] font-medium tracking-wider" style={{ color: '#F8FAFC' }}>
                     Easy Returns
                   </div>
-                  <div className="text-sm font-light tracking-wide" style={{ color: '#C8C8C5' }}>
+                  <div className="text-base font-light tracking-wide" style={{ color: '#CBD5E1' }}>
                     15-day return policy
                   </div>
                 </div>
 
-                <div className="space-y-4 group">
+                <div className="space-y-6 group">
                   <div className="flex justify-center mb-6">
-                    <div className="w-24 h-24 rounded-full flex items-center justify-center transition-all duration-500 group-hover:scale-110 bg-black border border-gray-600">
+                    <div className="w-28 h-28 rounded-full flex items-center justify-center transition-all duration-500 group-hover:scale-110 bg-gradient-to-br from-slate-700 to-slate-600 border border-slate-500 shadow-xl">
                       <img
                         src={secureIcon}
                         alt="Secure Payment"
-                        className="w-12 h-12 object-contain"
+                        className="w-14 h-14 object-contain"
+                        loading="lazy"
                       />
                     </div>
                   </div>
-                  <div className="text-xl font-['Italiana'] font-medium tracking-wider" style={{ color: '#F8F7F3' }}>
+                  <div className="text-2xl font-['Italiana'] font-medium tracking-wider" style={{ color: '#F8FAFC' }}>
                     Secure Payment
                   </div>
-                  <div className="text-sm font-light tracking-wide" style={{ color: '#C8C8C5' }}>
+                  <div className="text-base font-light tracking-wide" style={{ color: '#CBD5E1' }}>
                     SSL encrypted checkout
                   </div>
                 </div>
 
-                <div className="space-y-4 group">
+                <div className="space-y-6 group">
                   <div className="flex justify-center mb-6">
-                    <div className="w-24 h-24 rounded-full flex items-center justify-center transition-all duration-500 group-hover:scale-110 bg-black border border-gray-600">
+                    <div className="w-28 h-28 rounded-full flex items-center justify-center transition-all duration-500 group-hover:scale-110 bg-gradient-to-br from-slate-700 to-slate-600 border border-slate-500 shadow-xl">
                       <img
                         src={emiIcon}
                         alt="EMI Available"
-                        className="w-10 h-10 object-contain"
+                        className="w-12 h-12 object-contain"
+                        loading="lazy"
                       />
                     </div>
                   </div>
-                  <div className="text-xl font-['Italiana'] font-medium tracking-wider" style={{ color: '#F8F7F3' }}>
+                  <div className="text-2xl font-['Italiana'] font-medium tracking-wider" style={{ color: '#F8FAFC' }}>
                     EMI Available
                   </div>
-                  <div className="text-sm font-light tracking-wide" style={{ color: '#C8C8C5' }}>
+                  <div className="text-base font-light tracking-wide" style={{ color: '#CBD5E1' }}>
                     No cost EMI options
                   </div>
                 </div>
@@ -278,4 +327,6 @@ const FeaturedProducts = memo(() => {
   );
 });
 
-export default FeaturedProducts;
+FeaturedProducts.displayName = 'FeaturedProducts';
+
+export { FeaturedProducts };
