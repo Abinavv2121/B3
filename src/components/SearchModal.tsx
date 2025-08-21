@@ -223,7 +223,7 @@ const SearchModal = memo(({ isOpen, onClose }: { isOpen: boolean; onClose: () =>
                       onClick={onClose}
                       className="group block bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-all duration-300"
                     >
-                      <div className="aspect-[4/5] overflow-hidden">
+                      <div className="aspect-[3/4] overflow-hidden">
                         <img
                           src={product.image_url || "/placeholder.svg"}
                           alt={product.name || "Product"}

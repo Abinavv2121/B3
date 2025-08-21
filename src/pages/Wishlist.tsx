@@ -1,5 +1,5 @@
 import Navigation from "@/components/Navigation";
-import SupportiveToolbar from "@/components/SupportiveToolbar";
+import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -10,6 +10,8 @@ import { useFavourites } from "@/contexts/FavouritesContext";
 import { useCart } from "@/contexts/CartContext";
 import { useToast } from "@/hooks/use-toast";
 import { useMemo, useState } from "react";
+import { supabaseUtils } from "@/hooks/useSupabase";
+import { GoldDivider } from "@/components/ui/gold-divider";
 
 const Wishlist = () => {
   const { favourites, removeFromFavourites, clearFavourites } = useFavourites();
@@ -112,7 +114,6 @@ const Wishlist = () => {
     return (
       <>
         <Navigation />
-        <SupportiveToolbar />
         <div className="min-h-screen bg-royal-silk pt-32">
           <div className="container mx-auto px-4 py-16">
             <div className="text-center max-w-xl mx-auto">
@@ -141,7 +142,6 @@ const Wishlist = () => {
   return (
     <>
       <Navigation />
-      <SupportiveToolbar />
       <div className="min-h-screen bg-royal-silk pt-32">
         <div className="container mx-auto px-4 py-10">
           {/* Header */}
@@ -397,6 +397,7 @@ const Wishlist = () => {
           </div>
         )}
       </div>
+      <Footer />
     </>
   );
 };

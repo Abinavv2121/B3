@@ -169,7 +169,7 @@ const Bridal = () => {
                 <p className="text-red-400">Error loading products: {error}</p>
               </div>
             ) : transformedProducts.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-8 lg:gap-10 mb-20 w-full">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-6 mb-12 w-full">
                 {transformedProducts.map((product, index) => (
                   <div
                     key={product.id}

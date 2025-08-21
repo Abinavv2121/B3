@@ -1,20 +1,12 @@
-import { useEffect } from 'react';
-import { useLocation, useNavigate, Link } from 'react-router-dom';
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { 
-  CheckCircle, 
-  Package, 
-  Truck, 
-  Calendar, 
-  Phone, 
-  Mail,
-  Download,
-  Home,
-  ArrowRight
-} from "lucide-react";
+import { useEffect, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import Navigation from "@/components/Navigation";
-import SupportiveToolbar from "@/components/SupportiveToolbar";
+import Footer from "@/components/Footer";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { CheckCircle, Home, Package, Truck, CreditCard, ArrowRight, Star } from "lucide-react";
+import { GoldDivider } from "@/components/ui/gold-divider";
 
 const OrderSuccess = () => {
   const location = useLocation();
@@ -40,7 +32,6 @@ const OrderSuccess = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Navigation />
-      <SupportiveToolbar />
       
       <main className="pt-32 pb-16">
         <div className="max-w-4xl mx-auto px-4 lg:px-8">

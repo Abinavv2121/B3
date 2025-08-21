@@ -168,7 +168,7 @@ const AutoScrollCarousel = memo(() => {
         </div>
 
         {/* Product showcase */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 mb-20">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
           {transformedProducts.map((item) => (
             <div key={item.id} className="group">
               <div className="elegant-card rounded-3xl p-8 transition-all duration-700 hover:scale-[1.03] hover:shadow-2xl relative overflow-hidden bg-gradient-to-br from-slate-800/80 to-slate-700/80 backdrop-blur-xl border border-slate-600/40 shadow-xl">

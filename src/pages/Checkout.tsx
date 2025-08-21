@@ -20,7 +20,6 @@ import {
   Truck
 } from "lucide-react";
 import Navigation from "@/components/Navigation";
-import SupportiveToolbar from "@/components/SupportiveToolbar";
 
 interface ShippingAddress {
   firstName: string;
@@ -412,7 +411,6 @@ const Checkout = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Navigation />
-      <SupportiveToolbar />
       
       <main className="pt-32 pb-16">
         <div className="max-w-7xl mx-auto px-4 lg:px-8">

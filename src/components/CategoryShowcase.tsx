@@ -115,7 +115,7 @@ const CategoryShowcase = memo(() => {
 
       <div className="w-full px-4 lg:px-8 relative z-10">
         {/* Refined Section Header */}
-        <div className="text-center mb-20 max-w-4xl mx-auto">
+        <div className="text-center mb-6 max-w-4xl mx-auto">
           <h2 className="text-4xl lg:text-5xl font-['Italiana'] tracking-wide mb-6" 
               style={{ 
                 color: '#F8FAFC',
@@ -123,25 +123,25 @@ const CategoryShowcase = memo(() => {
               }}>
             Discover Your <span style={{ color: '#F59E0B' }}>Perfect Style</span>
           </h2>
-          <p className="text-xl text-slate-300 font-light max-w-2xl mx-auto">
+          <p className="text-lg text-slate-300 font-light max-w-2xl mx-auto">
             Explore our curated collections designed to celebrate your unique elegance
           </p>
         </div>
 
         {/* Refined Categories Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 mb-20">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-6 mb-12 w-[70%] mx-auto">
           {categories.map((category) => (
             <div
               key={category.id}
               className="group cursor-pointer"
               onClick={() => handleCategoryClick(category.href)}
             >
-              <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-800/80 to-slate-700/80 backdrop-blur-xl border border-slate-600/40 shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-[1.02]">
+              <div className="relative overflow-hidden rounded-sm bg-gradient-to-br from-slate-800/80 to-slate-700/80 backdrop-blur-xl border border-slate-600/40 shadow-sm hover:shadow-md transition-all duration-500 hover:scale-[1.02]">
                 {/* Subtle background pattern */}
                 <div className="absolute inset-0 bg-gradient-to-br from-slate-700/40 to-slate-600/40 opacity-60"></div>
                 
                 {/* Image Container */}
-                <div className="relative aspect-[4/5] overflow-hidden">
+                <div className="relative aspect-[2/3] overflow-hidden">
                   <img
                     src={category.image}
                     alt={category.title}
@@ -154,26 +154,26 @@ const CategoryShowcase = memo(() => {
                   <div className={`absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-500`} />
                   
                   {/* Refined Badge */}
-                  <div className="absolute top-4 left-4">
-                    <Badge className={`bg-gradient-to-r ${category.gradient} text-white text-xs px-3 py-1 border-0 shadow-xl`}>
+                  <div className="absolute top-0.5 left-0.5">
+                    <Badge className={`bg-gradient-to-r ${category.gradient} text-white text-xs px-0.5 py-0 border-0 shadow-sm`}>
                       {category.badge}
                     </Badge>
                   </div>
                   
                   {/* Refined Content Overlay */}
-                  <div className="absolute bottom-0 left-0 right-0 p-8 text-white">
-                    <h3 className="font-['Italiana'] text-2xl font-semibold mb-3 group-hover:text-amber-300 transition-colors duration-300">
+                  <div className="absolute bottom-0 left-0 right-0 p-1.5 text-white">
+                    <h3 className="font-['Italiana'] text-xs font-semibold mb-0.5 group-hover:text-amber-300 transition-colors duration-300">
                       {category.title}
                     </h3>
-                    <p className="text-sm text-gray-200 mb-4 font-light">
+                    <p className="text-xs text-gray-200 mb-0.5 font-light">
                       {category.subtitle}
                     </p>
-                    <p className="text-xs text-gray-300 mb-6 leading-relaxed">
+                    <p className="text-xs text-gray-300 mb-1 leading-relaxed">
                       {category.description}
                     </p>
                     
                     {/* Refined Price and Products */}
-                    <div className="flex items-center justify-between text-sm">
+                    <div className="flex items-center justify-between text-xs">
                       <span className="font-medium text-amber-300">
                         {category.price}
                       </span>
@@ -184,9 +184,9 @@ const CategoryShowcase = memo(() => {
                   </div>
                   
                   {/* Refined Hover Effect - Arrow */}
-                  <div className="absolute top-1/2 right-4 transform -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-all duration-500 translate-x-4 group-hover:translate-x-0">
-                    <div className="w-14 h-14 bg-slate-800/95 backdrop-blur-sm rounded-full flex items-center justify-center shadow-xl border border-slate-600/50">
-                      <ArrowRight className="w-6 h-6 text-slate-300" />
+                  <div className="absolute top-1/2 right-1.5 transform -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-all duration-500 translate-x-4 group-hover:translate-x-0">
+                    <div className="w-5 h-5 bg-slate-800/95 backdrop-blur-sm rounded-full flex items-center justify-center shadow-md border border-slate-600/50">
+                      <ArrowRight className="w-2.5 h-2.5 text-slate-300" />
                     </div>
                   </div>
                 </div>

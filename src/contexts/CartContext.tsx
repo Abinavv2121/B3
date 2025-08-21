@@ -33,7 +33,11 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   const [cartItems, setCartItems] = useLocalStorage<CartItem[]>(STORAGE_KEYS.CART, []);
 
   const addToCart = useCallback((item: Omit<CartItem, 'quantity'>) => {
+    console.log('CartContext: addToCart called with:', item);
+    
     setCartItems(prevItems => {
+      console.log('CartContext: Previous cart items:', prevItems);
+      
       const existingItem = prevItems.find(cartItem => 
         cartItem.id === item.id && 
         cartItem.selectedSize === item.selectedSize && 
@@ -41,17 +45,23 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
       );
 
       if (existingItem) {
+        console.log('CartContext: Item already exists, increasing quantity');
         // If item already exists with same size and color, increase quantity
-        return prevItems.map(cartItem =>
+        const newItems = prevItems.map(cartItem =>
           cartItem.id === item.id && 
           cartItem.selectedSize === item.selectedSize && 
           cartItem.selectedColor === item.selectedColor
             ? { ...cartItem, quantity: cartItem.quantity + 1 }
             : cartItem
         );
+        console.log('CartContext: New cart items after quantity increase:', newItems);
+        return newItems;
       } else {
+        console.log('CartContext: Adding new item to cart');
         // Add new item with quantity 1
-        return [...prevItems, { ...item, quantity: 1 }];
+        const newItems = [...prevItems, { ...item, quantity: 1 }];
+        console.log('CartContext: New cart items after adding:', newItems);
+        return newItems;
       }
     });
   }, [setCartItems]);

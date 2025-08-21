@@ -1,13 +1,20 @@
+import { useState, useEffect } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import Navigation from "@/components/Navigation";
-import SupportiveToolbar from "@/components/SupportiveToolbar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Trash2, Minus, Plus, ArrowLeft } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Trash2, ArrowLeft, ShoppingBag, Heart, Star, Minus, Plus } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
+import { useFavourites } from "@/contexts/FavouritesContext";
+import { supabaseUtils } from "@/hooks/useSupabase";
+import { GoldDivider } from "@/components/ui/gold-divider";
 
 const Cart = () => {
-  const { cartItems, removeFromCart, updateQuantity, cartTotal, clearCart } = useCart();
+  const { cartItems, removeFromCart, cartTotal, clearCart } = useCart();
+
+  // Debug cart data
+  console.log('Cart page: cartItems:', cartItems);
+  console.log('Cart page: cartTotal:', cartTotal);
 
   const subtotal = cartTotal;
   const discount = cartItems.reduce((sum, item) => sum + ((item.originalPrice || 0) - item.price) * item.quantity, 0);
@@ -17,7 +24,6 @@ const Cart = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Navigation />
-      <SupportiveToolbar />
       
       <main className="pt-32 pb-16">
         <div className="max-w-7xl mx-auto px-4 lg:px-8">
@@ -47,7 +53,7 @@ const Cart = () => {
               <h2 className="text-2xl font-semibold text-gray-900 mb-4">Your cart is empty</h2>
               <p className="text-gray-600 mb-8">Looks like you haven't added any items to your cart yet.</p>
               <Link to="/">
-                <Button className="bg-cultural hover:bg-cultural/90">
+                <Button className="bg-amber-500 hover:bg-amber-600 text-white">
                   Start Shopping
                 </Button>
               </Link>
@@ -121,31 +127,12 @@ const Cart = () => {
                               </Button>
                             </div>
                             
-                            {/* Quantity Controls */}
+                            {/* Quantity Display (Read-only) */}
                             <div className="flex items-center space-x-3 mt-4">
                               <span className="text-sm text-gray-600">Quantity:</span>
-                              <div className="flex items-center space-x-2">
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                                  disabled={item.quantity <= 1}
-                                  className="w-8 h-8 p-0"
-                                >
-                                  <Minus className="h-3 w-3" />
-                                </Button>
-                                <span className="w-8 text-center text-sm font-medium">
-                                  {item.quantity}
-                                </span>
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                                  className="w-8 h-8 p-0"
-                                >
-                                  <Plus className="h-3 w-3" />
-                                </Button>
-                              </div>
+                              <span className="text-sm font-medium text-gray-900">
+                                {item.quantity}
+                              </span>
                             </div>
                           </div>
                         </div>
@@ -198,7 +185,7 @@ const Cart = () => {
                     </Link>
                     <Button 
                       variant="outline" 
-                      className="w-full py-6 text-lg font-medium bg-cream hover:bg-cream/90"
+                      className="w-full py-6 text-lg font-medium border-gray-300 hover:bg-gray-50"
                       onClick={clearCart}
                     >
                       Clear Cart

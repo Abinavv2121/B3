@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Heart, ShoppingBag, Star, Eye, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
 import { useFavourites } from '@/contexts/FavouritesContext';
+import { useToast } from '@/hooks/use-toast';
 import { ProductImageGallery } from './ProductImageGallery';
 
 interface ProductCardProps {
@@ -28,6 +29,7 @@ interface ProductCardProps {
 const ProductCard = memo(({ product }: ProductCardProps) => {
   const { addToCart } = useCart();
   const { addToFavourites, removeFromFavourites, isInFavourites } = useFavourites();
+  const { toast } = useToast();
   const [showQuickView, setShowQuickView] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [selectedColor, setSelectedColor] = useState(product.colors[0]);
@@ -70,16 +72,32 @@ const ProductCard = memo(({ product }: ProductCardProps) => {
 
   const handleQuickAdd = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
+    console.log('Adding to cart:', {
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      selectedSize,
+      selectedColor
+    });
+    
     addToCart({
       id: product.id,
       name: product.name,
       price: product.price,
       image: product.image,
       category: product.category,
+      originalPrice: product.originalPrice,
       selectedSize: selectedSize,
       selectedColor: selectedColor,
     });
-  }, [addToCart, product.id, product.name, product.price, product.image, product.category, selectedColor, selectedSize]);
+    
+    // Show success feedback
+    toast({
+      title: 'Item added to cart',
+      description: `Item "${product.name}" added to cart.`,
+      variant: 'default',
+    });
+  }, [addToCart, product.id, product.name, product.price, product.image, product.category, product.originalPrice, selectedColor, selectedSize, toast]);
 
   const handleProductClick = useCallback(() => {
     setShowQuickView(true);

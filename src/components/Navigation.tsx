@@ -4,7 +4,6 @@ import brandLogo from "/src/assets/brand-logo.png";
 import wishlistIcon from "/src/assets/wishlist.png";
 import cartIcon from "/src/assets/cart.png";
 import searchIcon from "/src/assets/search.png";
-import nameIcon from "/src/assets/name.png";
 import SearchModal from "./SearchModal";
 import { useFavourites } from "@/contexts/FavouritesContext";
 import { useCart } from "@/contexts/CartContext";
@@ -19,6 +18,70 @@ const Navigation = memo(() => {
   const [isInCustomerFavs, setIsInCustomerFavs] = useState(false);
   const { favouritesCount } = useFavourites();
   const { cartCount } = useCart();
+
+  // Debug cart count
+  console.log('Navigation: Current cart count:', cartCount);
+
+  // Main categories that match your database and existing pages
+  const mainCategories = [
+    "ABOUT US",
+    "SHOP ALL"
+  ];
+
+  // Categories that link to existing pages
+  const categoryPages = {
+    "BRIDAL COLLECTION": {
+      route: "/bridal",
+      subcategories: [
+        "Bridal Lehangas",
+        "Bridal Sarees", 
+        "Bridal Suits",
+        "Heavy Work",
+        "Light Work"
+      ]
+    },
+    "ANARKALI": {
+      route: "/anarkali",
+      subcategories: [
+        "Party Wear",
+        "Casual Anarkalis",
+        "Designer Anarkalis",
+        "Heavy Work",
+        "Light Work"
+      ]
+    },
+    "LEHENGA": {
+      route: "/lehenga",
+      subcategories: [
+        "Bridal Lehangas",
+        "Party Wear",
+        "Sangeet Special",
+        "Heavy Work",
+        "Light Work"
+      ]
+    },
+    "SAREES": {
+      route: "/saree",
+      subcategories: [
+        "Silk Sarees",
+        "Cotton Sarees",
+        "Georgette",
+        "Chiffon",
+        "Designer Sarees"
+      ]
+    },
+    "SALWAR SUIT": {
+      route: "/salwar-suit",
+      subcategories: [
+        "Straight Cut",
+        "A-Line",
+        "Palazzo Sets",
+        "Sharara Sets",
+        "Printed",
+        "Embroidered"
+      ]
+    }
+  };
 
   // Memoize navigation functions
   const handleWishlistClick = useCallback(() => {
@@ -37,6 +100,42 @@ const Navigation = memo(() => {
     setIsSearchOpen(false);
   }, []);
 
+  const renderCategoryWithPopup = useCallback((category: string, categoryData: { route: string, subcategories: string[] }) => (
+    <Link
+      to={categoryData.route}
+      className={`px-6 py-2.5 text-sm font-medium font-italiana transition-all duration-300 whitespace-nowrap hover:bg-white/10 rounded-lg border border-transparent hover:border-white/20 ${
+        isInCustomerFavs 
+          ? 'text-white hover:text-gray-200'
+          : (lastScrollY > window.innerHeight ? 'text-gray-800 hover:text-purple-600' : 'text-white hover:text-gray-200')
+      }`}
+    >
+      {category}
+    </Link>
+  ), [isInCustomerFavs, lastScrollY]);
+
+  const renderSimpleLink = useCallback((link: string) => {
+    // Handle special cases for utility links
+    const routeMap: Record<string, string> = {
+      "SHOP ALL": "/",
+      "ABOUT US": "/about-us"
+    };
+
+    const route = routeMap[link] || `/${link.toLowerCase().replace(/\s+/g, '-').replace(/&/g, 'and')}`;
+
+    return (
+      <Link
+        to={route}
+        className={`px-6 py-2.5 text-sm font-medium font-italiana transition-all duration-300 whitespace-nowrap hover:bg-white/10 rounded-lg border border-transparent hover:border-white/20 ${
+          isInCustomerFavs 
+            ? 'text-white hover:text-gray-200'
+            : (lastScrollY > window.innerHeight ? 'text-gray-800 hover:text-purple-600' : 'text-white hover:text-gray-200')
+        }`}
+      >
+        {link}
+      </Link>
+    );
+  }, [isInCustomerFavs, lastScrollY]);
+
   // Throttled scroll handler for better performance
   const handleScroll = useCallback(() => {
     const currentScrollY = window.scrollY;
@@ -44,17 +143,11 @@ const Navigation = memo(() => {
     // Always show navigation, but add background when scrolling
     setIsVisible(true);
     
-    // Check if supportive toolbar has reached the bottom of hero section
-    const heroSection = document.getElementById('hero-section');
-    if (heroSection) {
-      const heroRect = heroSection.getBoundingClientRect();
-      const supportiveToolbarHeight = 56; // h-14 = 56px
-      const navigationHeight = 80; // h-20 = 80px
-      const totalHeaderHeight = navigationHeight + supportiveToolbarHeight;
-      
-      // When hero bottom is at or above the total header height, make opaque
-      const shouldBeOpaque = heroRect.bottom <= totalHeaderHeight;
-      setIsInCustomerFavs(shouldBeOpaque);
+    // Check if we're past the hero section
+    if (currentScrollY > window.innerHeight) {
+      setIsInCustomerFavs(true);
+    } else {
+      setIsInCustomerFavs(false);
     }
     
     setLastScrollY(currentScrollY);
@@ -108,13 +201,19 @@ const Navigation = memo(() => {
             </Link>
           </div>
           
-          {/* Center - Name Icon */}
+          {/* Center - Navigation Items */}
           <div className="flex-1 flex justify-center items-center">
-            <img 
-              src={nameIcon} 
-              alt="Name" 
-              className="h-16 w-auto max-w-full object-contain"
-            />
+            <div className="flex items-center space-x-2">
+              {/* Main Categories */}
+              {mainCategories.map((category) => 
+                renderSimpleLink(category)
+              )}
+              
+              {/* Category Pages */}
+              {Object.entries(categoryPages).map(([category, categoryData]) => 
+                renderCategoryWithPopup(category, categoryData)
+              )}
+            </div>
           </div>
           
           {/* Right side buttons */}

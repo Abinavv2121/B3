@@ -1,12 +1,11 @@
 import Navigation from "@/components/Navigation";
-import SupportiveToolbar from "@/components/SupportiveToolbar";
 import Footer from "@/components/Footer";
+import { GoldDivider } from "@/components/ui/gold-divider";
 
 const Special = () => {
   return (
     <div className="min-h-screen m-0 p-0">
       <Navigation />
-      <SupportiveToolbar />
       <main className="m-0 p-0">
         {/* Hero Section */}
         <section className="relative h-[60vh] bg-gradient-to-br from-purple-100 via-pink-100 to-indigo-100 flex items-center justify-center">

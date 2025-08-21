@@ -212,15 +212,9 @@ const FeaturedProducts = memo(() => {
 
         {/* Products Grid */}
         {transformedProducts.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-8 lg:gap-10 mb-20 w-full">
-            {transformedProducts.map((product, index) => (
-              <div
-                key={product.id}
-                className="animate-fade-in"
-                style={{ animationDelay: `${index * 0.1}s` }}
-              >
-                <ProductCard product={product} />
-              </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mb-12">
+            {transformedProducts.map((product) => (
+              <ProductCard key={product.id} product={product} />
             ))}
           </div>
         ) : (
@@ -242,7 +236,7 @@ const FeaturedProducts = memo(() => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-10 text-center max-w-6xl mx-auto">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-6 text-center max-w-6xl mx-auto">
                 <div className="space-y-6 group">
                   <div className="flex justify-center mb-6">
                     <div className="w-28 h-28 rounded-full flex items-center justify-center transition-all duration-500 group-hover:scale-110 bg-gradient-to-br from-slate-700 to-slate-600 border border-slate-500 shadow-xl">

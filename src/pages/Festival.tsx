@@ -1,12 +1,17 @@
 import Navigation from "@/components/Navigation";
-import SupportiveToolbar from "@/components/SupportiveToolbar";
 import Footer from "@/components/Footer";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Star, Heart, ShoppingBag } from "lucide-react";
+import { useCart } from "@/contexts/CartContext";
+import { useFavourites } from "@/contexts/FavouritesContext";
+import { supabaseUtils } from "@/hooks/useSupabase";
+import { GoldDivider } from "@/components/ui/gold-divider";
 
 const Festival = () => {
   return (
     <div className="min-h-screen m-0 p-0">
       <Navigation />
-      <SupportiveToolbar />
       <main className="m-0 p-0">
         {/* Hero Section */}
         <section className="relative h-[60vh] bg-gradient-to-br from-orange-100 via-yellow-100 to-red-100 flex items-center justify-center">
