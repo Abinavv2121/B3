@@ -17,6 +17,7 @@ const Wishlist = lazy(() => import('@/pages/Wishlist'));
 const Checkout = lazy(() => import('@/pages/Checkout'));
 const OrderSuccess = lazy(() => import('@/pages/OrderSuccess'));
 const Admin = lazy(() => import('@/pages/Admin'));
+const AboutUs = lazy(() => import('@/pages/AboutUs'));
 const NotFound = lazy(() => import('@/pages/NotFound'));
 
 // Loading component
@@ -69,6 +70,7 @@ const App = memo(() => {
                 <Route path="/checkout" element={<Checkout />} />
                 <Route path="/order-success" element={<OrderSuccess />} />
                 <Route path="/admin" element={<Admin />} />
+                <Route path="/about-us" element={<AboutUs />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>

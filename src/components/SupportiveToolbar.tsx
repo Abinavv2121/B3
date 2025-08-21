@@ -38,7 +38,8 @@ const SupportiveToolbar = () => {
 
   // Main categories that match your database and existing pages
   const mainCategories = [
-    "SHOP ALL"
+    "SHOP ALL",
+    "ABOUT US"
   ];
 
   // Categories that link to existing pages - removed the items from the picture
@@ -115,7 +116,8 @@ const SupportiveToolbar = () => {
   const renderSimpleLink = (link: string) => {
     // Handle special cases for utility links
     const routeMap: Record<string, string> = {
-      "SHOP ALL": "/"
+      "SHOP ALL": "/",
+      "ABOUT US": "/about-us"
     };
 
     const route = routeMap[link] || `/${link.toLowerCase().replace(/\s+/g, '-').replace(/&/g, 'and')}`;
