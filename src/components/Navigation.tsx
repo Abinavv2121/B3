@@ -263,9 +263,9 @@ const Navigation = memo(() => {
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-12 w-12 rounded-full">
                     <Avatar className="h-12 w-12">
-                      <AvatarImage src="" alt={user?.name || user?.email} />
+                      <AvatarImage src={user?.avatar_url || ""} alt={user?.name || user?.email} />
                       <AvatarFallback className="bg-primary text-primary-foreground">
-                        {user?.name?.charAt(0)?.toUpperCase() || 'U'}
+                        {user?.name?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || 'U'}
                       </AvatarFallback>
                     </Avatar>
                   </Button>

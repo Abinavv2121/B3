@@ -20,7 +20,7 @@ const Checkout = lazy(() => import('@/pages/Checkout'));
 const OrderSuccess = lazy(() => import('@/pages/OrderSuccess'));
 const Admin = lazy(() => import('@/pages/Admin'));
 const AboutUs = lazy(() => import('@/pages/AboutUs'));
-
+const AuthCallback = lazy(() => import('@/pages/AuthCallback'));
 const NotFound = lazy(() => import('@/pages/NotFound'));
 
 // Loading component
@@ -72,6 +72,7 @@ const AppContent = memo(() => {
           <Route path="/order-success" element={<OrderSuccess />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/about-us" element={<AboutUs />} />
+          <Route path="/auth/callback" element={<AuthCallback />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
@@ -85,33 +86,33 @@ AppContent.displayName = 'AppContent';
 
 // Auth Modal Wrapper Component
 const AuthModalWrapper = memo(() => {
-  const { showAuthModal, setShowAuthModal, login, signUp, continueAsGuest } = useAuth();
+  const { 
+    showAuthModal, 
+    setShowAuthModal, 
+    login, 
+    signUp, 
+    loginWithGoogle,
+    continueAsGuest,
+    loading,
+    error,
+    clearError
+  } = useAuth();
 
-  const handleLogin = async (email: string, password: string) => {
-    const success = await login(email, password);
-    if (success) {
-      console.log('Login successful');
-    } else {
-      console.log('Login failed');
-    }
-  };
-
-  const handleSignUp = async (name: string, email: string, password: string) => {
-    const success = await signUp(name, email, password);
-    if (success) {
-      console.log('Sign up successful');
-    } else {
-      console.log('Sign up failed');
-    }
+  const handleClose = () => {
+    setShowAuthModal(false);
+    clearError();
   };
 
   return (
     <AuthModal
       isOpen={showAuthModal}
-      onClose={() => setShowAuthModal(false)}
-      onLogin={handleLogin}
-      onSignUp={handleSignUp}
+      onClose={handleClose}
+      onLogin={login}
+      onSignUp={signUp}
+      onGoogleLogin={loginWithGoogle}
       onContinueAsGuest={continueAsGuest}
+      loading={loading}
+      error={error}
     />
   );
 });
