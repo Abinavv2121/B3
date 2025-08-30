@@ -93,7 +93,7 @@ const ProductImageGallery = memo(({ images, productName, className = "" }: Produ
       >
         <img
           src={images[0]}
-          alt={productName}
+          alt={`${productName} product image`}
           className="w-full h-full object-cover"
           loading="lazy"
           decoding="async"
@@ -112,7 +112,7 @@ const ProductImageGallery = memo(({ images, productName, className = "" }: Produ
         <img
           key={currentImageIndex}
           src={images[currentImageIndex]}
-          alt={`${productName} - Image ${currentImageIndex + 1}`}
+          alt={`${productName} - image ${currentImageIndex + 1}`}
           className="w-full h-full object-cover"
           loading="lazy"
           decoding="async"
@@ -125,7 +125,7 @@ const ProductImageGallery = memo(({ images, productName, className = "" }: Produ
 
         {/* Hover Indicator - Only show when this specific product is hovering */}
         {isHovering && (
-          <div className="absolute top-2 left-2 bg-gradient-to-r from-purple-400 to-pink-400 text-white text-xs px-2 py-1 rounded-full font-medium shadow-lg">
+          <div className="absolute top-2 left-2 bg-brandNavy text-white text-xs px-2 py-1 rounded-full font-medium shadow-lg">
             Auto-rotating
           </div>
         )}

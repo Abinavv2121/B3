@@ -103,15 +103,11 @@ const Navigation = memo(() => {
   const renderCategoryWithPopup = useCallback((category: string, categoryData: { route: string, subcategories: string[] }) => (
     <Link
       to={categoryData.route}
-      className={`px-6 py-2.5 text-sm font-medium font-italiana transition-all duration-300 whitespace-nowrap hover:bg-white/10 rounded-lg border border-transparent hover:border-white/20 ${
-        isInCustomerFavs 
-          ? 'text-white hover:text-gray-200'
-          : (lastScrollY > window.innerHeight ? 'text-gray-800 hover:text-purple-600' : 'text-white hover:text-gray-200')
-      }`}
+      className="px-4 py-2 text-base font-medium font-hind text-brandNavy transition-all duration-300 whitespace-nowrap hover:bg-gray-100 rounded-brand border border-transparent hover:border-gray-200 hover:text-brandGold"
     >
       {category}
     </Link>
-  ), [isInCustomerFavs, lastScrollY]);
+  ), []);
 
   const renderSimpleLink = useCallback((link: string) => {
     // Handle special cases for utility links
@@ -125,16 +121,12 @@ const Navigation = memo(() => {
     return (
       <Link
         to={route}
-        className={`px-6 py-2.5 text-sm font-medium font-italiana transition-all duration-300 whitespace-nowrap hover:bg-white/10 rounded-lg border border-transparent hover:border-white/20 ${
-          isInCustomerFavs 
-            ? 'text-white hover:text-gray-200'
-            : (lastScrollY > window.innerHeight ? 'text-gray-800 hover:text-purple-600' : 'text-white hover:text-gray-200')
-        }`}
+        className="px-4 py-2 text-base font-medium font-hind text-brandNavy transition-all duration-300 whitespace-nowrap hover:bg-gray-100 rounded-brand border border-transparent hover:border-gray-200 hover:text-brandGold"
       >
         {link}
       </Link>
     );
-  }, [isInCustomerFavs, lastScrollY]);
+  }, []);
 
   // Throttled scroll handler for better performance
   const handleScroll = useCallback(() => {
@@ -176,22 +168,20 @@ const Navigation = memo(() => {
 
   // Memoize header styles to prevent unnecessary re-renders
   const headerStyles = useMemo(() => ({
-    backgroundColor: isInCustomerFavs 
-      ? 'rgba(0, 0, 0, 0.95)' 
-      : 'rgba(255, 255, 255, 0.1)',
-    backdropFilter: isInCustomerFavs ? 'blur(20px)' : 'blur(12px)'
-  }), [isInCustomerFavs]);
+    backgroundColor: 'rgba(255, 255, 255, 1)', // Solid white background
+    backdropFilter: 'none' // Remove blur effect
+  }), []);
 
   return (
     <>
       <header 
-        className="fixed top-0 -left-[50px] w-[calc(100vw+100px)] z-50 backdrop-blur-md border-b border-border shadow-sm transition-all duration-500"
+        className="fixed top-0 left-0 w-full z-50 border-b border-gray-200 shadow-sm transition-all duration-500 bg-white"
         style={headerStyles}
       >
-      <div className="w-[calc(100%+100px)] relative h-20 px-4">
-        <div className="absolute inset-0 flex items-center py-6 px-16">
+      <div className="w-full relative h-30 px-8 bg-white">
+        <div className="absolute inset-0 flex items-center justify-between py-9 px-16 bg-white">
           {/* Left side - Logo */}
-          <div className="flex-1">
+          <div className="flex-shrink-0 pl-8">
             <Link to="/" className="flex items-center">
               <img 
                 src={brandLogo} 
@@ -202,8 +192,8 @@ const Navigation = memo(() => {
           </div>
           
           {/* Center - Navigation Items */}
-          <div className="flex-1 flex justify-center items-center">
-            <div className="flex items-center space-x-2">
+          <div className="flex-shrink-0 flex justify-center items-center mx-8">
+            <div className="flex items-center space-x-4">
               {/* Main Categories */}
               {mainCategories.map((category) => 
                 renderSimpleLink(category)
@@ -217,43 +207,43 @@ const Navigation = memo(() => {
           </div>
           
           {/* Right side buttons */}
-          <div className="flex-1 flex items-center justify-end space-x-4 pr-24">
+          <div className="flex-shrink-0 flex items-center space-x-4 pr-4">
             <button 
               onClick={handleWishlistClick}
-              className="relative flex items-center justify-center p-3 hover:bg-white/10 rounded-lg transition-colors cursor-pointer"
+              className="relative flex items-center justify-center p-4 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
             >
               <img 
                 src={wishlistIcon} 
                 alt="Wishlist" 
-                className="h-12 w-12"
+                className="h-16 w-16"
               />
               {favouritesCount > 0 && (
-                <Badge className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-red-500 text-white text-xs flex items-center justify-center p-0">
+                <Badge className="absolute -top-1 -right-1 h-6 w-6 rounded-full bg-red-500 text-white text-sm flex items-center justify-center p-0">
                   {favouritesCount > 99 ? '99+' : favouritesCount}
                 </Badge>
               )}
             </button>
             <button 
               onClick={handleSearchClick}
-              className="flex items-center justify-center p-3 hover:bg-white/10 rounded-lg transition-colors cursor-pointer"
+              className="flex items-center justify-center p-4 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
             >
               <img 
                 src={searchIcon} 
                 alt="Search" 
-                className="h-12 w-12"
+                className="h-16 w-16"
               />
             </button>
             <button 
               onClick={handleCartClick}
-              className="relative flex items-center justify-center p-3 hover:bg-white/10 rounded-lg transition-colors cursor-pointer"
+              className="relative flex items-center justify-center p-4 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
             >
               <img 
                 src={cartIcon} 
                 alt="Cart" 
-                className="h-12 w-12"
+                className="h-16 w-16"
               />
               {cartCount > 0 && (
-                <Badge className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-blue-500 text-white text-xs flex items-center justify-center p-0">
+                <Badge className="absolute -top-1 -right-1 h-6 w-6 rounded-full bg-blue-500 text-white text-sm flex items-center justify-center p-0">
                   {cartCount > 99 ? '99+' : cartCount}
                 </Badge>
               )}

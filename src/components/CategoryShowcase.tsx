@@ -32,7 +32,7 @@ const CategoryShowcase = memo(() => {
       price: "Starting ₹15,999",
       products: "200+ Designs",
       href: "/saree",
-      gradient: "from-rose-500 to-pink-600",
+      gradient: "from-brandGold to-brandGold",
       badge: "Traditional"
     },
     {
@@ -44,7 +44,7 @@ const CategoryShowcase = memo(() => {
       price: "Starting ₹12,999",
       products: "150+ Designs",
       href: "/anarkali",
-      gradient: "from-purple-500 to-indigo-600",
+      gradient: "from-brandNavy to-brandNavy",
       badge: "Elegant"
     },
     {
@@ -56,7 +56,7 @@ const CategoryShowcase = memo(() => {
       price: "Starting ₹25,999",
       products: "100+ Designs",
       href: "/lehenga",
-      gradient: "from-amber-500 to-orange-600",
+      gradient: "from-brandGold to-brandGold",
       badge: "Festive"
     },
     {
@@ -68,7 +68,7 @@ const CategoryShowcase = memo(() => {
       price: "Starting ₹8,999",
       products: "300+ Designs",
       href: "/salwar-suit",
-      gradient: "from-emerald-500 to-teal-600",
+      gradient: "from-brandNavy to-brandNavy",
       badge: "Versatile"
     },
     {
@@ -80,7 +80,7 @@ const CategoryShowcase = memo(() => {
       price: "Starting ₹6,999",
       products: "120+ Designs",
       href: "/western",
-      gradient: "from-blue-500 to-cyan-600",
+      gradient: "from-brandNavy to-brandNavy",
       badge: "Modern"
     },
     {
@@ -92,7 +92,7 @@ const CategoryShowcase = memo(() => {
       price: "Starting ₹45,999",
       products: "80+ Designs",
       href: "/bridal",
-      gradient: "from-red-500 to-rose-600",
+      gradient: "from-brandGold to-brandGold",
       badge: "Premium"
     }
   ], []);
@@ -100,28 +100,24 @@ const CategoryShowcase = memo(() => {
   return (
     <section 
       className="section-padding relative overflow-hidden"
-      style={{ 
-        background: 'linear-gradient(180deg, #1E293B 0%, #334155 25%, #475569 50%, #64748B 75%, #94A3B8 100%)'
-      }}
     >
       {/* Subtle, organic texture overlay */}
       <div className="absolute inset-0 opacity-10">
         <div className="absolute inset-0" style={{
-          backgroundImage: `radial-gradient(circle at 25% 75%, rgba(245, 158, 11, 0.3) 0%, transparent 50%),
-                           radial-gradient(circle at 75% 25%, rgba(139, 92, 246, 0.3) 0%, transparent 50%),
-                           radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.2) 0%, transparent 50%)`
+          backgroundImage: `radial-gradient(circle at 25% 75%, rgba(253, 189, 47, 0.3) 0%, transparent 50%),
+                           radial-gradient(circle at 75% 25%, rgba(0, 31, 73, 0.3) 0%, transparent 50%),
+                           radial-gradient(circle at 50% 50%, rgba(253, 189, 47, 0.2) 0%, transparent 50%)`
         }}></div>
       </div>
 
       <div className="w-full px-4 lg:px-8 relative z-10">
         {/* Refined Section Header */}
         <div className="text-center mb-6 max-w-4xl mx-auto">
-          <h2 className="text-4xl lg:text-5xl font-['Italiana'] tracking-wide mb-6" 
+          <h2 className="text-4xl lg:text-5xl font-hind tracking-wide mb-6 text-pureWhite" 
               style={{ 
-                color: '#F8FAFC',
                 textShadow: '0 2px 4px rgba(0,0,0,0.3)'
               }}>
-            Discover Your <span style={{ color: '#F59E0B' }}>Perfect Style</span>
+            Discover Your <span className="text-brandGold">Perfect Style</span>
           </h2>
           <p className="text-lg text-slate-300 font-light max-w-2xl mx-auto">
             Explore our curated collections designed to celebrate your unique elegance
@@ -162,7 +158,7 @@ const CategoryShowcase = memo(() => {
                   
                   {/* Refined Content Overlay */}
                   <div className="absolute bottom-0 left-0 right-0 p-1.5 text-white">
-                    <h3 className="font-['Italiana'] text-xs font-semibold mb-0.5 group-hover:text-amber-300 transition-colors duration-300">
+                    <h3 className="font-hind text-xs font-semibold mb-0.5 group-hover:text-brandGold transition-colors duration-300">
                       {category.title}
                     </h3>
                     <p className="text-xs text-gray-200 mb-0.5 font-light">
@@ -197,7 +193,7 @@ const CategoryShowcase = memo(() => {
         
         {/* Refined Call to Action */}
         <div className="text-center">
-          <Button className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white px-10 py-4 text-lg font-medium rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300">
+          <Button className="bg-brandGold text-white hover:opacity-90 px-10 py-4 text-lg font-medium rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300">
             <Sparkles className="mr-2 h-5 w-5" />
             Explore All Categories
           </Button>

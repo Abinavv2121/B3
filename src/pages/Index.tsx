@@ -4,7 +4,7 @@ import { AutoScrollCarousel } from "@/components/AutoScrollCarousel";
 import { CategoryShowcase } from "@/components/CategoryShowcase";
 import { FeaturedProducts } from "@/components/FeaturedProducts";
 import Footer from "@/components/Footer";
-import { GoldDivider } from "@/components/ui/gold-divider";
+
 
 /**
  * Home page component with optimized structure and reusable components
@@ -13,13 +13,15 @@ const Index = () => {
   return (
     <div className="min-h-screen m-0 p-0">
       <Navigation />
-      <main className="m-0 p-0">
+      <main 
+        className="m-0 p-0 relative"
+        style={{
+          background: 'linear-gradient(180deg, #000000 0%, #001F49 30%, #002A5C 45%, #003570 60%, #FDBD2F 75%, #FDBD2F 100%)'
+        }}
+      >
         <HeroSection />
-        <GoldDivider />
         <AutoScrollCarousel />
-        <GoldDivider />
         <CategoryShowcase />
-        <GoldDivider />
         <FeaturedProducts />
       </main>
       <Footer />

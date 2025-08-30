@@ -168,7 +168,7 @@ const Footer = () => {
                 {/* Shop Links */}
                 <div className="space-y-4">
                   <h4 
-                    className="text-lg font-['Playfair_Display'] font-medium tracking-wider"
+                    className="text-lg font-hind font-medium tracking-wider"
                     style={{ color: '#D4AF37' }}
                   >
                     Shop
@@ -185,7 +185,7 @@ const Footer = () => {
                       <button
                         key={link.name}
                         onClick={() => handlePageNavigation(link.href)}
-                        className="block text-white/80 hover:text-white transition-all duration-300 font-light tracking-wide font-['Italiana', serif] text-left w-full text-sm"
+                        className="block text-white/80 hover:text-white transition-all duration-300 font-light tracking-wide font-hind text-left w-full text-sm"
                       >
                         {link.name}
                       </button>
@@ -196,7 +196,7 @@ const Footer = () => {
                 {/* Customer Care */}
                 <div className="space-y-4">
                   <h4 
-                    className="text-lg font-['Playfair_Display'] font-medium tracking-wider"
+                    className="text-lg font-hind font-medium tracking-wider"
                     style={{ color: '#D4AF37' }}
                   >
                     Customer Care
@@ -211,7 +211,7 @@ const Footer = () => {
                       <button
                         key={link.name}
                         onClick={() => handlePageNavigation(link.href)}
-                        className="block text-white/80 hover:text-white transition-all duration-300 font-light tracking-wide font-['Italiana', serif] text-left w-full text-sm"
+                        className="block text-white/80 hover:text-white transition-all duration-300 font-light tracking-wide font-hind text-left w-full text-sm"
                       >
                         {link.name}
                       </button>
@@ -222,7 +222,7 @@ const Footer = () => {
                 {/* Legal */}
                 <div className="space-y-4">
                   <h4 
-                    className="text-lg font-['Playfair_Display'] font-medium tracking-wider"
+                    className="text-lg font-hind font-medium tracking-wider"
                     style={{ color: '#D4AF37' }}
                   >
                     Legal
@@ -237,7 +237,7 @@ const Footer = () => {
                       <button
                         key={link.name}
                         onClick={() => handlePageNavigation(link.href)}
-                        className="block text-white/80 hover:text-white transition-all duration-300 font-light tracking-wide font-['Italiana', serif] text-left w-full text-sm"
+                        className="block text-white/80 hover:text-white transition-all duration-300 font-light tracking-wide font-hind text-left w-full text-sm"
                       >
                         {link.name}
                       </button>

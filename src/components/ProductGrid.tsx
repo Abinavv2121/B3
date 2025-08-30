@@ -64,7 +64,7 @@ export default function ProductGrid({
       <section className="section-padding relative overflow-hidden bg-royal-silk">
         <div className="w-full px-4 lg:px-8 relative z-10">
           <div className="text-center mb-12 max-w-4xl mx-auto">
-            <h2 className="text-3xl lg:text-4xl font-['Italiana'] tracking-wide" 
+            <h2 className="text-3xl lg:text-4xl font-hind tracking-wide" 
                 style={{ 
                   color: '#F8F7F3',
                   textShadow: '0 2px 4px rgba(0,0,0,0.8)'
@@ -88,7 +88,7 @@ export default function ProductGrid({
       <section className="section-padding relative overflow-hidden bg-royal-silk">
         <div className="w-full px-4 lg:px-8 relative z-10">
           <div className="text-center mb-12 max-w-4xl mx-auto">
-            <h2 className="text-3xl lg:text-4xl font-['Italiana'] tracking-wide" 
+            <h2 className="text-3xl lg:text-4xl font-hind tracking-wide" 
                 style={{ 
                   color: '#F8F7F3',
                   textShadow: '0 2px 4px rgba(0,0,0,0.8)'

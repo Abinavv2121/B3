@@ -19,6 +19,10 @@ export default {
 		},
 		extend: {
 			colors: {
+				// Brand palette
+				brandGold: '#FDBD2F',
+				brandNavy: '#001F49',
+				pureWhite: '#FFFFFF',
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
 				ring: 'hsl(var(--ring))',
@@ -78,12 +82,14 @@ export default {
 			fontFamily: {
 				'serif': ['Playfair Display', 'serif'],
 				'sans': ['Inter', 'sans-serif'],
-				'italiana': ['Italiana', 'serif']
+				'italiana': ['Italiana', 'serif'],
+				'hind': ['Hind', 'system-ui', 'sans-serif']
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
 				md: 'calc(var(--radius) - 2px)',
-				sm: 'calc(var(--radius) - 4px)'
+				sm: 'calc(var(--radius) - 4px)',
+				brand: '6px'
 			},
 			keyframes: {
 				'accordion-down': {

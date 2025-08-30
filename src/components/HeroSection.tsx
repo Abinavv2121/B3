@@ -26,7 +26,7 @@ const HeroSection = () => {
         <div className="text-left -mt-16">
           <RotatingText
             texts={['HER.', 'AVAL.']}
-            mainClassName="text-white/95 drop-shadow-[0_4px_28px_rgba(0,0,0,0.45)] text-4xl lg:text-5xl font-normal font-['Playfair_Display'] tracking-[0.06em]"
+            mainClassName="text-white/95 drop-shadow-[0_4px_28px_rgba(0,0,0,0.45)] text-[6rem] lg:text-[9rem] font-normal font-hind tracking-[0.06em]"
             rotationInterval={5000}
           />
         </div>

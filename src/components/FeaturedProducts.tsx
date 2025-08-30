@@ -119,7 +119,7 @@ const FeaturedProducts = memo(() => {
   if (isLoading) {
     return (
       <section className="section-padding relative overflow-hidden" style={{ 
-        background: 'linear-gradient(180deg, #0F172A 0%, #1E293B 20%, #334155 40%, #475569 60%, #64748B 80%, #94A3B8 100%)'
+
       }}>
         <div className="w-full px-4 lg:px-8 relative z-10">
           <div className="text-center mb-16 max-w-4xl mx-auto">
@@ -128,7 +128,7 @@ const FeaturedProducts = memo(() => {
                   color: '#F8FAFC',
                   textShadow: '0 2px 4px rgba(0,0,0,0.3)'
                 }}>
-              Featured <span style={{ color: '#EAB308' }}>Collections</span>
+              Featured <span className="text-brandGold">Collections</span>
             </h2>
           </div>
           <div className="flex justify-center">
@@ -142,7 +142,7 @@ const FeaturedProducts = memo(() => {
   if (error) {
     return (
       <section className="section-padding relative overflow-hidden" style={{ 
-        background: 'linear-gradient(180deg, #0F172A 0%, #1E293B 20%, #334155 40%, #475569 60%, #64748B 80%, #94A3B8 100%)'
+
       }}>
         <div className="w-full px-4 lg:px-8 relative z-10">
           <div className="text-center mb-16 max-w-4xl mx-auto">
@@ -151,7 +151,7 @@ const FeaturedProducts = memo(() => {
                   color: '#F8FAFC',
                   textShadow: '0 2px 4px rgba(0,0,0,0.3)'
                 }}>
-              Featured <span style={{ color: '#EAB308' }}>Collections</span>
+              Featured <span className="text-brandGold">Collections</span>
             </h2>
           </div>
           <div className="text-center text-red-400">
@@ -163,15 +163,13 @@ const FeaturedProducts = memo(() => {
   }
 
   return (
-    <section className="section-padding relative overflow-hidden" style={{ 
-      background: 'linear-gradient(180deg, #0F172A 0%, #1E293B 20%, #334155 40%, #475569 60%, #64748B 80%, #94A3B8 100%)'
-    }}>
+    <section className="section-padding relative overflow-hidden">
       {/* Subtle, organic texture overlay */}
       <div className="absolute inset-0 opacity-10">
         <div className="absolute inset-0" style={{
-          backgroundImage: `radial-gradient(circle at 20% 80%, rgba(139, 92, 246, 0.3) 0%, transparent 50%),
-                           radial-gradient(circle at 80% 20%, rgba(236, 72, 153, 0.3) 0%, transparent 50%),
-                           radial-gradient(circle at 40% 40%, rgba(34, 197, 94, 0.2) 0%, transparent 50%)`
+          backgroundImage: `radial-gradient(circle at 20% 80%, rgba(253, 189, 47, 0.3) 0%, transparent 50%),
+                           radial-gradient(circle at 80% 20%, rgba(0, 31, 73, 0.3) 0%, transparent 50%),
+                           radial-gradient(circle at 40% 40%, rgba(253, 189, 47, 0.2) 0%, transparent 50%)`
         }}></div>
       </div>
 
@@ -197,10 +195,10 @@ const FeaturedProducts = memo(() => {
               <button
                 key={filter.id}
                 onClick={() => handleFilterChange(filter.id)}
-                className={`font-italiana text-sm font-medium uppercase tracking-wide whitespace-nowrap px-6 py-3 rounded-xl transition-all duration-300 hover:scale-105 ${
+                className={`font-hind text-sm font-medium uppercase tracking-wide whitespace-nowrap px-6 py-3 rounded-xl transition-all duration-300 hover:scale-105 ${
                   activeFilter === filter.id
-                    ? 'text-slate-900 bg-gradient-to-r from-amber-400 to-yellow-500 border border-amber-300 shadow-lg'
-                    : 'text-slate-300 hover:text-amber-300 hover:bg-slate-700/60 border border-transparent hover:border-slate-500/60'
+                    ? 'text-white bg-brandGold border border-brandGold shadow-lg'
+                    : 'text-slate-300 hover:text-brandGold hover:bg-brandNavy/60 border border-transparent hover:border-brandGold/60'
                 }`}
               >
                 {filter.name}
@@ -225,21 +223,21 @@ const FeaturedProducts = memo(() => {
 
         {/* Refined Feature Benefits Section */}
         <div className="mt-24">
-          <div className="py-20 rounded-3xl bg-gradient-to-br from-slate-800/80 to-slate-700/80 backdrop-blur-xl border border-slate-600/40 shadow-2xl">
+                      <div className="py-20 rounded-3xl bg-gradient-to-br from-brandNavy/80 to-brandNavy/60 backdrop-blur-xl border border-brandGold/40 shadow-2xl">
             <div className="w-full px-4 lg:px-8">
               <div className="text-center mb-16">
-                <h3 className="text-4xl lg:text-5xl font-['Playfair_Display'] font-light tracking-wider mb-6" style={{ color: '#F8FAFC' }}>
+                <h3 className="text-4xl lg:text-5xl font-hind font-light tracking-wider mb-6" style={{ color: '#F8FAFC' }}>
                   PREMIUM SERVICES
                 </h3>
                 <div className="mx-auto w-[140px]">
-                  <div className="h-1.5 bg-gradient-to-r from-amber-400 to-yellow-500 rounded-full shadow-lg" />
+                  <div className="h-1.5 bg-brandGold rounded-full shadow-lg" />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-4 gap-6 text-center max-w-6xl mx-auto">
                 <div className="space-y-6 group">
                   <div className="flex justify-center mb-6">
-                    <div className="w-28 h-28 rounded-full flex items-center justify-center transition-all duration-500 group-hover:scale-110 bg-gradient-to-br from-slate-700 to-slate-600 border border-slate-500 shadow-xl">
+                    <div className="w-28 h-28 rounded-full flex items-center justify-center transition-all duration-500 group-hover:scale-110 bg-gradient-to-br from-brandNavy to-brandNavy/80 border border-brandGold shadow-xl">
                       <img
                         src={shippingIcon}
                         alt="Free Shipping"
@@ -248,7 +246,7 @@ const FeaturedProducts = memo(() => {
                       />
                     </div>
                   </div>
-                  <div className="text-2xl font-['Italiana'] font-medium tracking-wider" style={{ color: '#F8FAFC' }}>
+                  <div className="text-2xl font-hind font-medium tracking-wider" style={{ color: '#F8FAFC' }}>
                     Free Shipping
                   </div>
                   <div className="text-base font-light tracking-wide" style={{ color: '#CBD5E1' }}>
@@ -258,7 +256,7 @@ const FeaturedProducts = memo(() => {
 
                 <div className="space-y-6 group">
                   <div className="flex justify-center mb-6">
-                    <div className="w-28 h-28 rounded-full flex items-center justify-center transition-all duration-500 group-hover:scale-110 bg-gradient-to-br from-slate-700 to-slate-600 border border-slate-500 shadow-xl">
+                    <div className="w-28 h-28 rounded-full flex items-center justify-center transition-all duration-500 group-hover:scale-110 bg-gradient-to-br from-brandNavy to-brandNavy/80 border border-brandGold shadow-xl">
                       <img
                         src={returnIcon}
                         alt="Easy Returns"
@@ -267,7 +265,7 @@ const FeaturedProducts = memo(() => {
                       />
                     </div>
                   </div>
-                  <div className="text-2xl font-['Italiana'] font-medium tracking-wider" style={{ color: '#F8FAFC' }}>
+                  <div className="text-2xl font-hind font-medium tracking-wider" style={{ color: '#F8FAFC' }}>
                     Easy Returns
                   </div>
                   <div className="text-base font-light tracking-wide" style={{ color: '#CBD5E1' }}>
@@ -277,7 +275,7 @@ const FeaturedProducts = memo(() => {
 
                 <div className="space-y-6 group">
                   <div className="flex justify-center mb-6">
-                    <div className="w-28 h-28 rounded-full flex items-center justify-center transition-all duration-500 group-hover:scale-110 bg-gradient-to-br from-slate-700 to-slate-600 border border-slate-500 shadow-xl">
+                    <div className="w-28 h-28 rounded-full flex items-center justify-center transition-all duration-500 group-hover:scale-110 bg-gradient-to-br from-brandNavy to-brandNavy/80 border border-brandGold shadow-xl">
                       <img
                         src={secureIcon}
                         alt="Secure Payment"
@@ -286,7 +284,7 @@ const FeaturedProducts = memo(() => {
                       />
                     </div>
                   </div>
-                  <div className="text-2xl font-['Italiana'] font-medium tracking-wider" style={{ color: '#F8FAFC' }}>
+                  <div className="text-2xl font-hind font-medium tracking-wider" style={{ color: '#F8FAFC' }}>
                     Secure Payment
                   </div>
                   <div className="text-base font-light tracking-wide" style={{ color: '#CBD5E1' }}>
@@ -296,7 +294,7 @@ const FeaturedProducts = memo(() => {
 
                 <div className="space-y-6 group">
                   <div className="flex justify-center mb-6">
-                    <div className="w-28 h-28 rounded-full flex items-center justify-center transition-all duration-500 group-hover:scale-110 bg-gradient-to-br from-slate-700 to-slate-600 border border-slate-500 shadow-xl">
+                    <div className="w-28 h-28 rounded-full flex items-center justify-center transition-all duration-500 group-hover:scale-110 bg-gradient-to-br from-brandNavy to-brandNavy/80 border border-brandGold shadow-xl">
                       <img
                         src={emiIcon}
                         alt="EMI Available"
@@ -305,7 +303,7 @@ const FeaturedProducts = memo(() => {
                       />
                     </div>
                   </div>
-                  <div className="text-2xl font-['Italiana'] font-medium tracking-wider" style={{ color: '#F8FAFC' }}>
+                  <div className="text-2xl font-hind font-medium tracking-wider" style={{ color: '#F8FAFC' }}>
                     EMI Available
                   </div>
                   <div className="text-base font-light tracking-wide" style={{ color: '#CBD5E1' }}>

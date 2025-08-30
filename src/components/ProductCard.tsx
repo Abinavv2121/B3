@@ -197,11 +197,7 @@ const ProductCard = memo(({ product }: ProductCardProps) => {
             {/* Quick Shop Overlay */}
             <div className="absolute bottom-3 left-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-4 group-hover:translate-x-0">
               <Button
-                className={`flex-1 border-0 shadow-lg ${
-                  isProductInCart 
-                    ? 'bg-gray-400 cursor-not-allowed' 
-                    : 'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600'
-                }`}
+                className={`flex-1 border-0 shadow-lg ${isProductInCart ? 'bg-gray-400 cursor-not-allowed' : 'bg-brandGold text-white hover:opacity-90'}`}
                 onClick={handleQuickAdd}
                 disabled={isProductInCart}
               >
@@ -217,7 +213,7 @@ const ProductCard = memo(({ product }: ProductCardProps) => {
                   <button
                     key={index}
                     className={`w-6 h-6 rounded-full border-2 ${
-                      selectedColor === color ? 'border-purple-500 scale-110 shadow-lg' : 'border-white/80'
+                      selectedColor === color ? 'border-brandGold scale-110 shadow-lg' : 'border-white/80'
                     } transition-all duration-200`}
                     style={{ backgroundColor: color }}
                     onClick={handleColorSelect(color)}
@@ -235,7 +231,7 @@ const ProductCard = memo(({ product }: ProductCardProps) => {
             </p>
 
             {/* Name */}
-            <h3 className="font-serif font-semibold text-lg leading-tight text-gray-800 group-hover:text-purple-700 transition-colors duration-300">
+            <h3 className="font-hind font-semibold text-lg leading-tight text-gray-800 group-hover:text-brandNavy transition-colors duration-300">
               {product.name}
             </h3>
 
