@@ -96,7 +96,6 @@ const App = memo(() => {
       <AuthProvider>
         <CartProvider>
           <FavouritesProvider>
-<<<<<<< HEAD
             <div className="App">
               <Suspense fallback={<LoadingSpinner />}>
                 <Routes>
@@ -119,9 +118,6 @@ const App = memo(() => {
               </Suspense>
               <Toaster />
             </div>
-=======
-            <AppContent />
->>>>>>> 400153b1e94d25f6944814df5745192866a0f20e
           </FavouritesProvider>
         </CartProvider>
       </AuthProvider>
