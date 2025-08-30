@@ -5,15 +5,9 @@ import wishlistIcon from "/src/assets/wishlist.png";
 import cartIcon from "/src/assets/cart.png";
 import searchIcon from "/src/assets/search.png";
 import SearchModal from "./SearchModal";
-import AuthModal from "./AuthModal";
 import { useFavourites } from "@/contexts/FavouritesContext";
 import { useCart } from "@/contexts/CartContext";
-import { useAuth } from "@/contexts/AuthContext";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { User, LogOut, Settings } from "lucide-react";
 import { memo } from "react";
 
 const Navigation = memo(() => {
@@ -24,7 +18,6 @@ const Navigation = memo(() => {
   const [isInCustomerFavs, setIsInCustomerFavs] = useState(false);
   const { favouritesCount } = useFavourites();
   const { cartCount } = useCart();
-  const { user, signOut } = useAuth();
 
   // Debug cart count
   console.log('Navigation: Current cart count:', cartCount);
@@ -107,19 +100,7 @@ const Navigation = memo(() => {
     setIsSearchOpen(false);
   }, []);
 
-  const handleSignOut = useCallback(async () => {
-    await signOut();
-  }, [signOut]);
 
-  const getUserInitials = useCallback((name?: string, email?: string) => {
-    if (name) {
-      return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
-    }
-    if (email) {
-      return email[0].toUpperCase();
-    }
-    return 'U';
-  }, []);
 
   const renderCategoryWithPopup = useCallback((category: string, categoryData: { route: string, subcategories: string[] }) => (
     <Link
@@ -270,53 +251,7 @@ const Navigation = memo(() => {
               )}
             </button>
 
-            {/* Authentication */}
-            {user ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-12 w-12 rounded-full">
-                    <Avatar className="h-12 w-12">
-                      <AvatarImage src={user.avatar_url} alt={user.name || user.email} />
-                      <AvatarFallback className="bg-primary text-primary-foreground">
-                        {getUserInitials(user.name, user.email)}
-                      </AvatarFallback>
-                    </Avatar>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56" align="end" forceMount>
-                  <DropdownMenuLabel className="font-normal">
-                    <div className="flex flex-col space-y-1">
-                      <p className="text-sm font-medium leading-none">{user.name || 'User'}</p>
-                      <p className="text-xs leading-none text-muted-foreground">
-                        {user.email}
-                      </p>
-                    </div>
-                  </DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem>
-                    <User className="mr-2 h-4 w-4" />
-                    <span>Profile</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Settings className="mr-2 h-4 w-4" />
-                    <span>Settings</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleSignOut}>
-                    <LogOut className="mr-2 h-4 w-4" />
-                    <span>Log out</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            ) : (
-              <AuthModal 
-                trigger={
-                  <Button variant="outline" size="sm" className="h-12 px-4">
-                    Sign In
-                  </Button>
-                }
-              />
-            )}
+
           </div>
         </div>
       </div>

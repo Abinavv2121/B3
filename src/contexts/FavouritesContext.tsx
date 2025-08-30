@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
 
 interface FavouriteItem {
   id: string;
@@ -42,7 +41,7 @@ interface FavouritesProviderProps {
 
 export const FavouritesProvider: React.FC<FavouritesProviderProps> = ({ children }) => {
   const [favourites, setFavourites] = useState<FavouriteItem[]>([]);
-  const { requireAuth } = useAuth();
+
 
   // Load favourites from localStorage on mount
   useEffect(() => {
@@ -68,11 +67,6 @@ export const FavouritesProvider: React.FC<FavouritesProviderProps> = ({ children
   }, [favourites]);
 
   const addToFavourites = (product: Omit<FavouriteItem, 'addedAt'>) => {
-    // Check authentication before adding to favourites
-    if (!requireAuth()) {
-      console.log('FavouritesContext: Authentication required for adding to wishlist');
-      return;
-    }
     
     setFavourites(prev => {
       // Check if product is already in favourites

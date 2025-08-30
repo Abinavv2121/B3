@@ -36,14 +36,6 @@ A modern, responsive fashion e-commerce website built with React, TypeScript, an
 - **Color Scheme**: Cultural color palette with modern aesthetics
 - **Premium Typography**: Custom font combinations including Italiana, Playfair Display, and Inter
 
-### **Authentication & User Management**
-
-- **Google OAuth Integration**: Seamless sign-in with Google accounts
-- **Email/Password Authentication**: Traditional authentication method
-- **User Profile Management**: Update profile information and preferences
-- **Session Management**: Persistent login sessions with automatic token refresh
-- **Secure Authentication Flow**: OAuth callback handling and error management
-
 ## 🚀 Technologies Used
 
 - **Frontend Framework**: React 18 with TypeScript
