@@ -78,43 +78,7 @@ const Gown = () => {
   return (
     <div className="min-h-screen m-0 p-0">
       <Navigation />
-      <main className="m-0 p-0">
-        {/* Hero Section */}
-        <section className="relative h-screen flex items-center justify-center overflow-hidden">
-          {/* Background Image */}
-          <div className="absolute inset-0">
-            <img
-              src="/src/assets/bridal.png"
-              alt="Gown Collection"
-              className="w-full h-full object-cover"
-            />
-            <div className="absolute inset-0 bg-black/60"></div>
-          </div>
-          
-          {/* Content */}
-          <div className="relative z-10 text-center space-y-8 px-4">
-            <h1 className="text-5xl lg:text-7xl font-['Italiana'] tracking-wide" 
-                style={{ 
-                  color: '#F8F7F3',
-                  textShadow: '0 2px 4px rgba(0,0,0,0.8)'
-                }}>
-              GOWN COLLECTION
-            </h1>
-            <p className="text-xl lg:text-2xl text-white/90 max-w-2xl mx-auto leading-relaxed">
-              Discover our stunning collection of elegant gowns, perfect for every special occasion
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <Button 
-                size="lg"
-                className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white px-8 py-4 text-lg font-semibold rounded-brand shadow-lg"
-                onClick={() => document.getElementById('products-section')?.scrollIntoView({ behavior: 'smooth' })}
-              >
-                Explore Collection
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-            </div>
-          </div>
-        </section>
+      <main className="m-0 p-0 pt-24">
 
         {/* Products Section */}
         <section id="products-section" className="py-16 px-4 bg-gradient-to-br from-slate-50 to-amber-50">

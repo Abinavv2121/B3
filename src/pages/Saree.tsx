@@ -1,13 +1,11 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import ProductGrid from "@/components/ProductGrid";
 import { GoldDivider } from "@/components/ui/gold-divider";
 import { supabaseUtils } from "@/hooks/useSupabase";
-import { ProductRow, FilterOption } from "@/types";
+import { ProductRow } from "@/types";
 import { PRODUCT_CONFIG } from "@/constants";
-import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
 
 /**
  * Saree category page with optimized structure and reusable components
@@ -69,55 +67,13 @@ const Saree = () => {
   return (
     <div className="min-h-screen m-0 p-0">
       <Navigation />
-      <main className="m-0 p-0">
-        {/* Hero Section */}
-        <section className="relative h-screen flex items-center justify-center overflow-hidden">
-          {/* Background Image */}
-          <div className="absolute inset-0">
-            <img
-              src="/src/assets/saree.jpg"
-              alt="Saree Collection"
-              className="w-full h-full object-contain object-center"
-              style={{
-                maxWidth: '100%',
-                maxHeight: '100%',
-                objectFit: 'contain'
-              }}
-            />
-            <div className="absolute inset-0 bg-black/60"></div>
-          </div>
-          
-          {/* Content */}
-          <div className="relative z-10 text-center space-y-8 px-4">
-            <h1 className="text-5xl lg:text-7xl font-['Italiana'] tracking-wide" 
-                style={{ 
-                  color: '#F8F7F3',
-                  textShadow: '0 2px 4px rgba(0,0,0,0.8)'
-                }}>
-              SAREE <span style={{ color: '#D4AF37' }}>COLLECTION</span>
-            </h1>
-            <p className="text-xl lg:text-2xl font-light tracking-wide text-white/90 max-w-2xl mx-auto">
-              Traditional Elegance Meets Modern Grace
-            </p>
-            <div className="flex justify-center space-x-4">
-              <Button className="btn-premium">
-                Explore Collection
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-        </section>
-
-        <GoldDivider />
+      <main className="m-0 p-0 pt-24">
 
         {/* Products Section */}
         <ProductGrid
           products={products}
           isLoading={isLoading}
           error={error}
-          filters={updatedFilters}
-          activeFilter={activeFilter}
-          onFilterChange={handleFilterChange}
           title="Discover Our Saree Collection"
           subtitle="From handwoven silk to contemporary georgette, explore our curated collection of sarees that celebrate the timeless beauty of Indian tradition."
         />

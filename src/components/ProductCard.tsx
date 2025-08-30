@@ -135,11 +135,17 @@ const ProductCard = memo(({ product }: ProductCardProps) => {
       <div className="bg-white/80 backdrop-blur-xl rounded-2xl border border-gray-200/50 shadow-lg hover:shadow-2xl transition-all duration-500 hover:scale-[1.02] overflow-hidden">
         {/* Image Container */}
         <div className="relative aspect-[3/4] overflow-hidden">
-          <ProductImageGallery
-            images={allImages}
-            productName={product.name}
-            className="w-full h-full"
-          />
+          <picture>
+            <source srcSet={`${product.image}?w=480 1x, ${product.image}?w=960 2x`} media="(max-width: 640px)" />
+            <source srcSet={`${product.image}?w=720 1x, ${product.image}?w=1440 2x`} media="(max-width: 1024px)" />
+            <img 
+              src={product.image} 
+              alt={product.name}
+              loading="lazy" 
+              decoding="async"
+              className="w-full h-full object-cover"
+            />
+          </picture>
           
           {/* Overlay */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent group-hover:from-black/30 transition-all duration-300 pointer-events-none"></div>

@@ -56,7 +56,7 @@ const FeaturedProducts = memo(() => {
     try {
       setIsLoading(true);
       setError(null);
-      const { data, error } = await supabaseUtils.getProducts();
+      const { data, error } = await supabaseUtils.getProducts({ limit: 24 });
       if (error) {
         setError(error.message);
       } else {

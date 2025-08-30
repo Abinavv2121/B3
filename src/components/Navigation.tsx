@@ -208,8 +208,8 @@ const Navigation = memo(() => {
               </Link>
             </div>
 
-            {/* Center - Nav items (scrollable if overflow) */}
-            <nav className="flex-1 mx-4 overflow-x-auto">
+            {/* Center - Nav items */}
+            <nav className="flex-1 mx-4">
               <div className="flex items-center justify-center space-x-3 whitespace-nowrap">
                 {mainCategories.map((category) => renderSimpleLink(category))}
                 {Object.entries(categoryPages).map(([category, categoryData]) => renderCategoryWithPopup(category, categoryData))}
@@ -249,111 +249,66 @@ const Navigation = memo(() => {
                   </Badge>
                 )}
               </button>
+
+              {/* Authentication */}
+              {isAuthenticated ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="relative h-12 w-12 rounded-full">
+                      <Avatar className="h-12 w-12">
+                        <AvatarImage src={user?.avatar_url || ""} alt={user?.name || user?.email} />
+                        <AvatarFallback className="bg-primary text-primary-foreground">
+                          {user?.name?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || 'U'}
+                        </AvatarFallback>
+                      </Avatar>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-56" align="end" forceMount>
+                    <DropdownMenuLabel className="font-normal">
+                      <div className="flex flex-col space-y-1">
+                        <p className="text-sm font-medium leading-none">{user?.name || 'User'}</p>
+                        <p className="text-xs leading-none text-muted-foreground">
+                          {user?.email}
+                        </p>
+                      </div>
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => navigate('/profile')}>
+                      <User className="mr-2 h-4 w-4" />
+                      <span>Profile</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => navigate('/settings')}>
+                      <Settings className="mr-2 h-4 w-4" />
+                      <span>Settings</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={logout}>
+                      <LogOut className="mr-2 h-4 w-4" />
+                      <span>Log out</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : isGuest ? (
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="h-12 px-4"
+                  onClick={() => setShowAuthModal(true)}
+                >
+                  <User className="mr-2 h-4 w-4" />
+                  Guest - Sign In
+                </Button>
+              ) : (
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="h-12 px-4"
+                  onClick={() => setShowAuthModal(true)}
+                >
+                  Sign In
+                </Button>
+              )}
             </div>
-          </div>
-          
-          {/* Right side buttons */}
-          <div className="flex-shrink-0 flex items-center space-x-4 pr-4">
-            <button 
-              onClick={handleWishlistClick}
-              className="relative flex items-center justify-center p-4 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
-            >
-              <img 
-                src={wishlistIcon} 
-                alt="Wishlist" 
-                className="h-16 w-16"
-              />
-              {favouritesCount > 0 && (
-                <Badge className="absolute -top-1 -right-1 h-6 w-6 rounded-full bg-red-500 text-white text-sm flex items-center justify-center p-0">
-                  {favouritesCount > 99 ? '99+' : favouritesCount}
-                </Badge>
-              )}
-            </button>
-            <button 
-              onClick={handleSearchClick}
-              className="flex items-center justify-center p-4 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
-            >
-              <img 
-                src={searchIcon} 
-                alt="Search" 
-                className="h-16 w-16"
-              />
-            </button>
-            <button 
-              onClick={handleCartClick}
-              className="relative flex items-center justify-center p-4 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
-            >
-              <img 
-                src={cartIcon} 
-                alt="Cart" 
-                className="h-16 w-16"
-              />
-              {cartCount > 0 && (
-                <Badge className="absolute -top-1 -right-1 h-6 w-6 rounded-full bg-blue-500 text-white text-sm flex items-center justify-center p-0">
-                  {cartCount > 99 ? '99+' : cartCount}
-                </Badge>
-              )}
-            </button>
-
-            {/* Authentication */}
-            {isAuthenticated ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-12 w-12 rounded-full">
-                    <Avatar className="h-12 w-12">
-                      <AvatarImage src={user?.avatar_url || ""} alt={user?.name || user?.email} />
-                      <AvatarFallback className="bg-primary text-primary-foreground">
-                        {user?.name?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || 'U'}
-                      </AvatarFallback>
-                    </Avatar>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56" align="end" forceMount>
-                  <DropdownMenuLabel className="font-normal">
-                    <div className="flex flex-col space-y-1">
-                      <p className="text-sm font-medium leading-none">{user?.name || 'User'}</p>
-                      <p className="text-xs leading-none text-muted-foreground">
-                        {user?.email}
-                      </p>
-                    </div>
-                  </DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem>
-                    <User className="mr-2 h-4 w-4" />
-                    <span>Profile</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Settings className="mr-2 h-4 w-4" />
-                    <span>Settings</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={logout}>
-                    <LogOut className="mr-2 h-4 w-4" />
-                    <span>Log out</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            ) : isGuest ? (
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="h-12 px-4"
-                onClick={() => setShowAuthModal(true)}
-              >
-                <User className="mr-2 h-4 w-4" />
-                Guest - Sign In
-              </Button>
-            ) : (
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="h-12 px-4"
-                onClick={() => setShowAuthModal(true)}
-              >
-                Sign In
-              </Button>
-            )}
-
           </div>
         </div>
       </header>

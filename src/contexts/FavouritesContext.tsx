@@ -42,11 +42,12 @@ interface FavouritesProviderProps {
 
 export const FavouritesProvider: React.FC<FavouritesProviderProps> = ({ children }) => {
   const [favourites, setFavourites] = useState<FavouriteItem[]>([]);
-  const { requireAuth } = useAuth();
+  const { requireAuth, user } = useAuth();
 
   // Load favourites from localStorage on mount
   useEffect(() => {
-    const savedFavourites = localStorage.getItem('b3-favourites');
+    const storageKey = user ? `b3-favourites_${user.id}` : 'b3-favourites';
+    const savedFavourites = localStorage.getItem(storageKey);
     if (savedFavourites) {
       try {
         const parsed = JSON.parse(savedFavourites);
@@ -59,13 +60,16 @@ export const FavouritesProvider: React.FC<FavouritesProviderProps> = ({ children
       } catch (error) {
         // console.error('Error loading favourites from localStorage:', error);
       }
+    } else {
+      setFavourites([]);
     }
-  }, []);
+  }, [user]);
 
   // Save favourites to localStorage whenever favourites change
   useEffect(() => {
-    localStorage.setItem('b3-favourites', JSON.stringify(favourites));
-  }, [favourites]);
+    const storageKey = user ? `b3-favourites_${user.id}` : 'b3-favourites';
+    localStorage.setItem(storageKey, JSON.stringify(favourites));
+  }, [favourites, user]);
 
   const addToFavourites = (product: Omit<FavouriteItem, 'addedAt'>) => {
     // Check authentication before adding to favourites

@@ -23,6 +23,8 @@ const Admin = lazy(() => import('@/pages/Admin'));
 const AboutUs = lazy(() => import('@/pages/AboutUs'));
 const AuthCallback = lazy(() => import('@/pages/AuthCallback'));
 const ProductDetail = lazy(() => import('@/pages/ProductDetail'));
+const Profile = lazy(() => import('@/pages/Profile'));
+const Settings = lazy(() => import('@/pages/Settings'));
 const NotFound = lazy(() => import('@/pages/NotFound'));
 
 // Loading component
@@ -77,6 +79,8 @@ const AppContent = memo(() => {
           <Route path="/about-us" element={<AboutUs />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
           <Route path="/product/:id" element={<ProductDetail />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/settings" element={<Settings />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
@@ -88,13 +92,13 @@ const AppContent = memo(() => {
 
 AppContent.displayName = 'AppContent';
 
-// Auth Modal Wrapper Component
+// Global Auth Modal mounted once at app root
 const AuthModalWrapper = memo(() => {
-  const { 
-    showAuthModal, 
-    setShowAuthModal, 
-    login, 
-    signUp, 
+  const {
+    showAuthModal,
+    setShowAuthModal,
+    login,
+    signUp,
     loginWithGoogle,
     continueAsGuest,
     loading,

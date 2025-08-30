@@ -24,6 +24,7 @@ interface AuthContextType {
   loginWithGoogle: () => Promise<void>
   continueAsGuest: () => void
   logout: () => void
+  updateProfile: (updates: Partial<User>) => Promise<boolean>
   requireAuth: () => boolean
   setShowAuthModal: (show: boolean) => void
   clearError: () => void
@@ -177,10 +178,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const logout = useCallback(async () => {
     try {
       setLoading(true)
+      
+      // Clear user-specific data before logout
+      if (user) {
+        localStorage.removeItem(`${STORAGE_KEYS.CART}_${user.id}`)
+        localStorage.removeItem(`b3-favourites_${user.id}`)
+      }
+      
       await signOut()
       setUser(null)
       setHasShownInitialModal(false)
-      // Clear other user-related data if needed
+      
+      // Clear general data
       localStorage.removeItem(STORAGE_KEYS.CART)
       localStorage.removeItem('b3-favourites')
     } catch (error) {
@@ -188,7 +197,32 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     } finally {
       setLoading(false)
     }
-  }, [setUser, setHasShownInitialModal])
+  }, [setUser, setHasShownInitialModal, user])
+
+  const updateProfile = useCallback(async (updates: Partial<User>): Promise<boolean> => {
+    try {
+      setLoading(true)
+      setError(null)
+      
+      if (!user) {
+        setError('No user to update')
+        return false
+      }
+      
+      // Here you would typically update the user profile in your backend
+      // For now, we'll just update the local state
+      const updatedUser = { ...user, ...updates }
+      setUser(updatedUser)
+      
+      return true
+    } catch (error) {
+      console.error('Profile update failed:', error)
+      setError('Failed to update profile')
+      return false
+    } finally {
+      setLoading(false)
+    }
+  }, [user, setUser])
 
   const requireAuth = useCallback((): boolean => {
     if (!user || user.isGuest) {
@@ -272,6 +306,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     loginWithGoogle,
     continueAsGuest,
     logout,
+    updateProfile,
     requireAuth,
     setShowAuthModal,
     clearError

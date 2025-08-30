@@ -79,48 +79,7 @@ const Anarkali = () => {
   return (
     <div className="min-h-screen m-0 p-0">
       <Navigation />
-      <main className="m-0 p-0">
-        {/* Hero Section */}
-        <section className="relative h-screen flex items-center justify-center overflow-hidden">
-          {/* Background Image */}
-          <div className="absolute inset-0">
-            <img
-              src="/src/assets/anarkali.jpg"
-              alt="Anarkali Collection"
-              className="w-full h-full object-cover"
-            />
-            <div className="absolute inset-0 bg-black/60"></div>
-          </div>
-          
-          {/* Content */}
-          <div className="relative z-10 text-center space-y-8 px-4">
-            <h1 className="text-5xl lg:text-7xl font-['Italiana'] tracking-wide" 
-                style={{ 
-                  color: '#F8F7F3',
-                  textShadow: '0 2px 4px rgba(0,0,0,0.8)'
-                }}>
-              ANARKALI <span style={{ color: '#D4AF37' }}>COLLECTION</span>
-            </h1>
-            <p className="text-xl lg:text-2xl font-light tracking-wide text-white/90 max-w-2xl mx-auto">
-              Royal Grace Meets Timeless Beauty
-            </p>
-            <div className="flex justify-center space-x-4">
-              <Button className="btn-premium">
-                Explore Collection
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-        </section>
-
-        {/* Gold Divider */}
-        <div 
-          className="w-full h-0"
-          style={{
-            borderTop: '1px solid rgba(212,175,55,0.15)',
-            boxShadow: '0 -12px 24px rgba(0,0,0,0.6) inset'
-          }}
-        />
+      <main className="m-0 p-0 pt-24">
 
         {/* Products Section */}
         <section className="section-padding relative overflow-hidden bg-royal-silk">

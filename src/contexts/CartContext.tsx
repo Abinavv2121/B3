@@ -32,7 +32,11 @@ interface CartProviderProps {
 }
 
 export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
-  const [cartItems, setCartItems] = useLocalStorage<CartItem[]>(STORAGE_KEYS.CART, []);
+  const { user } = useAuth();
+  const [cartItems, setCartItems] = useLocalStorage<CartItem[]>(
+    user ? `${STORAGE_KEYS.CART}_${user.id}` : STORAGE_KEYS.CART, 
+    []
+  );
   const { requireAuth } = useAuth();
 
   const addToCart = useCallback((item: Omit<CartItem, 'quantity'>) => {
