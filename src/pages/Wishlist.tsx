@@ -142,7 +142,7 @@ const Wishlist = () => {
   return (
     <>
       <Navigation />
-      <div className="min-h-screen bg-royal-silk pt-32">
+      <div className="min-h-screen bg-gradient-to-br from-amber-100 via-amber-200 to-orange-300 pt-32">
         <div className="container mx-auto px-4 py-10">
           {/* Header */}
           <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between mb-8">

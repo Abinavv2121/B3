@@ -1,3 +1,6 @@
+
+
+
 import React, { useCallback, memo, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -7,8 +10,8 @@ import sareeImage from '/src/assets/saree.jpg';
 import anarkaliImage from '/src/assets/anarkali.jpg';
 import lehengaImage from '/src/assets/lehenga.jpg';
 import salwarSuitImage from '/src/assets/salwarsuit.jpg';
+import gownImage from '/src/assets/bridal.png';
 import westernImage from '/src/assets/western.jpg';
-import bridalImage from '/src/assets/bridal.png';
 
 const CategoryShowcase = memo(() => {
   const navigate = useNavigate();
@@ -73,6 +76,18 @@ const CategoryShowcase = memo(() => {
     },
     {
       id: 5,
+      title: "GOWN",
+      subtitle: "Elegant Sophistication",
+      description: "Stunning gowns for special occasions and celebrations",
+      image: gownImage,
+      price: "Starting ₹35,999",
+      products: "90+ Designs",
+      href: "/gown",
+      gradient: "from-brandGold to-brandGold",
+      badge: "Elegant"
+    },
+    {
+      id: 6,
       title: "WESTERN WEAR",
       subtitle: "Modern Fusion",
       description: "Contemporary western wear with ethnic touches",
@@ -82,18 +97,6 @@ const CategoryShowcase = memo(() => {
       href: "/western",
       gradient: "from-brandNavy to-brandNavy",
       badge: "Modern"
-    },
-    {
-      id: 6,
-      title: "BRIDAL COLLECTION",
-      subtitle: "Your Dream Day",
-      description: "Exquisite bridal wear for the most special day",
-      image: bridalImage,
-      price: "Starting ₹45,999",
-      products: "80+ Designs",
-      href: "/bridal",
-      gradient: "from-brandGold to-brandGold",
-      badge: "Premium"
     }
   ], []);
 

@@ -36,16 +36,16 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   const { requireAuth } = useAuth();
 
   const addToCart = useCallback((item: Omit<CartItem, 'quantity'>) => {
-    console.log('CartContext: addToCart called with:', item);
+    // console.debug('CartContext: addToCart called with:', item);
     
     // Check authentication before adding to cart
     if (!requireAuth()) {
-      console.log('CartContext: Authentication required for adding to cart');
+      // console.debug('CartContext: Authentication required for adding to cart');
       return;
     }
     
     setCartItems(prevItems => {
-      console.log('CartContext: Previous cart items:', prevItems);
+      // console.debug('CartContext: Previous cart items:', prevItems);
       
       // Check if this exact product (same ID, size, and color) is already in cart
       const existingItem = prevItems.find(cartItem => 
@@ -55,15 +55,15 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
       );
 
       if (existingItem) {
-        console.log('CartContext: Product already in cart - cannot add duplicate');
+        // console.debug('CartContext: Product already in cart - cannot add duplicate');
         // Product already exists in cart - don't add duplicate
         // Return the same cart items unchanged
         return prevItems;
       } else {
-        console.log('CartContext: Adding new unique product to cart');
+        // console.debug('CartContext: Adding new unique product to cart');
         // Add new unique product with quantity 1
         const newItems = [...prevItems, { ...item, quantity: 1 }];
-        console.log('CartContext: New cart items after adding:', newItems);
+        // console.debug('CartContext: New cart items after adding:', newItems);
         return newItems;
       }
     });

@@ -57,7 +57,7 @@ export const FavouritesProvider: React.FC<FavouritesProviderProps> = ({ children
         }));
         setFavourites(favouritesWithDates);
       } catch (error) {
-        console.error('Error loading favourites from localStorage:', error);
+        // console.error('Error loading favourites from localStorage:', error);
       }
     }
   }, []);
@@ -70,7 +70,7 @@ export const FavouritesProvider: React.FC<FavouritesProviderProps> = ({ children
   const addToFavourites = (product: Omit<FavouriteItem, 'addedAt'>) => {
     // Check authentication before adding to favourites
     if (!requireAuth()) {
-      console.log('FavouritesContext: Authentication required for adding to wishlist');
+      // console.debug('FavouritesContext: Authentication required for adding to wishlist');
       return;
     }
     

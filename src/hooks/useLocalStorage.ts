@@ -20,7 +20,7 @@ export function useLocalStorage<T>(
       const item = window.localStorage.getItem(key)
       return item ? JSON.parse(item) : initialValue
     } catch (error) {
-      console.error(`Error reading localStorage key "${key}":`, error)
+      // console.error(`Error reading localStorage key "${key}":`, error)
       return initialValue
     }
   })
@@ -30,17 +30,17 @@ export function useLocalStorage<T>(
     try {
       // Allow value to be a function so we have the same API as useState
       const valueToStore = value instanceof Function ? value(storedValue) : value
-      console.log(`useLocalStorage: Setting key "${key}" to:`, valueToStore);
+      // console.debug(`useLocalStorage: Setting key "${key}" to:`, valueToStore);
       
       setStoredValue(valueToStore)
       
       // Save to local storage
       if (typeof window !== 'undefined') {
         window.localStorage.setItem(key, JSON.stringify(valueToStore))
-        console.log(`useLocalStorage: Saved to localStorage key "${key}":`, valueToStore);
+        // console.debug(`useLocalStorage: Saved to localStorage key "${key}":`, valueToStore);
       }
     } catch (error) {
-      console.error(`Error setting localStorage key "${key}":`, error)
+      // console.error(`Error setting localStorage key "${key}":`, error)
     }
   }, [key, storedValue])
 
@@ -52,7 +52,7 @@ export function useLocalStorage<T>(
         window.localStorage.removeItem(key)
       }
     } catch (error) {
-      console.error(`Error removing localStorage key "${key}":`, error)
+      // console.error(`Error removing localStorage key "${key}":`, error)
     }
   }, [key, initialValue])
 
@@ -63,7 +63,7 @@ export function useLocalStorage<T>(
         try {
           setStoredValue(JSON.parse(e.newValue))
         } catch (error) {
-          console.error(`Error parsing localStorage value for key "${key}":`, error)
+          // console.error(`Error parsing localStorage value for key "${key}":`, error)
         }
       }
     }

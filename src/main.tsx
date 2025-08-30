@@ -14,25 +14,20 @@ root.render(
 );
 
 // Service Worker registration for PWA capabilities
-if ('serviceWorker' in navigator) {
+if ('serviceWorker' in navigator && import.meta.env.PROD) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js')
-      .then((registration) => {
-        console.log('SW registered: ', registration);
-      })
-      .catch((registrationError) => {
-        console.log('SW registration failed: ', registrationError);
-      });
+      .catch(() => {});
   });
 }
 
 // Performance monitoring
-if (process.env.NODE_ENV === 'development') {
+if (import.meta.env.DEV) {
   // Monitor long tasks
   const observer = new PerformanceObserver((list) => {
     for (const entry of list.getEntries()) {
       if (entry.duration > 50) {
-        console.warn('Long task detected:', entry);
+        // console.warn('Long task detected:', entry);
       }
     }
   });

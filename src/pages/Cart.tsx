@@ -13,8 +13,8 @@ const Cart = () => {
   const { cartItems, removeFromCart, cartTotal, clearCart } = useCart();
 
   // Debug cart data
-  console.log('Cart page: cartItems:', cartItems);
-  console.log('Cart page: cartTotal:', cartTotal);
+  // console.debug('Cart page: cartItems:', cartItems);
+  // console.debug('Cart page: cartTotal:', cartTotal);
 
   const subtotal = cartTotal;
   const discount = cartItems.reduce((sum, item) => sum + ((item.originalPrice || 0) - item.price) * item.quantity, 0);

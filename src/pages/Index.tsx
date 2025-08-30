@@ -16,7 +16,7 @@ const Index = () => {
       <main 
         className="m-0 p-0 relative"
         style={{
-          background: 'linear-gradient(180deg, #000000 0%, #001F49 30%, #002A5C 45%, #003570 60%, #FDBD2F 75%, #FDBD2F 100%)'
+          background: 'linear-gradient(180deg, #000000 0%, #1e3a8a 25%, #3b82f6 40%, #60a5fa 55%, #fbbf24 70%, #fde047 85%, #fef3c7 100%)'
         }}
       >
         <HeroSection />
