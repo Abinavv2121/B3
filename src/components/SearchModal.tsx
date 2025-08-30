@@ -22,7 +22,8 @@ const SearchModal = memo(({ isOpen, onClose }: { isOpen: boolean; onClose: () =>
     { id: "Bridal Collection", name: "Bridal Collection" },
     { id: "Festival Glory", name: "Festival Glory" },
     { id: "Special Moments", name: "Special Moments" },
-    { id: "Western Edge", name: "Western Edge" }
+    { id: "Western Edge", name: "Western Edge" },
+    { id: "Gown", name: "Gown" }
   ], []);
 
   // Fetch all products from Supabase

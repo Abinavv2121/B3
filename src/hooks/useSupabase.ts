@@ -113,6 +113,17 @@ export const supabaseUtils = {
     return { data, error }
   },
 
+  // Get a single product by ID
+  async getProduct(id: string) {
+    const { data, error } = await supabase
+      .from('products')
+      .select('*')
+      .eq('id', id)
+      .single()
+    
+    return { data: data ? [data] : null, error }
+  },
+
   // Admin functions for product management
   async addProduct(product: any) {
     const { data, error } = await supabase

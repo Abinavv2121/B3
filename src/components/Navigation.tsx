@@ -80,6 +80,16 @@ const Navigation = memo(() => {
         "Printed",
         "Embroidered"
       ]
+    },
+    "GOWN": {
+      route: "/gown",
+      subcategories: [
+        "Bridal Gowns",
+        "Party Gowns",
+        "Designer Gowns",
+        "Heavy Work",
+        "Light Work"
+      ]
     }
   };
 

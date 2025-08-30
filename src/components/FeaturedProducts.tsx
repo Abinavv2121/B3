@@ -213,8 +213,8 @@ const FeaturedProducts = memo(() => {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mb-12">
             {transformedProducts.map((product) => (
               <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
+          ))}
+        </div>
         ) : (
           <div className="text-center py-20">
             <p className="text-slate-300 text-lg">No products found in this category.</p>

@@ -10,6 +10,7 @@ const Saree = lazy(() => import('@/pages/Saree'));
 const Anarkali = lazy(() => import('@/pages/Anarkali'));
 const Lehenga = lazy(() => import('@/pages/Lehenga'));
 const SalwarSuit = lazy(() => import('@/pages/SalwarSuit'));
+const Gown = lazy(() => import('@/pages/Gown'));
 const Western = lazy(() => import('@/pages/Western'));
 const Bridal = lazy(() => import('@/pages/Bridal'));
 const Cart = lazy(() => import('@/pages/Cart'));
@@ -18,6 +19,7 @@ const Checkout = lazy(() => import('@/pages/Checkout'));
 const OrderSuccess = lazy(() => import('@/pages/OrderSuccess'));
 const Admin = lazy(() => import('@/pages/Admin'));
 const AboutUs = lazy(() => import('@/pages/AboutUs'));
+const ProductDetail = lazy(() => import('@/pages/ProductDetail'));
 const NotFound = lazy(() => import('@/pages/NotFound'));
 
 // Loading component
@@ -63,15 +65,17 @@ const App = memo(() => {
                 <Route path="/anarkali" element={<Anarkali />} />
                 <Route path="/lehenga" element={<Lehenga />} />
                 <Route path="/salwar-suit" element={<SalwarSuit />} />
+                <Route path="/gown" element={<Gown />} />
                 <Route path="/western" element={<Western />} />
                 <Route path="/bridal" element={<Bridal />} />
                 <Route path="/cart" element={<Cart />} />
                 <Route path="/wishlist" element={<Wishlist />} />
                 <Route path="/checkout" element={<Checkout />} />
                 <Route path="/order-success" element={<OrderSuccess />} />
-                <Route path="/admin" element={<Admin />} />
-                <Route path="/about-us" element={<AboutUs />} />
-                <Route path="*" element={<NotFound />} />
+                                            <Route path="/admin" element={<Admin />} />
+                            <Route path="/about-us" element={<AboutUs />} />
+                            <Route path="/product/:id" element={<ProductDetail />} />
+                            <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>
             <Toaster />

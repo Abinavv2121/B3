@@ -71,7 +71,8 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
     "Anarkali",
     "Lehenga",
     "Saree",
-    "Salwar Suit"
+    "Salwar Suit",
+    "Gown"
   ];
 
   const sections = [
@@ -81,6 +82,7 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
     { value: "anarkali", label: "Anarkali Collection", description: "Appears in the Anarkali category showcase" },
     { value: "lehenga", label: "Lehenga Collection", description: "Appears in the Lehenga category showcase" },
     { value: "salwar_suit", label: "Salwar Suit Collection", description: "Appears in the Salwar Suit category showcase" },
+    { value: "gown", label: "Gown Collection", description: "Appears in the Gown category showcase" },
     { value: "western_wear", label: "Western Wear Collection", description: "Appears in the Western Wear category showcase" },
     { value: "bridal_collection", label: "Bridal Collection", description: "Appears in the Bridal Collection category showcase" }
   ];
@@ -580,8 +582,8 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
                       onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                       className="border-white/20 bg-white/5 text-white placeholder:text-white/50 focus:border-yellow-500 focus:ring-yellow-500/20 min-h-[100px]"
                       placeholder="Enter product description..."
-                      />
-                    </div>
+                    />
+                  </div>
 
                   {/* Product Image Upload */}
                     <MultiImageUpload
@@ -609,7 +611,7 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
                     />
 
                   {/* Primary Color */}
-                    <div className="space-y-2">
+                  <div className="space-y-2">
                       <Label htmlFor="primary_color" className="text-white/90 font-medium">
                         Primary Color
                       </Label>
@@ -620,11 +622,11 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
                         className="border-white/20 bg-white/5 text-white placeholder:text-white/50 focus:border-yellow-500 focus:ring-yellow-500/20"
                         placeholder="e.g., Red, Blue, Gold, etc."
                       />
-                    </div>
+                  </div>
 
                   {/* Colors and Sizes */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
+                  <div className="space-y-2">
                       <Label className="text-white/90 font-medium">Colors</Label>
                     <div className="flex flex-wrap gap-2">
                       {availableColors.map((color) => (
@@ -828,14 +830,14 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
                             <div className="w-full h-full flex items-center justify-center">
                               <Package className="w-12 h-12 text-white/20" />
                             </div>
-                          )}
-                        </div>
+                   )}
+                 </div>
 
                         {/* Additional Images Count */}
                         {product.additional_images && product.additional_images.length > 0 && (
                           <div className="absolute top-2 right-2 bg-yellow-500 text-black text-xs px-2 py-1 rounded-full font-medium">
                             +{product.additional_images.length}
-                          </div>
+             </div>
                         )}
 
                         {/* Product Info */}
@@ -873,12 +875,12 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
 
                           {/* Primary Color */}
                           {product.primary_color && (
-                            <div>
+                    <div>
                               <span className="text-white/60 text-sm">Primary Color: </span>
                               <Badge variant="outline" className="ml-1">
                                 {product.primary_color}
                               </Badge>
-                            </div>
+                    </div>
                           )}
 
                           {/* Tags */}
