@@ -2,6 +2,7 @@ import React, { Suspense, lazy, memo } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { CartProvider } from '@/contexts/CartContext';
 import { FavouritesProvider } from '@/contexts/FavouritesContext';
+import { AuthProvider } from '@/contexts/AuthContext';
 import { Toaster } from '@/components/ui/toaster';
 
 // Lazy load components for code splitting
@@ -18,6 +19,7 @@ const Checkout = lazy(() => import('@/pages/Checkout'));
 const OrderSuccess = lazy(() => import('@/pages/OrderSuccess'));
 const Admin = lazy(() => import('@/pages/Admin'));
 const AboutUs = lazy(() => import('@/pages/AboutUs'));
+const AuthCallback = lazy(() => import('@/pages/AuthCallback'));
 const NotFound = lazy(() => import('@/pages/NotFound'));
 
 // Loading component
@@ -53,31 +55,34 @@ ErrorFallback.displayName = 'ErrorFallback';
 const App = memo(() => {
   return (
     <Router>
-      <CartProvider>
-        <FavouritesProvider>
-          <div className="App">
-            <Suspense fallback={<LoadingSpinner />}>
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/saree" element={<Saree />} />
-                <Route path="/anarkali" element={<Anarkali />} />
-                <Route path="/lehenga" element={<Lehenga />} />
-                <Route path="/salwar-suit" element={<SalwarSuit />} />
-                <Route path="/western" element={<Western />} />
-                <Route path="/bridal" element={<Bridal />} />
-                <Route path="/cart" element={<Cart />} />
-                <Route path="/wishlist" element={<Wishlist />} />
-                <Route path="/checkout" element={<Checkout />} />
-                <Route path="/order-success" element={<OrderSuccess />} />
-                <Route path="/admin" element={<Admin />} />
-                <Route path="/about-us" element={<AboutUs />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </Suspense>
-            <Toaster />
-          </div>
-        </FavouritesProvider>
-      </CartProvider>
+      <AuthProvider>
+        <CartProvider>
+          <FavouritesProvider>
+            <div className="App">
+              <Suspense fallback={<LoadingSpinner />}>
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/saree" element={<Saree />} />
+                  <Route path="/anarkali" element={<Anarkali />} />
+                  <Route path="/lehenga" element={<Lehenga />} />
+                  <Route path="/salwar-suit" element={<SalwarSuit />} />
+                  <Route path="/western" element={<Western />} />
+                  <Route path="/bridal" element={<Bridal />} />
+                  <Route path="/cart" element={<Cart />} />
+                  <Route path="/wishlist" element={<Wishlist />} />
+                  <Route path="/checkout" element={<Checkout />} />
+                  <Route path="/order-success" element={<OrderSuccess />} />
+                  <Route path="/admin" element={<Admin />} />
+                  <Route path="/about-us" element={<AboutUs />} />
+                  <Route path="/auth/callback" element={<AuthCallback />} />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </Suspense>
+              <Toaster />
+            </div>
+          </FavouritesProvider>
+        </CartProvider>
+      </AuthProvider>
     </Router>
   );
 });
