@@ -2,7 +2,9 @@ import React, { Suspense, lazy, memo } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { CartProvider } from '@/contexts/CartContext';
 import { FavouritesProvider } from '@/contexts/FavouritesContext';
+import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import { Toaster } from '@/components/ui/toaster';
+import AuthModal from '@/components/AuthModal';
 
 // Lazy load components for code splitting
 const Index = lazy(() => import('@/pages/Index'));
@@ -50,34 +52,53 @@ const ErrorFallback = memo(() => (
 
 ErrorFallback.displayName = 'ErrorFallback';
 
+// Component to render AuthModal within AuthContext
+const AppContent = memo(() => {
+  const { showAuthModal, setShowAuthModal } = useAuth();
+  
+  return (
+    <div className="App">
+      <Suspense fallback={<LoadingSpinner />}>
+        <Routes>
+          <Route path="/" element={<Index />} />
+          <Route path="/saree" element={<Saree />} />
+          <Route path="/anarkali" element={<Anarkali />} />
+          <Route path="/lehenga" element={<Lehenga />} />
+          <Route path="/salwar-suit" element={<SalwarSuit />} />
+          <Route path="/western" element={<Western />} />
+          <Route path="/bridal" element={<Bridal />} />
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/wishlist" element={<Wishlist />} />
+          <Route path="/checkout" element={<Checkout />} />
+          <Route path="/order-success" element={<OrderSuccess />} />
+          <Route path="/admin" element={<Admin />} />
+          <Route path="/about-us" element={<AboutUs />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </Suspense>
+      <Toaster />
+      
+      {/* Auth Modal */}
+      <AuthModal 
+        isOpen={showAuthModal} 
+        onClose={() => setShowAuthModal(false)} 
+      />
+    </div>
+  );
+});
+
+AppContent.displayName = 'AppContent';
+
 const App = memo(() => {
   return (
     <Router>
-      <CartProvider>
-        <FavouritesProvider>
-          <div className="App">
-            <Suspense fallback={<LoadingSpinner />}>
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/saree" element={<Saree />} />
-                <Route path="/anarkali" element={<Anarkali />} />
-                <Route path="/lehenga" element={<Lehenga />} />
-                <Route path="/salwar-suit" element={<SalwarSuit />} />
-                <Route path="/western" element={<Western />} />
-                <Route path="/bridal" element={<Bridal />} />
-                <Route path="/cart" element={<Cart />} />
-                <Route path="/wishlist" element={<Wishlist />} />
-                <Route path="/checkout" element={<Checkout />} />
-                <Route path="/order-success" element={<OrderSuccess />} />
-                <Route path="/admin" element={<Admin />} />
-                <Route path="/about-us" element={<AboutUs />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </Suspense>
-            <Toaster />
-          </div>
-        </FavouritesProvider>
-      </CartProvider>
+      <AuthProvider>
+        <CartProvider>
+          <FavouritesProvider>
+            <AppContent />
+          </FavouritesProvider>
+        </CartProvider>
+      </AuthProvider>
     </Router>
   );
 });
