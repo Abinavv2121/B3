@@ -867,8 +867,8 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
 
                           {/* Section Badge */}
                     <div>
-                            <span className="text-white/60 text-sm">Section: </span>
-                            <Badge variant="outline" className="ml-1">
+                            <span style={{ color: 'white', fontWeight: '600', fontSize: '14px' }}>Section: </span>
+                            <Badge variant="outline" className="ml-1" style={{ color: 'white', borderColor: 'white' }}>
                               {sections.find(s => s.value === product.section)?.label || product.section || 'N/A'}
                             </Badge>
                     </div>
@@ -876,8 +876,8 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
                           {/* Primary Color */}
                           {product.primary_color && (
                     <div>
-                              <span className="text-white/60 text-sm">Primary Color: </span>
-                              <Badge variant="outline" className="ml-1">
+                              <span style={{ color: 'white', fontWeight: '600', fontSize: '14px' }}>Primary Color: </span>
+                              <Badge variant="outline" className="ml-1" style={{ color: 'white', borderColor: 'white' }}>
                                 {product.primary_color}
                               </Badge>
                     </div>

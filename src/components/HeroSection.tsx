@@ -1,13 +1,33 @@
+import { useState, useEffect } from 'react';
 import heroImage from "/src/assets/hero.png";
-import RotatingText from './RotatingText';
 
 const HeroSection = () => {
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  
+  // Array of hero images to cycle through (replacing the text)
+  const heroImages = [
+    "/src/assets/1.png",
+    "/src/assets/2.png", 
+    "/src/assets/3.png",
+    "/src/assets/4.png",
+    "/src/assets/5.png"
+  ];
+
+  // Cycle through images every 5 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % heroImages.length);
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [heroImages.length]);
+
   return (
     <section 
       id="hero-section"
       className="relative w-full h-screen overflow-hidden"
     >
-      {/* Main hero image - full opacity */}
+      {/* Original background image */}
       <div 
         className="absolute inset-0 z-1 bg-cover bg-no-repeat"
         style={{
@@ -22,13 +42,36 @@ const HeroSection = () => {
       {/* Additional gentle corner shading */}
       <div className="absolute inset-0 bg-gradient-to-br from-black/20 via-transparent to-black/30 z-5" />
       
+      {/* Cycling hero images (replacing the text) */}
       <div className="absolute inset-0 flex items-center justify-center z-10">
         <div className="text-left -mt-16">
-          <RotatingText
-            texts={['HER.', 'AVAL.']}
-            mainClassName="text-white/95 drop-shadow-[0_4px_28px_rgba(0,0,0,0.45)] text-[6rem] lg:text-[9rem] font-normal font-hind tracking-[0.06em]"
-            rotationInterval={5000}
-          />
+          {heroImages.map((image, index) => (
+            <div 
+              key={image}
+              className={`transition-opacity duration-1000 ${
+                index === currentImageIndex ? 'opacity-100' : 'opacity-0'
+              }`}
+              style={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                width: 'auto',
+                height: 'auto',
+                maxWidth: '80%',
+                maxHeight: '80%'
+              }}
+            >
+              <img 
+                src={image} 
+                alt={`Hero Image ${index + 1}`}
+                className="w-auto h-auto max-w-full max-h-full object-contain"
+                style={{
+                  filter: 'drop-shadow(0 4px 28px rgba(0,0,0,0.45))'
+                }}
+              />
+            </div>
+          ))}
         </div>
       </div>
       
@@ -36,8 +79,8 @@ const HeroSection = () => {
       <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20">
         <div className="text-left -mt-16">
           <div className="h-[6rem] lg:h-[10rem]"></div>
-                <p className="text-white/90 text-lg lg:text-xl font-light tracking-[0.25em] mt-1" style={{ fontFamily: "Inter, sans-serif" }}>
-                  BY B3 FASHION STUDIOS
+                <p className="text-white/90 text-lg lg:text-xl font-light tracking-[0.25em] mt-32" style={{ fontFamily: "Inter, sans-serif" }}>
+                  BY B3 FASHION STUDIO
                 </p>
         </div>
       </div>

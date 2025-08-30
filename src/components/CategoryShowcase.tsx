@@ -12,7 +12,6 @@ import lehengaImage from '/src/assets/lehenga.jpg';
 import salwarSuitImage from '/src/assets/salwarsuit.jpg';
 import gownImage from '/src/assets/bridal.png';
 import westernImage from '/src/assets/western.jpg';
-import bridalImage from '/src/assets/bridal.png';
 
 const CategoryShowcase = memo(() => {
   const navigate = useNavigate();
@@ -98,18 +97,6 @@ const CategoryShowcase = memo(() => {
       href: "/western",
       gradient: "from-brandNavy to-brandNavy",
       badge: "Modern"
-    },
-    {
-      id: 7,
-      title: "BRIDAL COLLECTION",
-      subtitle: "Your Dream Day",
-      description: "Exquisite bridal wear for the most special day",
-      image: bridalImage,
-      price: "Starting ₹45,999",
-      products: "80+ Designs",
-      href: "/bridal",
-      gradient: "from-brandGold to-brandGold",
-      badge: "Premium"
     }
   ], []);
 

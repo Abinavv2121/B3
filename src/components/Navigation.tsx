@@ -19,8 +19,7 @@ const Navigation = memo(() => {
   const { favouritesCount } = useFavourites();
   const { cartCount } = useCart();
 
-  // Debug cart count
-  console.log('Navigation: Current cart count:', cartCount);
+  // console.debug('Navigation: Current cart count:', cartCount);
 
   // Main categories that match your database and existing pages
   const mainCategories = [
@@ -185,84 +184,67 @@ const Navigation = memo(() => {
   return (
     <>
       <header 
-        className="fixed top-0 left-0 w-full z-50 border-b border-gray-200 shadow-sm transition-all duration-500 bg-white"
+        className="fixed top-0 left-0 w-full z-50 border-b border-gray-200 shadow-sm transition-all duration-300 bg-white"
         style={headerStyles}
       >
-      <div className="w-full relative h-30 px-8 bg-white">
-        <div className="absolute inset-0 flex items-center justify-between py-9 px-16 bg-white">
-          {/* Left side - Logo */}
-          <div className="flex-shrink-0 pl-8">
-            <Link to="/" className="flex items-center">
-              <img 
-                src={brandLogo} 
-                alt="Brand Logo" 
-                className="h-24 w-auto"
-              />
-            </Link>
-          </div>
-          
-          {/* Center - Navigation Items */}
-          <div className="flex-shrink-0 flex justify-center items-center mx-8">
-            <div className="flex items-center space-x-4">
-              {/* Main Categories */}
-              {mainCategories.map((category) => 
-                renderSimpleLink(category)
-              )}
-              
-              {/* Category Pages */}
-              {Object.entries(categoryPages).map(([category, categoryData]) => 
-                renderCategoryWithPopup(category, categoryData)
-              )}
+        <div className="w-full bg-white">
+          <div className="flex items-center justify-between py-5 px-4 lg:px-6">
+            {/* Left - Logo */}
+            <div className="shrink-0">
+              <Link to="/" className="flex items-center">
+                <img 
+                  src={brandLogo} 
+                  alt="Brand Logo" 
+                  className="h-20 w-auto"
+                />
+              </Link>
+            </div>
+
+            {/* Center - Nav items (scrollable if overflow) */}
+            <nav className="flex-1 mx-4 overflow-x-auto">
+              <div className="flex items-center justify-center space-x-3 whitespace-nowrap">
+                {mainCategories.map((category) => renderSimpleLink(category))}
+                {Object.entries(categoryPages).map(([category, categoryData]) => renderCategoryWithPopup(category, categoryData))}
+              </div>
+            </nav>
+
+            {/* Right - Actions */}
+            <div className="shrink-0 flex items-center space-x-2">
+              <button 
+                onClick={handleSearchClick}
+                className="flex items-center justify-center p-4 hover:bg-gray-100 rounded-lg transition-colors"
+                aria-label="Search"
+              >
+                <img src={searchIcon} alt="Search" className="h-14 w-14" />
+              </button>
+              <button 
+                onClick={handleWishlistClick}
+                className="relative flex items-center justify-center p-4 hover:bg-gray-100 rounded-lg transition-colors"
+                aria-label="Wishlist"
+              >
+                <img src={wishlistIcon} alt="Wishlist" className="h-14 w-14" />
+                {favouritesCount > 0 && (
+                  <Badge className="absolute -top-1 -right-1 h-6 w-6 rounded-full bg-red-500 text-white text-[11px] flex items-center justify-center p-0">
+                    {favouritesCount > 99 ? '99+' : favouritesCount}
+                  </Badge>
+                )}
+              </button>
+              <button 
+                onClick={handleCartClick}
+                className="relative flex items-center justify-center p-4 hover:bg-gray-100 rounded-lg transition-colors"
+                aria-label="Cart"
+              >
+                <img src={cartIcon} alt="Cart" className="h-14 w-14" />
+                {cartCount > 0 && (
+                  <Badge className="absolute -top-1 -right-1 h-6 w-6 rounded-full bg-blue-500 text-white text-[11px] flex items-center justify-center p-0">
+                    {cartCount > 99 ? '99+' : cartCount}
+                  </Badge>
+                )}
+              </button>
             </div>
           </div>
-          
-          {/* Right side buttons */}
-          <div className="flex-shrink-0 flex items-center space-x-4 pr-4">
-            <button 
-              onClick={handleWishlistClick}
-              className="relative flex items-center justify-center p-4 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
-            >
-              <img 
-                src={wishlistIcon} 
-                alt="Wishlist" 
-                className="h-16 w-16"
-              />
-              {favouritesCount > 0 && (
-                <Badge className="absolute -top-1 -right-1 h-6 w-6 rounded-full bg-red-500 text-white text-sm flex items-center justify-center p-0">
-                  {favouritesCount > 99 ? '99+' : favouritesCount}
-                </Badge>
-              )}
-            </button>
-            <button 
-              onClick={handleSearchClick}
-              className="flex items-center justify-center p-4 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
-            >
-              <img 
-                src={searchIcon} 
-                alt="Search" 
-                className="h-16 w-16"
-              />
-            </button>
-            <button 
-              onClick={handleCartClick}
-              className="relative flex items-center justify-center p-4 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
-            >
-              <img 
-                src={cartIcon} 
-                alt="Cart" 
-                className="h-16 w-16"
-              />
-              {cartCount > 0 && (
-                <Badge className="absolute -top-1 -right-1 h-6 w-6 rounded-full bg-blue-500 text-white text-sm flex items-center justify-center p-0">
-                  {cartCount > 99 ? '99+' : cartCount}
-                </Badge>
-              )}
-            </button>
-
-          </div>
         </div>
-      </div>
-    </header>
+      </header>
       
       {/* Search Modal */}
       <SearchModal 

@@ -27,16 +27,16 @@ const ProductDetail = () => {
   // Fetch product data
   useEffect(() => {
     const fetchProduct = async () => {
-      console.log('Fetching product with ID:', id);
+      // console.debug('Fetching product with ID:', id);
       if (!id) {
-        console.log('No ID provided');
+        // console.debug('No ID provided');
         return;
       }
       
       try {
         setLoading(true);
         const { data, error } = await supabaseUtils.getProduct(id);
-        console.log('Supabase response:', { data, error });
+        // console.debug('Supabase response:', { data, error });
         
         if (error) {
           console.error('Error fetching product:', error);
@@ -49,7 +49,7 @@ const ProductDetail = () => {
         }
         
         if (data && data.length > 0) {
-          console.log('Product data received:', data[0]);
+          // console.debug('Product data received:', data[0]);
           setProduct(data[0]);
           const imgs = [data[0].image_url, ...(data[0].additional_images || [])].filter(Boolean) as string[];
           setActiveImage(imgs[0] || '');
@@ -63,7 +63,7 @@ const ProductDetail = () => {
             setSelectedColor(data[0].primary_color);
           }
         } else {
-          console.log('No product data received:', data);
+          // console.debug('No product data received:', data);
         }
       } catch (error) {
         console.error('Error:', error);
@@ -110,50 +110,166 @@ const ProductDetail = () => {
   const requiresSize = useMemo(() => !!(product && Array.isArray(product.sizes) && product.sizes.length > 0), [product]);
   const requiresColor = useMemo(() => !!(product && Array.isArray(product.colors) && product.colors.length > 0), [product]);
   const effectiveColor = useMemo(() => {
-    if (requiresColor && selectedColor) return selectedColor;
-    return product?.primary_color || '';
+    /* console.debug('Calculating effective color:', {
+      requiresColor,
+      selectedColor,
+      primaryColor: product?.primary_color,
+      colors: product?.colors
+    }); */
+    
+    if (requiresColor && selectedColor) {
+      // console.debug('Using selected color:', selectedColor);
+      return selectedColor;
+    }
+    
+    if (product?.primary_color) {
+      // console.debug('Using primary color:', product.primary_color);
+      return product.primary_color;
+    }
+    
+    // Fallback to first available color if no primary color
+    if (product?.colors && product.colors.length > 0) {
+      // console.debug('Using first available color:', product.colors[0]);
+      return product.colors[0];
+    }
+    
+    // console.debug('No color found, using empty string');
+    return '';
   }, [requiresColor, selectedColor, product]);
 
-  // Resolve CSS color from name/hex with robust normalization
+  // Enhanced color resolution with comprehensive mapping
   const resolveColor = (input: string): string => {
     if (!input) return '#9CA3AF';
+    
+    // console.debug('Resolving color input:', input);
+    
     const colorMap: Record<string, string> = {
-      'BLACK': '#000000', 'WHITE': '#FFFFFF', 'OFF WHITE': '#FAF9F6', 'IVORY': '#FFFFF0',
-      'RED': '#EF4444', 'MAROON': '#7F1D1D', 'WINE': '#4B0625', 'BURGUNDY': '#800020',
+      // Basic colors
+      'BLACK': '#000000', 'WHITE': '#FFFFFF', 'IVORY': '#FFFFF0',
+      
+      // Reds
+      'RED': '#EF4444', 'MAROON': '#7F1D1D', 'WINE': '#4B0625', 'BURGUNDY': '#800020', 'CRIMSON': '#DC2626',
+      
+      // Pinks
       'PINK': '#EC4899', 'RANI PINK': '#E11D48', 'HOT PINK': '#DB2777', 'MAGENTA': '#D81B60', 'FUCHSIA': '#C2185B',
+      'ROSE': '#E11D48', 'ROSE PINK': '#E11D48', 'DEEP PINK': '#DB2777',
+      
+      // Oranges & Yellows
       'PEACH': '#FFCCB6', 'CORAL': '#FF7F50', 'ORANGE': '#FB923C', 'TANGERINE': '#F59E0B', 'YELLOW': '#F59E0B',
-      'GOLD': '#D4AF37', 'ROSE GOLD': '#B76E79', 'SILVER': '#C0C0C0', 'CHAMPAGNE': '#F7E7CE', 'BEIGE': '#F5F5DC', 'CREAM': '#FFFDD0',
-      'BROWN': '#92400E', 'COFFEE': '#6F4E37', 'TAN': '#D2B48C',
+      'AMBER': '#F59E0B', 'GOLDEN': '#F59E0B',
+      
+      // Metallics
+      'GOLD': '#D4AF37', 'ROSE GOLD': '#B76E79', 'SILVER': '#C0C0C0', 'CHAMPAGNE': '#F7E7CE', 'BRONZE': '#CD7F32',
+      
+      // Neutrals
+      'BEIGE': '#F5F5DC', 'CREAM': '#FFFDD0', 'ECRU': '#F5F5DC', 'OFF WHITE': '#FAF9F6',
+      
+      // Browns
+      'BROWN': '#92400E', 'COFFEE': '#6F4E37', 'TAN': '#D2B48C', 'CHOCOLATE': '#7C2D12', 'MOCHA': '#92400E',
+      
+      // Blues
       'BLUE': '#3B82F6', 'NAVY': '#1E3A8A', 'ROYAL BLUE': '#1D4ED8', 'SKY BLUE': '#38BDF8', 'TEAL BLUE': '#0F766E',
-      'GREEN': '#10B981', 'EMERALD': '#059669', 'BOTTLE GREEN': '#1B4D3E', 'SEA GREEN': '#2E8B57', 'MINT': '#98FF98', 'OLIVE': '#556B2F', 'SAGE': '#9CAF88',
-      'TURQUOISE': '#40E0D0', 'AQUA': '#00FFFF', 'TEAL': '#14B8A6',
-      'PURPLE': '#8B5CF6', 'LAVENDER': '#B794F4', 'VIOLET': '#7C3AED',
-      'GREY': '#9CA3AF', 'GRAY': '#9CA3AF', 'CHARCOAL': '#36454F'
+      'DARK BLUE': '#1E3A8A', 'LIGHT BLUE': '#38BDF8', 'STEEL BLUE': '#475569',
+      
+      // Greens
+      'GREEN': '#10B981', 'EMERALD': '#059669', 'BOTTLE GREEN': '#1B4D3E', 'SEA GREEN': '#2E8B57', 'MINT': '#98FF98', 
+      'OLIVE': '#556B2F', 'SAGE': '#9CAF88', 'FOREST GREEN': '#166534', 'HUNTER GREEN': '#14532D',
+      
+      // Teals & Cyans
+      'TURQUOISE': '#40E0D0', 'AQUA': '#00FFFF', 'TEAL': '#14B8A6', 'CYAN': '#06B6D4',
+      
+      // Purples
+      'PURPLE': '#8B5CF6', 'LAVENDER': '#B794F4', 'VIOLET': '#7C3AED', 'PLUM': '#7C2D12', 'MAUVE': '#C084FC',
+      
+      // Grays
+      'GREY': '#9CA3AF', 'GRAY': '#9CA3AF', 'CHARCOAL': '#36454F', 'SLATE': '#64748B', 'STONE': '#78716C'
     };
-    const isHex = /^#([0-9A-F]{3}){1,2}$/i.test(input);
-    if (isHex) return input;
-    const norm = input.replace(/[-_]+/g, ' ').replace(/\s+/g, ' ').trim().toUpperCase();
-    if (colorMap[norm]) return colorMap[norm];
-    // Browser validation fallback
-    const opt = document.createElement('option');
-    opt.style.color = input;
-    if (opt.style.color) return input;
-    return '#9CA3AF';
+    
+    // Handle hex colors
+    if (/^#([0-9A-F]{3}){1,2}$/i.test(input)) {
+      // console.debug('Input is hex color:', input);
+      return input;
+    }
+    
+    // Normalize color name
+    const normalized = input.replace(/[-_]+/g, ' ').replace(/\s+/g, ' ').trim().toUpperCase();
+    // console.debug('Normalized color:', normalized);
+    
+    // Check exact match first
+    if (colorMap[normalized]) {
+      // console.debug('Exact match found:', colorMap[normalized]);
+      return colorMap[normalized];
+    }
+    
+    // Check partial matches for common variations
+    for (const [key, value] of Object.entries(colorMap)) {
+      if (normalized.includes(key) || key.includes(normalized)) {
+        // console.debug('Partial match found:', key, '->', value);
+        return value;
+      }
+    }
+    
+    // Try browser validation as last resort
+    try {
+      const testElement = document.createElement('div');
+      testElement.style.color = input;
+      if (testElement.style.color && testElement.style.color !== '') {
+        // console.debug('Browser validation successful:', input);
+        return input;
+      }
+    } catch (e) {
+      // console.debug('Browser validation failed:', e);
+    }
+    
+    // console.debug('Using fallback color: #9CA3AF');
+    return '#9CA3AF'; // Fallback to neutral gray
   };
 
-  const resolvedPrimary = useMemo(() => resolveColor(effectiveColor), [effectiveColor]);
+  const resolvedPrimary = useMemo(() => {
+    const resolved = resolveColor(effectiveColor);
+    // console.debug('Color resolution:', { effectiveColor, resolved, original: product?.primary_color });
+    return resolved;
+  }, [effectiveColor, product?.primary_color]);
 
+  // Create unique background for each product based on primary color
   const pageBgStyle = useMemo(() => {
-    // Try to build a subtle gradient anchored to primary color
-    // Use rgba with low alpha for start color
-    const span = document.createElement('span');
-    span.style.color = resolvedPrimary;
-    const rgb = getComputedStyle(span).color; // "rgb(r, g, b)"
-    const match = rgb.match(/\d+/g);
-    const [r, g, b] = match ? match.map(Number) : [240, 200, 120];
-    return {
-      background: `linear-gradient(180deg, rgba(${r}, ${g}, ${b}, 0.25) 0%, rgba(${r}, ${g}, ${b}, 0.12) 35%, #FFF7E6 100%)`
-    } as React.CSSProperties;
+    // console.debug('Creating background for color:', resolvedPrimary);
+    
+    // Always try to create a unique background, even for fallback colors
+    try {
+      if (resolvedPrimary && resolvedPrimary !== '#9CA3AF') {
+        // Convert hex to RGB for better gradient control
+        const hex = resolvedPrimary.replace('#', '');
+        const r = parseInt(hex.substr(0, 2), 16);
+        const g = parseInt(hex.substr(2, 2), 16);
+        const b = parseInt(hex.substr(4, 2), 16);
+        
+        // console.debug('RGB values:', { r, g, b, hex: resolvedPrimary });
+        
+        // Create a more intense gradient based on the product's primary color
+        // Start with stronger version of the color, transition to medium, then to complementary tones
+        return {
+          background: `linear-gradient(180deg, 
+            rgba(${r}, ${g}, ${b}, 0.4) 0%, 
+            rgba(${r}, ${g}, ${b}, 0.25) 20%, 
+            rgba(${r}, ${g}, ${b}, 0.15) 40%, 
+            rgba(${r}, ${g}, ${b}, 0.08) 60%, 
+            rgba(${r}, ${g}, ${b}, 0.05) 80%, 
+            #FEF3C7 100%)`
+        } as React.CSSProperties;
+      } else {
+        // For fallback colors, still create a unique gradient but with more intensity
+        return {
+          background: 'linear-gradient(180deg, #FEF3C7 0%, #FDE68A 25%, #F59E0B 50%, #D97706 75%, #B45309 100%)'
+        } as React.CSSProperties;
+      }
+    } catch (e) {
+      console.error('Error creating background:', e);
+      // Enhanced fallback with more intensity
+      return {
+        background: 'linear-gradient(180deg, #FEF3C7 0%, #FDE68A 25%, #F59E0B 50%, #D97706 75%, #B45309 100%)'
+      } as React.CSSProperties;
+    }
   }, [resolvedPrimary]);
 
   // Handle add to cart
@@ -395,31 +511,11 @@ const ProductDetail = () => {
               <div className="space-y-2">
                 <h3 className="text-lg font-semibold text-amber-800">Primary Color</h3>
                 <div className="flex items-center space-x-3">
-                  {(() => {
-                    const colorMap: Record<string, string> = {
-                      'BLACK': '#000000', 'WHITE': '#FFFFFF', 'OFF WHITE': '#FAF9F6', 'IVORY': '#FFFFF0',
-                      'RED': '#EF4444', 'MAROON': '#7F1D1D', 'WINE': '#4B0625', 'BURGUNDY': '#800020',
-                      'PINK': '#EC4899', 'RANI PINK': '#E11D48', 'HOT PINK': '#DB2777', 'MAGENTA': '#D81B60', 'FUCHSIA': '#C2185B',
-                      'PEACH': '#FFCCB6', 'CORAL': '#FF7F50', 'ORANGE': '#FB923C', 'TANGERINE': '#F59E0B', 'YELLOW': '#F59E0B',
-                      'GOLD': '#D4AF37', 'ROSE GOLD': '#B76E79', 'SILVER': '#C0C0C0', 'CHAMPAGNE': '#F7E7CE', 'BEIGE': '#F5F5DC', 'CREAM': '#FFFDD0',
-                      'BROWN': '#92400E', 'COFFEE': '#6F4E37', 'TAN': '#D2B48C',
-                      'BLUE': '#3B82F6', 'NAVY': '#1E3A8A', 'ROYAL BLUE': '#1D4ED8', 'SKY BLUE': '#38BDF8', 'TEAL BLUE': '#0F766E',
-                      'GREEN': '#10B981', 'EMERALD': '#059669', 'BOTTLE GREEN': '#1B4D3E', 'SEA GREEN': '#2E8B57', 'MINT': '#98FF98', 'OLIVE': '#556B2F', 'SAGE': '#9CAF88',
-                      'TURQUOISE': '#40E0D0', 'AQUA': '#00FFFF', 'TEAL': '#14B8A6',
-                      'PURPLE': '#8B5CF6', 'LAVENDER': '#B794F4', 'VIOLET': '#7C3AED',
-                      'GREY': '#9CA3AF', 'GRAY': '#9CA3AF', 'CHARCOAL': '#36454F'
-                    };
-                    const normalize = (c: string) => c.replace(/[-_]+/g, ' ').replace(/\s+/g, ' ').trim().toUpperCase();
-                    const key = normalize(String(effectiveColor));
-                    const isHex = /^#([0-9A-F]{3}){1,2}$/i.test(String(effectiveColor));
-                    const swatch = isHex ? String(effectiveColor) : (colorMap[key] || '#9CA3AF');
-                    return (
-                      <div className="flex items-center space-x-3">
-                        <div className="w-10 h-10 rounded-full border-2 border-amber-300 shadow-md" style={{ backgroundColor: swatch }} />
-                        <span className="text-amber-700 font-medium">{String(effectiveColor)}</span>
-                      </div>
-                    );
-                  })()}
+                  <div 
+                    className="w-10 h-10 rounded-full border-2 border-amber-300 shadow-md" 
+                    style={{ backgroundColor: resolvedPrimary }} 
+                  />
+                  <span className="text-amber-700 font-medium">{String(effectiveColor)}</span>
                 </div>
               </div>
             )}

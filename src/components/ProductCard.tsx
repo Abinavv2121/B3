@@ -88,13 +88,13 @@ const ProductCard = memo(({ product }: ProductCardProps) => {
       return;
     }
     
-    console.log('Adding to cart:', {
+    /* console.debug('Adding to cart:', {
       id: product.id,
       name: product.name,
       price: product.price,
       selectedSize,
       selectedColor
-    });
+    }); */
     
     addToCart({
       id: product.id,
