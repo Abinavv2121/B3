@@ -2,6 +2,7 @@ import React, { createContext, useContext, useCallback, useMemo } from 'react';
 import { CartItem } from '@/types';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { STORAGE_KEYS } from '@/constants';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface CartContextType {
   cartItems: CartItem[];
@@ -31,9 +32,16 @@ interface CartProviderProps {
 
 export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   const [cartItems, setCartItems] = useLocalStorage<CartItem[]>(STORAGE_KEYS.CART, []);
+  const { requireAuth } = useAuth();
 
   const addToCart = useCallback((item: Omit<CartItem, 'quantity'>) => {
     console.log('CartContext: addToCart called with:', item);
+    
+    // Check authentication before adding to cart
+    if (!requireAuth()) {
+      console.log('CartContext: Authentication required for adding to cart');
+      return;
+    }
     
     setCartItems(prevItems => {
       console.log('CartContext: Previous cart items:', prevItems);
@@ -58,7 +66,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
         return newItems;
       }
     });
-  }, [setCartItems]);
+  }, [setCartItems, requireAuth]);
 
   const removeFromCart = useCallback((itemId: string) => {
     setCartItems(prevItems => prevItems.filter(item => item.id !== itemId));
