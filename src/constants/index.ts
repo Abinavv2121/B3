@@ -143,6 +143,8 @@ export const STORAGE_KEYS = {
   FAVOURITES: 'favourites',
   USER_PREFERENCES: 'user_preferences',
   THEME: 'theme',
+  AUTH_USER: 'auth_user',
+  AUTH_INITIAL_MODAL_SHOWN: 'auth_initial_modal_shown',
 } as const;
 
 // Error Messages
