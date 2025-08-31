@@ -11,7 +11,6 @@ import { useCart } from "@/contexts/CartContext";
 import { useToast } from "@/hooks/use-toast";
 import { useMemo, useState } from "react";
 import { supabaseUtils } from "@/hooks/useSupabase";
-import { GoldDivider } from "@/components/ui/gold-divider";
 
 const Wishlist = () => {
   const { favourites, removeFromFavourites, clearFavourites } = useFavourites();

@@ -20,10 +20,10 @@ export const MultiImageUpload = ({
   const [uploadProgress, setUploadProgress] = useState(0);
 
   // Debug logging
-  console.log('MultiImageUpload props:', { currentImages, maxImages });
+  if (import.meta.env.DEV) console.log('MultiImageUpload props:', { currentImages, maxImages });
 
   const handleFileUpload = async (files: FileList) => {
-    console.log('handleFileUpload called with files:', files);
+    if (import.meta.env.DEV) console.log('handleFileUpload called with files:', files);
     
     if (currentImages.length + files.length > maxImages) {
       alert(`You can only upload up to ${maxImages} images. You currently have ${currentImages.length} images.`);
@@ -57,7 +57,7 @@ export const MultiImageUpload = ({
         const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
         const filePath = `product-images/${fileName}`;
 
-        console.log('Uploading file:', { fileName, filePath, fileSize: file.size });
+        if (import.meta.env.DEV) console.log('Uploading file:', { fileName, filePath, fileSize: file.size });
 
         // Upload to Supabase Storage
         const { data, error } = await supabase.storage
@@ -68,7 +68,7 @@ export const MultiImageUpload = ({
           });
 
         if (error) {
-          console.error('Upload error for', file.name, ':', error);
+          if (import.meta.env.DEV) console.error('Upload error for', file.name, ':', error);
           alert(`Failed to upload ${file.name}: ${error.message}`);
           continue;
         }
@@ -78,18 +78,18 @@ export const MultiImageUpload = ({
           .from('product-images')
           .getPublicUrl(filePath);
 
-        console.log('File uploaded successfully:', publicUrl);
+        if (import.meta.env.DEV) console.log('File uploaded successfully:', publicUrl);
         newImageUrls.push(publicUrl);
         setUploadProgress(((i + 1) / totalFiles) * 100);
       }
 
       // Add new images to existing ones
       const allImages = [...currentImages, ...newImageUrls];
-      console.log('Calling onImagesChanged with:', allImages);
+      if (import.meta.env.DEV) console.log('Calling onImagesChanged with:', allImages);
       onImagesChanged(allImages);
 
     } catch (error: any) {
-      console.error('Upload error:', error);
+      if (import.meta.env.DEV) console.error('Upload error:', error);
       alert(`Upload failed: ${error.message}`);
     } finally {
       setUploading(false);

@@ -13,7 +13,7 @@ const AuthCallback = () => {
         const { data, error } = await supabase.auth.getSession()
         
         if (error) {
-          console.error('Auth callback error:', error)
+          if (import.meta.env.DEV) console.error('Auth callback error:', error)
           setError(error.message)
           setTimeout(() => navigate('/'), 3000)
           return
@@ -21,7 +21,7 @@ const AuthCallback = () => {
 
         if (data.session) {
           // Successfully authenticated
-          console.log('Authentication successful')
+          if (import.meta.env.DEV) console.log('Authentication successful')
           navigate('/')
         } else {
           // No session found
@@ -29,7 +29,7 @@ const AuthCallback = () => {
           setTimeout(() => navigate('/'), 3000)
         }
       } catch (err) {
-        console.error('Unexpected error during auth callback:', err)
+        if (import.meta.env.DEV) console.error('Unexpected error during auth callback:', err)
         setError('An unexpected error occurred. Please try again.')
         setTimeout(() => navigate('/'), 3000)
       }

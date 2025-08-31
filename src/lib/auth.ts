@@ -210,3 +210,40 @@ export const onAuthStateChange = (callback: (user: AuthUser | null) => void) => 
     }
   })
 }
+
+/**
+ * Change password for the currently signed-in user.
+ * Optionally re-validates the current password for extra safety.
+ */
+export const changePassword = async (
+  currentPassword: string,
+  newPassword: string
+): Promise<{ success: boolean; error: AuthError | null }> => {
+  try {
+    const { data: { user }, error: getUserError } = await supabase.auth.getUser()
+    if (getUserError || !user?.email) {
+      return { success: false, error: getUserError }
+    }
+
+    // Reauthenticate to validate current password
+    const { error: reauthError } = await supabase.auth.signInWithPassword({
+      email: user.email,
+      password: currentPassword
+    })
+    if (reauthError) {
+      return { success: false, error: reauthError }
+    }
+
+    // Update password
+    const { error: updateError } = await supabase.auth.updateUser({
+      password: newPassword
+    })
+    if (updateError) {
+      return { success: false, error: updateError }
+    }
+
+    return { success: true, error: null }
+  } catch (error) {
+    return { success: false, error: error as AuthError }
+  }
+}

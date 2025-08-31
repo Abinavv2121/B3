@@ -39,7 +39,7 @@ const ProductDetail = () => {
         // console.debug('Supabase response:', { data, error });
         
         if (error) {
-          console.error('Error fetching product:', error);
+          if (import.meta.env.DEV) console.error('Error fetching product:', error);
           toast({
             title: "Error",
             description: "Failed to load product details",
@@ -66,7 +66,7 @@ const ProductDetail = () => {
           // console.debug('No product data received:', data);
         }
       } catch (error) {
-        console.error('Error:', error);
+        if (import.meta.env.DEV) console.error('Error:', error);
         toast({
           title: "Error",
           description: "Something went wrong",
@@ -264,7 +264,7 @@ const ProductDetail = () => {
         } as React.CSSProperties;
       }
     } catch (e) {
-      console.error('Error creating background:', e);
+      if (import.meta.env.DEV) console.error('Error creating background:', e);
       // Enhanced fallback with more intensity
       return {
         background: 'linear-gradient(180deg, #FEF3C7 0%, #FDE68A 25%, #F59E0B 50%, #D97706 75%, #B45309 100%)'

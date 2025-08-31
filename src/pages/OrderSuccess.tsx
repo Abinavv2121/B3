@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle, Home, Package, Truck, CreditCard, ArrowRight, Star } from "lucide-react";
-import { GoldDivider } from "@/components/ui/gold-divider";
+// Removed unused GoldDivider for performance cleanup
 
 const OrderSuccess = () => {
   const location = useLocation();

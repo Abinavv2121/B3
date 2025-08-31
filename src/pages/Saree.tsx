@@ -1,10 +1,9 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import ProductGrid from "@/components/ProductGrid";
-import { GoldDivider } from "@/components/ui/gold-divider";
 import { supabaseUtils } from "@/hooks/useSupabase";
-import { ProductRow } from "@/types";
+import { ProductRow, FilterOption } from "@/types";
 import { PRODUCT_CONFIG } from "@/constants";
 
 /**
@@ -17,15 +16,7 @@ const Saree = () => {
   const [activeFilter, setActiveFilter] = useState("all");
 
   // Memoize filters to prevent unnecessary re-renders
-  const filters: FilterOption[] = useMemo(() => [
-    { id: "all", name: "All Sarees", count: 0 },
-    { id: "Silk", name: "Silk Sarees", count: 0 },
-    { id: "Georgette", name: "Georgette Sarees", count: 0 },
-    { id: "Designer", name: "Designer Sarees", count: 0 },
-    { id: "Bridal", name: "Bridal Sarees", count: 0 },
-    { id: "Party", name: "Party Wear", count: 0 },
-    { id: "Casual", name: "Casual Sarees", count: 0 }
-  ], []);
+  const filters: FilterOption[] = useMemo(() => [], []);
 
   const loadProducts = useCallback(async () => {
     setIsLoading(true);
@@ -51,18 +42,7 @@ const Saree = () => {
   }, []);
 
   // Update filter counts when products change
-  const updatedFilters = useMemo(() => {
-    return filters.map(filter => {
-      if (filter.id === "all") {
-        return { ...filter, count: products.length };
-      } else {
-        const count = products.filter(p => 
-          p.design?.includes(filter.id) || p.name.includes(filter.id)
-        ).length;
-        return { ...filter, count };
-      }
-    });
-  }, [filters, products]);
+  const updatedFilters = useMemo(() => filters, [filters]);
 
   return (
     <div className="min-h-screen m-0 p-0">
@@ -74,11 +54,15 @@ const Saree = () => {
           products={products}
           isLoading={isLoading}
           error={error}
+          filters={updatedFilters}
+          activeFilter={activeFilter}
+          onFilterChange={handleFilterChange}
           title="Discover Our Saree Collection"
           subtitle="From handwoven silk to contemporary georgette, explore our curated collection of sarees that celebrate the timeless beauty of Indian tradition."
+          showFilters={false}
         />
 
-        <GoldDivider />
+        {/* Removed divider for cleaner layout */}
 
         {/* Features Section */}
         <section className="section-padding relative overflow-hidden bg-royal-silk">

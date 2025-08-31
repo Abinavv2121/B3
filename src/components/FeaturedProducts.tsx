@@ -51,17 +51,39 @@ const FeaturedProducts = memo(() => {
     ];
   }, [products]);
 
-  // Memoized load products function
+  // Cache-first load with background refresh for faster initial render
   const loadProducts = useCallback(async () => {
     try {
-      setIsLoading(true);
       setError(null);
-      const { data, error } = await supabaseUtils.getProducts({ limit: 24 });
-      if (error) {
-        setError(error.message);
+      // 1) Try cached light data first
+      const cachedLight = supabaseUtils.getFromCache<any[]>(`cache:products_light:${24}`);
+      if (cachedLight && cachedLight.length) {
+        setProducts(cachedLight as any);
+        setIsLoading(false);
       } else {
-        setProducts(data || []);
+        setIsLoading(true);
       }
+
+      // 2) Fetch light list fast
+      const { data: lightData, error: lightErr } = await supabaseUtils.getProductsLight({ limit: 24 });
+      if (!lightErr && lightData) {
+        setProducts(lightData as any);
+      }
+
+      // 3) Background refresh scheduled in idle time
+      const schedule = (cb: () => void) => ("requestIdleCallback" in window ? (window as any).requestIdleCallback(cb, { timeout: 1200 }) : setTimeout(cb, 250));
+      schedule(() => {
+        supabaseUtils.getProducts({ force: true, limit: 24 }).then(({ data }) => {
+          if (data && data.length) {
+            setProducts(prev => {
+              const byId: Record<string, any> = {};
+              for (const p of prev) byId[p.id] = p;
+              for (const f of data) byId[f.id] = { ...byId[f.id], ...f };
+              return Object.values(byId) as any;
+            });
+          }
+        }).catch(() => {/* ignore */});
+      });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load products');
     } finally {
@@ -97,22 +119,22 @@ const FeaturedProducts = memo(() => {
     });
   }, [products, activeFilter]);
 
-  // Memoized transformed products
+  // Keep original product shape expected by ProductCard (ProductRow-like)
   const transformedProducts = useMemo(() => {
     return filteredProducts.map(product => ({
       id: product.id,
       name: product.name,
       price: product.price,
-      originalPrice: product.original_price,
-      image: product.image_url,
+      original_price: product.original_price,
+      image_url: product.image_url,
       category: product.category,
       rating: product.rating,
       reviews: product.reviews,
-      isNew: product.is_new,
-      isBestSeller: product.is_best_seller,
-      colors: product.colors || ['#000000'],
-      sizes: product.sizes || ['M'],
-      additionalImages: product.additional_images || [],
+      is_new: product.is_new,
+      is_best_seller: product.is_best_seller,
+      colors: product.colors || [],
+      sizes: product.sizes || [],
+      additional_images: product.additional_images || [],
     }));
   }, [filteredProducts]);
 
@@ -131,8 +153,10 @@ const FeaturedProducts = memo(() => {
               Featured <span className="text-brandGold">Collections</span>
             </h2>
           </div>
-          <div className="flex justify-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-400"></div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mb-12">
+            {Array.from({ length: 10 }).map((_, idx) => (
+              <div key={idx} className="animate-pulse bg-white/10 rounded-xl h-[360px]" />
+            ))}
           </div>
         </div>
       </section>
@@ -188,25 +212,7 @@ const FeaturedProducts = memo(() => {
           </p>
         </div>
 
-        {/* Refined Filter Tabs */}
-        <div className="flex justify-center mb-16">
-          <div className="flex items-center space-x-3 px-8 py-4 bg-slate-800/60 backdrop-blur-xl rounded-2xl border border-slate-600/40 shadow-xl">
-            {filters.map((filter) => (
-              <button
-                key={filter.id}
-                onClick={() => handleFilterChange(filter.id)}
-                className={`font-hind text-sm font-medium uppercase tracking-wide whitespace-nowrap px-6 py-3 rounded-xl transition-all duration-300 hover:scale-105 ${
-                  activeFilter === filter.id
-                    ? 'text-white bg-brandGold border border-brandGold shadow-lg'
-                    : 'text-slate-300 hover:text-brandGold hover:bg-brandNavy/60 border border-transparent hover:border-brandGold/60'
-                }`}
-              >
-                {filter.name}
-                <span className="ml-2 text-xs opacity-80 normal-case">({filter.count})</span>
-              </button>
-            ))}
-          </div>
-        </div>
+        {/* Filters removed for minimal Featured Collections */}
 
         {/* Products Grid */}
         {transformedProducts.length > 0 ? (

@@ -78,6 +78,47 @@ export const supabaseUtils = {
     }
   },
 
+  // Lightweight product fetch for faster lists (only fields needed for grids/cards)
+  async getProductsLight({ force = false, limit }: { force?: boolean; limit?: number } = {}) {
+    const cacheKey = `cache:products_light:${limit ?? 'all'}`
+    if (!force) {
+      const cached = this.getFromCache<any[]>(cacheKey)
+      if (cached) return { data: cached, error: null as any }
+    }
+
+    const LIGHT_FIELDS = 'id,name,category,price,original_price,image_url,rating,reviews,is_new,is_best_seller,additional_images,created_at'
+
+    try {
+      let query = supabase
+        .from('products')
+        .select(LIGHT_FIELDS)
+        .order('created_at', { ascending: false })
+      if (limit && Number.isFinite(limit)) {
+        query = (query as any).limit(limit)
+      }
+      const { data, error } = await query
+      if (error) throw error
+      if (data) this.setCache(cacheKey, data)
+      return { data, error: null as any }
+    } catch (err) {
+      // Fallback to full select if some columns are missing in DB
+      try {
+        let query = supabase
+          .from('products')
+          .select('*')
+          .order('created_at', { ascending: false })
+        if (limit && Number.isFinite(limit)) {
+          query = (query as any).limit(limit)
+        }
+        const { data: allData, error: allError } = await query
+        if (!allError && allData) this.setCache(cacheKey, allData)
+        return { data: allData, error: allError as any }
+      } catch (finalErr) {
+        return { data: null as any, error: finalErr as any }
+      }
+    }
+  },
+
   // Get all products
   async getProducts({ force = false, limit }: { force?: boolean; limit?: number } = {}) {
     const cacheKey = `cache:products:${limit ?? 'all'}`

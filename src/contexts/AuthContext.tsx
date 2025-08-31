@@ -1,7 +1,9 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react'
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react'
 import { useLocalStorage } from '@/hooks/useLocalStorage'
 import { STORAGE_KEYS } from '@/constants'
-import { AuthUser, AuthState, signInWithGoogle, signInWithEmail, signUpWithEmail, signOut, getCurrentUser, onAuthStateChange } from '@/lib/auth'
+import { AuthUser, AuthState, signInWithGoogle, signInWithEmail, signUpWithEmail, signOut, getCurrentUser, onAuthStateChange, changePassword } from '@/lib/auth'
+import { getTranslation, type Language, type TranslationKey } from '@/lib/translations'
+import { fetchExchangeRates, defaultExchangeRates, type ExchangeRates, type Currency, getConvertedPrice } from '@/lib/currency'
 
 export interface User {
   id: string
@@ -19,15 +21,33 @@ interface AuthContextType {
   showAuthModal: boolean
   loading: boolean
   error: string | null
+  settings: {
+    theme: string
+    language: string
+    currency: string
+    emailNotifications: boolean
+    pushNotifications: boolean
+    orderUpdates: boolean
+    promotionalEmails: boolean
+    profileVisibility: string
+    showEmail: boolean
+    twoFactorAuth: boolean
+    loginAlerts: boolean
+  }
+  exchangeRates: ExchangeRates
+  convertCurrency: (amount: number, fromCurrency?: string) => string
+  t: (key: string) => string
   login: (email: string, password: string) => Promise<boolean>
   signUp: (name: string, email: string, password: string) => Promise<boolean>
   loginWithGoogle: () => Promise<void>
   continueAsGuest: () => void
   logout: () => void
   updateProfile: (updates: Partial<User>) => Promise<boolean>
+  updateSettings: (updates: Partial<AuthContextType['settings']>) => void
   requireAuth: () => boolean
   setShowAuthModal: (show: boolean) => void
   clearError: () => void
+  changePassword: (currentPassword: string, newPassword: string) => Promise<boolean>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -45,14 +65,84 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [user, setUser] = useLocalStorage<User | null>(STORAGE_KEYS.USER, null)
+  const [user, setUser] = useLocalStorage<User | null>(STORAGE_KEYS.AUTH_USER, null)
   const [showAuthModal, setShowAuthModal] = useState(false)
   const [hasShownInitialModal, setHasShownInitialModal] = useLocalStorage<boolean>('hasShownInitialModal', false)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [exchangeRates, setExchangeRates] = useState<ExchangeRates>(defaultExchangeRates)
+  const [settings, setSettings] = useLocalStorage<any>(
+    user ? `b3-settings_${user.id}` : 'b3-settings',
+    {
+      theme: 'light',
+      language: 'en',
+      currency: 'INR',
+      emailNotifications: true,
+      pushNotifications: false,
+      orderUpdates: true,
+      promotionalEmails: false,
+      profileVisibility: 'public',
+      showEmail: false,
+      twoFactorAuth: false,
+      loginAlerts: true
+    }
+  )
 
   const clearError = useCallback(() => {
     setError(null)
+  }, [])
+
+  const updateSettings = useCallback((updates: Partial<AuthContextType['settings']>) => {
+    setSettings(prev => ({ ...prev, ...updates }))
+  }, [setSettings])
+
+  // Translation function
+  const t = useCallback((key: string): string => {
+    return getTranslation(key as TranslationKey, settings.language as Language)
+  }, [settings.language])
+
+  // Currency conversion function
+  const convertCurrency = useCallback((amount: number, fromCurrency: string = 'INR'): string => {
+    return getConvertedPrice(amount, fromCurrency as Currency, settings.currency as Currency, exchangeRates)
+  }, [settings.currency, exchangeRates])
+
+  // Apply theme to document
+  useEffect(() => {
+    if (settings.theme) {
+      document.documentElement.setAttribute('data-theme', settings.theme)
+      if (settings.theme === 'dark') {
+        document.documentElement.classList.add('dark')
+        document.body.classList.add('dark')
+        document.body.style.backgroundColor = '#1a1a1a'
+        document.body.style.color = '#ffffff'
+      } else {
+        document.documentElement.classList.remove('dark')
+        document.body.classList.remove('dark')
+        document.body.style.backgroundColor = ''
+        document.body.style.color = ''
+      }
+    }
+  }, [settings.theme])
+
+  // Apply language to document
+  useEffect(() => {
+    if (settings.language) {
+      document.documentElement.setAttribute('lang', settings.language)
+    }
+  }, [settings.language])
+
+  // Fetch exchange rates on mount
+  useEffect(() => {
+    const loadExchangeRates = async () => {
+      try {
+        const rates = await fetchExchangeRates()
+        setExchangeRates(rates)
+      } catch (error) {
+        console.warn('Failed to load exchange rates:', error)
+      }
+    }
+    
+    loadExchangeRates()
   }, [])
 
   // Show modal on page load if user hasn't seen it before
@@ -142,7 +232,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }, [setUser, setHasShownInitialModal])
 
-  const loginWithGoogle = useCallback(async (): Promise<void> => {
+  const loginWithGoogle = useCallback(async () => {
     try {
       setLoading(true)
       setError(null)
@@ -152,8 +242,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if (authError) {
         setError(authError.message || 'Failed to sign in with Google')
       }
-      // Note: The actual user will be set via the auth state change listener
-      // when the user returns from the OAuth flow
     } catch (error) {
       console.error('Google login failed:', error)
       setError('An unexpected error occurred')
@@ -164,32 +252,24 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const continueAsGuest = useCallback(() => {
     const guestUser: User = {
-      id: 'guest-' + Date.now(),
+      id: `guest_${Date.now()}`,
       name: 'Guest User',
-      email: '',
+      email: 'guest@example.com',
       isGuest: true
     }
     
     setUser(guestUser)
-    setShowAuthModal(false)
     setHasShownInitialModal(true)
   }, [setUser, setHasShownInitialModal])
 
   const logout = useCallback(async () => {
     try {
       setLoading(true)
-      
-      // Clear user-specific data before logout
-      if (user) {
-        localStorage.removeItem(`${STORAGE_KEYS.CART}_${user.id}`)
-        localStorage.removeItem(`b3-favourites_${user.id}`)
-      }
-      
       await signOut()
       setUser(null)
       setHasShownInitialModal(false)
       
-      // Clear general data
+      // Clear general (guest) data only. Keep user-specific data so it persists across sessions.
       localStorage.removeItem(STORAGE_KEYS.CART)
       localStorage.removeItem('b3-favourites')
     } catch (error) {
@@ -197,7 +277,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     } finally {
       setLoading(false)
     }
-  }, [setUser, setHasShownInitialModal, user])
+  }, [setUser, setHasShownInitialModal])
 
   const updateProfile = useCallback(async (updates: Partial<User>): Promise<boolean> => {
     try {
@@ -223,6 +303,56 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setLoading(false)
     }
   }, [user, setUser])
+
+  // Migrate guest cart/wishlist to the signed-in user's storage keys
+  const hasMigratedRef = useRef(false)
+  const migrateLocalDataToUser = useCallback((newUser: User) => {
+    try {
+      const userId = newUser.id
+      // Cart
+      const guestCartKey = STORAGE_KEYS.CART
+      const userCartKey = `${STORAGE_KEYS.CART}_${userId}`
+      const guestCartRaw = localStorage.getItem(guestCartKey)
+      const userCartRaw = localStorage.getItem(userCartKey)
+      const guestCart = guestCartRaw ? JSON.parse(guestCartRaw) : []
+      const userCart = userCartRaw ? JSON.parse(userCartRaw) : []
+
+      if (guestCart.length > 0) {
+        const seen = new Set(userCart.map((i: any) => `${i.id}|${i.selectedSize || ''}|${i.selectedColor || ''}`))
+        for (const item of guestCart) {
+          const key = `${item.id}|${item.selectedSize || ''}|${item.selectedColor || ''}`
+          if (!seen.has(key)) {
+            userCart.push(item)
+            seen.add(key)
+          }
+        }
+        localStorage.setItem(userCartKey, JSON.stringify(userCart))
+        localStorage.removeItem(guestCartKey)
+      }
+
+      // Favourites
+      const guestFavKey = 'b3-favourites'
+      const userFavKey = `b3-favourites_${userId}`
+      const guestFavRaw = localStorage.getItem(guestFavKey)
+      const userFavRaw = localStorage.getItem(userFavKey)
+      const guestFav = guestFavRaw ? JSON.parse(guestFavRaw) : []
+      const userFav = userFavRaw ? JSON.parse(userFavRaw) : []
+
+      if (guestFav.length > 0) {
+        const favIds = new Set(userFav.map((i: any) => i.id))
+        for (const item of guestFav) {
+          if (!favIds.has(item.id)) {
+            userFav.push(item)
+            favIds.add(item.id)
+          }
+        }
+        localStorage.setItem(userFavKey, JSON.stringify(userFav))
+        localStorage.removeItem(guestFavKey)
+      }
+    } catch (e) {
+      console.error('Failed migrating local data to user keys:', e)
+    }
+  }, [])
 
   const requireAuth = useCallback((): boolean => {
     if (!user || user.isGuest) {
@@ -279,6 +409,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setUser(newUser)
         setShowAuthModal(false)
         setHasShownInitialModal(true)
+        if (!hasMigratedRef.current) {
+          migrateLocalDataToUser(newUser)
+          hasMigratedRef.current = true
+        }
       } else {
         // Only clear user if they're not a guest
         if (user && !user.isGuest) {
@@ -289,7 +423,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     })
 
     return () => subscription.unsubscribe()
-  }, [setUser, setHasShownInitialModal, user])
+  }, [setUser, setHasShownInitialModal, user, migrateLocalDataToUser])
 
   const isAuthenticated = Boolean(user && !user.isGuest)
   const isGuest = Boolean(user?.isGuest)
@@ -301,15 +435,25 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     showAuthModal,
     loading,
     error,
+    settings,
+    exchangeRates,
+    convertCurrency,
+    t,
     login,
     signUp,
     loginWithGoogle,
     continueAsGuest,
     logout,
     updateProfile,
+    updateSettings,
     requireAuth,
     setShowAuthModal,
-    clearError
+    clearError,
+    changePassword: async (currentPassword: string, newPassword: string) => {
+      const { success, error } = await changePassword(currentPassword, newPassword)
+      if (error) setError(error.message)
+      return success
+    }
   }
 
   return (

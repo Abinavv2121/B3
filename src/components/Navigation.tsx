@@ -4,7 +4,8 @@ import brandLogo from "/src/assets/brand-logo.png";
 import wishlistIcon from "/src/assets/wishlist.png";
 import cartIcon from "/src/assets/cart.png";
 import searchIcon from "/src/assets/search.png";
-import SearchModal from "./SearchModal";
+import React, { lazy, Suspense } from 'react';
+const SearchModal = lazy(() => import('./SearchModal'));
 import { useFavourites } from "@/contexts/FavouritesContext";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -17,25 +18,23 @@ import { memo } from "react";
 
 const Navigation = memo(() => {
   const navigate = useNavigate();
+  const { user, isAuthenticated, logout, setShowAuthModal, t } = useAuth();
   const [isVisible, setIsVisible] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isInCustomerFavs, setIsInCustomerFavs] = useState(false);
   const { favouritesCount } = useFavourites();
   const { cartCount } = useCart();
-  const { user, isAuthenticated, isGuest, logout, setShowAuthModal } = useAuth();
-
-  // console.debug('Navigation: Current cart count:', cartCount);
 
   // Main categories that match your database and existing pages
   const mainCategories = [
-    "ABOUT US",
-    "SHOP ALL"
+    t('nav.about'),
+    t('nav.shop')
   ];
 
   // Categories that link to existing pages
   const categoryPages = {
-    "BRIDAL COLLECTION": {
+    [t('category.bridal')]: {
       route: "/bridal",
       subcategories: [
         "Bridal Lehangas",
@@ -45,7 +44,7 @@ const Navigation = memo(() => {
         "Light Work"
       ]
     },
-    "ANARKALI": {
+    [t('category.anarkali')]: {
       route: "/anarkali",
       subcategories: [
         "Party Wear",
@@ -55,7 +54,7 @@ const Navigation = memo(() => {
         "Light Work"
       ]
     },
-    "LEHENGA": {
+    [t('category.lehenga')]: {
       route: "/lehenga",
       subcategories: [
         "Bridal Lehangas",
@@ -65,7 +64,7 @@ const Navigation = memo(() => {
         "Light Work"
       ]
     },
-    "SAREES": {
+    [t('category.saree')]: {
       route: "/saree",
       subcategories: [
         "Silk Sarees",
@@ -75,7 +74,7 @@ const Navigation = memo(() => {
         "Designer Sarees"
       ]
     },
-    "SALWAR SUIT": {
+    [t('category.salwar_suit')]: {
       route: "/salwar-suit",
       subcategories: [
         "Straight Cut",
@@ -86,7 +85,7 @@ const Navigation = memo(() => {
         "Embroidered"
       ]
     },
-    "GOWN": {
+    [t('category.gown')]: {
       route: "/gown",
       subcategories: [
         "Bridal Gowns",
@@ -115,7 +114,10 @@ const Navigation = memo(() => {
     setIsSearchOpen(false);
   }, []);
 
-
+  const handleLogout = useCallback(() => {
+    logout();
+    navigate("/");
+  }, [logout, navigate]);
 
   const renderCategoryWithPopup = useCallback((category: string, categoryData: { route: string, subcategories: string[] }) => (
     <Link
@@ -129,11 +131,49 @@ const Navigation = memo(() => {
   const renderSimpleLink = useCallback((link: string) => {
     // Handle special cases for utility links
     const routeMap: Record<string, string> = {
-      "SHOP ALL": "/",
-      "ABOUT US": "/about-us"
+      [t('nav.about')]: "/about-us"
     };
 
     const route = routeMap[link] || `/${link.toLowerCase().replace(/\s+/g, '-').replace(/&/g, 'and')}`;
+
+    // Special handling for Shop All - scroll to featured collections
+    if (link === t('nav.shop')) {
+      return (
+        <button
+          onClick={() => {
+            const featuredSection = document.querySelector('[data-section="featured-collections"]');
+            if (featuredSection) {
+              // Custom smooth scroll with slower animation
+              const targetPosition = featuredSection.getBoundingClientRect().top + window.pageYOffset - 100; // Offset for header
+              const startPosition = window.pageYOffset;
+              const distance = targetPosition - startPosition;
+              const duration = 2000; // 2 seconds for slower scroll
+              let startTime: number | null = null;
+
+              const easeInOutCubic = (t: number) => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
+              const animateScroll = (currentTime: number) => {
+                if (startTime === null) startTime = currentTime;
+                const timeElapsed = currentTime - startTime;
+                const progress = Math.min(timeElapsed / duration, 1);
+                const easedProgress = easeInOutCubic(progress);
+                
+                window.scrollTo(0, startPosition + distance * easedProgress);
+                
+                if (progress < 1) {
+                  requestAnimationFrame(animateScroll);
+                }
+              };
+
+              requestAnimationFrame(animateScroll);
+            }
+          }}
+          className="px-4 py-2 text-base font-medium font-hind text-brandNavy transition-all duration-300 whitespace-nowrap hover:bg-gray-100 rounded-brand border border-transparent hover:border-gray-200 hover:text-brandGold cursor-pointer"
+        >
+          {link}
+        </button>
+      );
+    }
 
     return (
       <Link
@@ -143,7 +183,7 @@ const Navigation = memo(() => {
         {link}
       </Link>
     );
-  }, []);
+  }, [t]);
 
   // Throttled scroll handler for better performance
   const handleScroll = useCallback(() => {
@@ -208,8 +248,8 @@ const Navigation = memo(() => {
               </Link>
             </div>
 
-            {/* Center - Nav items */}
-            <nav className="flex-1 mx-4">
+            {/* Center - Nav items (scrollable if overflow) */}
+            <nav className="flex-1 mx-4 overflow-x-auto">
               <div className="flex items-center justify-center space-x-3 whitespace-nowrap">
                 {mainCategories.map((category) => renderSimpleLink(category))}
                 {Object.entries(categoryPages).map(([category, categoryData]) => renderCategoryWithPopup(category, categoryData))}
@@ -221,16 +261,16 @@ const Navigation = memo(() => {
               <button 
                 onClick={handleSearchClick}
                 className="flex items-center justify-center p-4 hover:bg-gray-100 rounded-lg transition-colors"
-                aria-label="Search"
+                aria-label={t('common.search')}
               >
-                <img src={searchIcon} alt="Search" className="h-14 w-14" />
+                <img src={searchIcon} alt={t('common.search')} className="h-14 w-14" />
               </button>
               <button 
                 onClick={handleWishlistClick}
                 className="relative flex items-center justify-center p-4 hover:bg-gray-100 rounded-lg transition-colors"
-                aria-label="Wishlist"
+                aria-label={t('nav.wishlist')}
               >
-                <img src={wishlistIcon} alt="Wishlist" className="h-14 w-14" />
+                <img src={wishlistIcon} alt={t('nav.wishlist')} className="h-14 w-14" />
                 {favouritesCount > 0 && (
                   <Badge className="absolute -top-1 -right-1 h-6 w-6 rounded-full bg-red-500 text-white text-[11px] flex items-center justify-center p-0">
                     {favouritesCount > 99 ? '99+' : favouritesCount}
@@ -240,9 +280,9 @@ const Navigation = memo(() => {
               <button 
                 onClick={handleCartClick}
                 className="relative flex items-center justify-center p-4 hover:bg-gray-100 rounded-lg transition-colors"
-                aria-label="Cart"
+                aria-label={t('nav.cart')}
               >
-                <img src={cartIcon} alt="Cart" className="h-14 w-14" />
+                <img src={cartIcon} alt={t('nav.cart')} className="h-14 w-14" />
                 {cartCount > 0 && (
                   <Badge className="absolute -top-1 -right-1 h-6 w-6 rounded-full bg-blue-500 text-white text-[11px] flex items-center justify-center p-0">
                     {cartCount > 99 ? '99+' : cartCount}
@@ -254,8 +294,8 @@ const Navigation = memo(() => {
               {isAuthenticated ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="relative h-12 w-12 rounded-full">
-                      <Avatar className="h-12 w-12">
+                    <Button variant="ghost" className="relative h-14 w-14 rounded-full p-0 hover:bg-gray-100">
+                      <Avatar className="h-14 w-14">
                         <AvatarImage src={user?.avatar_url || ""} alt={user?.name || user?.email} />
                         <AvatarFallback className="bg-primary text-primary-foreground">
                           {user?.name?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || 'U'}
@@ -275,37 +315,28 @@ const Navigation = memo(() => {
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={() => navigate('/profile')}>
                       <User className="mr-2 h-4 w-4" />
-                      <span>Profile</span>
+                      <span>{t('nav.profile')}</span>
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => navigate('/settings')}>
                       <Settings className="mr-2 h-4 w-4" />
-                      <span>Settings</span>
+                      <span>{t('nav.settings')}</span>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={logout}>
+                    <DropdownMenuItem onClick={handleLogout}>
                       <LogOut className="mr-2 h-4 w-4" />
-                      <span>Log out</span>
+                      <span>{t('nav.signout')}</span>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
-              ) : isGuest ? (
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="h-12 px-4"
-                  onClick={() => setShowAuthModal(true)}
-                >
-                  <User className="mr-2 h-4 w-4" />
-                  Guest - Sign In
-                </Button>
               ) : (
                 <Button 
                   variant="outline" 
                   size="sm" 
-                  className="h-12 px-4"
+                  className="h-14 px-4 hover:bg-gray-100"
                   onClick={() => setShowAuthModal(true)}
                 >
-                  Sign In
+                  <User className="mr-2 h-4 w-4" />
+                  {t('nav.signin')}
                 </Button>
               )}
             </div>
@@ -314,10 +345,12 @@ const Navigation = memo(() => {
       </header>
       
       {/* Search Modal */}
-      <SearchModal 
-        isOpen={isSearchOpen} 
-        onClose={handleSearchClose} 
-      />
+      <Suspense fallback={null}>
+        <SearchModal 
+          isOpen={isSearchOpen} 
+          onClose={handleSearchClose} 
+        />
+      </Suspense>
     </>
   );
 });

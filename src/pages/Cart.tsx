@@ -7,7 +7,6 @@ import { Trash2, ArrowLeft, ShoppingBag, Heart, Star, Minus, Plus } from "lucide
 import { useCart } from "@/contexts/CartContext";
 import { useFavourites } from "@/contexts/FavouritesContext";
 import { supabaseUtils } from "@/hooks/useSupabase";
-import { GoldDivider } from "@/components/ui/gold-divider";
 
 const Cart = () => {
   const { cartItems, removeFromCart, cartTotal, clearCart } = useCart();

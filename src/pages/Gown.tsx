@@ -58,21 +58,21 @@ const Gown = () => {
         product.design?.includes(activeFilter) || product.name.includes(activeFilter)
       );
 
-  // Transform database products to match ProductCard interface
+  // Keep ProductRow-like shape for ProductCard expectations
   const transformedProducts = filteredProducts.map(product => ({
     id: product.id,
     name: product.name,
     category: product.category,
     price: product.price,
-    originalPrice: product.original_price,
-    image: product.image_url || "/placeholder.svg",
+    original_price: product.original_price,
+    image_url: product.image_url || "/placeholder.svg",
     rating: product.rating || 4.5,
     reviews: product.reviews || Math.floor(Math.random() * 200) + 50,
-    isNew: product.is_new,
-    isBestSeller: product.is_best_seller,
+    is_new: product.is_new,
+    is_best_seller: product.is_best_seller,
     colors: product.colors || ["#DC2626", "#10B981", "#7C3AED", "#F59E0B"],
     sizes: product.sizes || ["S", "M", "L", "XL", "XXL"],
-    type: "gown"
+    additional_images: product.additional_images || [],
   }));
 
   return (
@@ -93,26 +93,7 @@ const Gown = () => {
               </p>
             </div>
 
-            {/* Filters */}
-            <div className="flex flex-wrap justify-center gap-3 mb-8">
-              {filters.map((filter) => (
-                <Button
-                  key={filter.id}
-                  variant={activeFilter === filter.id ? "default" : "outline"}
-                  onClick={() => setActiveFilter(filter.id)}
-                  className={`font-hind ${
-                    activeFilter === filter.id
-                      ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white border-0"
-                      : "border-slate-300 text-slate-700 hover:bg-slate-100"
-                  }`}
-                >
-                  {filter.name}
-                  <Badge variant="secondary" className="ml-2 bg-white/20 text-white">
-                    {filter.count}
-                  </Badge>
-                </Button>
-              ))}
-            </div>
+            {/* Filters removed for clean layout */}
 
             {/* Loading State */}
             {isLoading && (
@@ -142,11 +123,7 @@ const Gown = () => {
             {!isLoading && !error && (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {transformedProducts.map((product) => (
-                  <ProductCard
-                    key={product.id}
-                    product={product}
-                    additionalImages={[]}
-                  />
+                  <ProductCard key={product.id} product={product} />
                 ))}
               </div>
             )}

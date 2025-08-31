@@ -140,6 +140,7 @@
   body {
     @apply bg-background text-foreground font-['Inter'];
     font-feature-settings: 'rlig' 1, 'calt' 1;
+    scroll-behavior: smooth;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -149,6 +150,11 @@
 }
 
 @layer components {
+  /* Offscreen sections render on demand for smoother scroll */
+  .cv-auto {
+    content-visibility: auto;
+    contain-intrinsic-size: 1000px 1200px;
+  }
   /* Premium Button Variants */
   .btn-cultural {
     @apply bg-gradient-to-r from-[hsl(var(--accent))] to-[hsl(355,75%,45%)] text-white shadow-[var(--shadow-cultural)] hover:shadow-[var(--shadow-glow)] transition-[var(--transition-smooth)] border-0;

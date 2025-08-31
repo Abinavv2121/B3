@@ -31,12 +31,12 @@ const SearchModal = memo(({ isOpen, onClose }: { isOpen: boolean; onClose: () =>
     try {
       const { data, error } = await supabaseUtils.getProducts({ limit: 200 });
       if (error) {
-        console.error('Error fetching products:', error);
+        if (import.meta.env.DEV) console.error('Error fetching products:', error);
         return;
       }
       setAllProducts(data || []);
     } catch (err) {
-      console.error('Failed to fetch products:', err);
+      if (import.meta.env.DEV) console.error('Failed to fetch products:', err);
     }
   }, []);
 

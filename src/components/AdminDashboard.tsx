@@ -588,23 +588,18 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
                   {/* Product Image Upload */}
                     <MultiImageUpload
                       onImagesChanged={(urls) => {
-                        console.log('AdminDashboard onImagesChanged called with:', urls);
                         if (urls.length > 0) {
-                          const newFormData = { 
+                          setFormData({ 
                             ...formData, 
                             image_url: urls[0], 
                             additional_images: urls.slice(1) 
-                          };
-                          console.log('Setting new form data:', newFormData);
-                          setFormData(newFormData);
+                          });
                         } else {
-                          const newFormData = { 
+                          setFormData({ 
                             ...formData, 
                             image_url: "", 
                             additional_images: [] 
-                          };
-                          console.log('Clearing form data:', newFormData);
-                          setFormData(newFormData);
+                          });
                         }
                       }}
                       currentImages={[formData.image_url, ...(formData.additional_images || [])].filter(Boolean)}

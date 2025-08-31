@@ -74,5 +74,18 @@ export function useLocalStorage<T>(
     }
   }, [key])
 
+  // Reload value when the key itself changes (e.g., when user signs in/out)
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    try {
+      const item = window.localStorage.getItem(key)
+      setStoredValue(item ? JSON.parse(item) : initialValue)
+    } catch (error) {
+      // console.error(`Error reloading localStorage key "${key}":`, error)
+      setStoredValue(initialValue)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [key])
+
   return [storedValue, setValue, removeValue]
 }

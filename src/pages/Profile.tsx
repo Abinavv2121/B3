@@ -16,7 +16,7 @@ import { useToast } from "@/hooks/use-toast";
 
 const Profile = () => {
   const navigate = useNavigate();
-  const { user, isAuthenticated, requireAuth, updateProfile } = useAuth();
+  const { user, isAuthenticated, requireAuth, updateProfile, settings } = useAuth();
   const { cartItems, cartCount } = useCart();
   const { favourites, favouritesCount } = useFavourites();
   const { toast } = useToast();
@@ -122,7 +122,9 @@ const Profile = () => {
                     )}
                   </div>
                   <CardTitle className="text-2xl">{user?.name}</CardTitle>
-                  <CardDescription className="text-lg">{user?.email}</CardDescription>
+                  <CardDescription className="text-lg">
+                    {settings.showEmail ? user?.email : 'Email hidden'}
+                  </CardDescription>
                 </CardHeader>
                 
                 <CardContent className="space-y-6">

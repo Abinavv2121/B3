@@ -27,35 +27,13 @@ import { useToast } from "@/hooks/use-toast";
 
 const Settings = () => {
   const navigate = useNavigate();
-  const { user, isAuthenticated, requireAuth } = useAuth();
+  const { user, isAuthenticated, requireAuth, settings, updateSettings } = useAuth();
   const { toast } = useToast();
   
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   
-  const [settings, setSettings] = useState({
-    // Notifications
-    emailNotifications: true,
-    pushNotifications: false,
-    orderUpdates: true,
-    promotionalEmails: false,
-    
-    // Privacy
-    profileVisibility: "public",
-    showEmail: false,
-    allowAnalytics: true,
-    
-    // Appearance
-    theme: "light",
-    language: "en",
-    currency: "INR",
-    
-    // Security
-    twoFactorAuth: false,
-    loginAlerts: true
-  });
-
   const [passwordData, setPasswordData] = useState({
     currentPassword: "",
     newPassword: "",
@@ -67,10 +45,7 @@ const Settings = () => {
   }, [requireAuth]);
 
   const handleSettingChange = (key: string, value: any) => {
-    setSettings(prev => ({
-      ...prev,
-      [key]: value
-    }));
+    updateSettings({ [key]: value });
   };
 
   const handlePasswordChange = (field: string, value: string) => {
@@ -83,9 +58,7 @@ const Settings = () => {
   const handleSaveSettings = async () => {
     setIsLoading(true);
     try {
-      // Here you would typically save settings to your backend
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      // Settings are already saved via updateSettings
       toast({
         title: "Settings Saved",
         description: "Your settings have been successfully updated.",
@@ -101,6 +74,7 @@ const Settings = () => {
     }
   };
 
+  const { changePassword } = useAuth();
   const handleChangePassword = async () => {
     if (passwordData.newPassword !== passwordData.confirmPassword) {
       toast({
@@ -122,25 +96,13 @@ const Settings = () => {
 
     setIsLoading(true);
     try {
-      // Here you would typically change the password in your backend
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      toast({
-        title: "Password Changed",
-        description: "Your password has been successfully updated.",
-      });
-      
-      setPasswordData({
-        currentPassword: "",
-        newPassword: "",
-        confirmPassword: ""
-      });
-    } catch (error) {
-      toast({
-        title: "Password Change Failed",
-        description: "Failed to change password. Please try again.",
-        variant: "destructive",
-      });
+      const ok = await changePassword(passwordData.currentPassword, passwordData.newPassword)
+      if (ok) {
+        toast({ title: "Password Changed", description: "Your password has been successfully updated." })
+        setPasswordData({ currentPassword: "", newPassword: "", confirmPassword: "" })
+      } else {
+        toast({ title: "Password Change Failed", description: "Invalid current password or other error.", variant: "destructive" })
+      }
     } finally {
       setIsLoading(false);
     }

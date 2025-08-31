@@ -10,7 +10,15 @@ export default defineConfig(({ mode }) => ({
     port: 8080,
   },
   plugins: [
-    react(),
+    react({
+      jsxImportSource: 'react',
+      babel: {
+        plugins: mode === 'production' ? [[
+          'transform-remove-console',
+          { exclude: ['error', 'warn'] }
+        ]] : [],
+      },
+    }),
     mode === 'development' &&
     componentTagger(),
   ].filter(Boolean),
@@ -18,5 +26,12 @@ export default defineConfig(({ mode }) => ({
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
+  },
+  esbuild: mode === 'production' ? { drop: ['console', 'debugger'] } : {},
+  build: {
+    sourcemap: false,
+    target: 'es2018',
+    cssCodeSplit: true,
+    chunkSizeWarningLimit: 1000,
   },
 }));

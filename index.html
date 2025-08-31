@@ -23,6 +23,13 @@
   </head>
 
   <body>
+    <style>
+      /* Reduce painting cost on scroll, especially Safari/macOS */
+      html, body { overscroll-behavior-y: none; }
+      /* Makes scrolling smoother by hinting to the compositor */
+      .will-change-transform { will-change: transform; }
+      .will-change-opacity { will-change: opacity; }
+    </style>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

@@ -229,7 +229,7 @@ const Checkout = () => {
       rzp.open();
       
     } catch (error) {
-      console.error('Payment initiation failed:', error);
+      if (import.meta.env.DEV) console.error('Payment initiation failed:', error);
       setIsProcessing(false);
       toast({
         title: "Payment setup failed",
@@ -278,7 +278,7 @@ const Checkout = () => {
       }
       
     } catch (error) {
-      console.error('Payment verification failed:', error);
+      if (import.meta.env.DEV) console.error('Payment verification failed:', error);
       toast({
         title: "Payment verification failed",
         description: "Please contact support with your payment details",
@@ -362,7 +362,7 @@ const Checkout = () => {
           variant: "success"
         });
       } catch (emailError) {
-        console.error('Failed to send email notification:', emailError);
+        if (import.meta.env.DEV) console.error('Failed to send email notification:', emailError);
         toast({
           title: "Order Placed Successfully",
           description: "Order confirmation email could not be sent",
@@ -381,7 +381,7 @@ const Checkout = () => {
       });
       
     } catch (error) {
-      console.error('COD order failed:', error);
+      if (import.meta.env.DEV) console.error('COD order failed:', error);
       toast({
         title: "Order creation failed",
         description: "Please try again or contact support",

@@ -15,10 +15,11 @@ const HeroSection = () => {
 
   // Cycle through images every 5 seconds
   useEffect(() => {
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReduced) return; // avoid background timers on low-end/PRM devices
     const interval = setInterval(() => {
       setCurrentImageIndex((prevIndex) => (prevIndex + 1) % heroImages.length);
-    }, 5000);
-
+    }, 6000);
     return () => clearInterval(interval);
   }, [heroImages.length]);
 
@@ -37,7 +38,7 @@ const HeroSection = () => {
       ></div>
 
       {/* Static overlay for readability */}
-      <div className="absolute inset-0 z-2 bg-gradient-to-b from-black/50 via-black/20 to-black/60" />
+      <div className="absolute inset-0 z-2 bg-gradient-to-b from-black/50 via-black/20 to-black/60 will-change-opacity" />
       
       {/* Additional gentle corner shading */}
       <div className="absolute inset-0 bg-gradient-to-br from-black/20 via-transparent to-black/30 z-5" />

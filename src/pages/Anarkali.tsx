@@ -59,21 +59,21 @@ const Anarkali = () => {
         product.design?.includes(activeFilter) || product.name.includes(activeFilter)
       );
 
-  // Transform database products to match ProductCard interface
+  // Keep ProductRow-like shape for ProductCard expectations
   const transformedProducts = filteredProducts.map(product => ({
     id: product.id,
     name: product.name,
     category: product.category,
     price: product.price,
-    originalPrice: product.original_price,
-    image: product.image_url || "/placeholder.svg",
+    original_price: product.original_price,
+    image_url: product.image_url || "/placeholder.svg",
     rating: product.rating || 4.5,
     reviews: product.reviews || Math.floor(Math.random() * 200) + 50,
-    isNew: product.is_new,
-    isBestSeller: product.is_best_seller,
+    is_new: product.is_new,
+    is_best_seller: product.is_best_seller,
     colors: product.colors || ["#DC2626", "#10B981", "#7C3AED", "#F59E0B"],
     sizes: product.sizes || ["XS", "S", "M", "L", "XL"],
-    type: "anarkali"
+    additional_images: product.additional_images || [],
   }));
 
   return (
@@ -99,25 +99,7 @@ const Anarkali = () => {
               </p>
             </div>
 
-            {/* Filter Tabs */}
-            <div className="flex justify-center mb-12">
-              <div className="flex items-center space-x-2 px-6 py-3 bg-black/95 backdrop-blur-xl rounded-lg border-b border-gray-200 shadow-sm">
-                {filters.map((filter) => (
-                  <button
-                    key={filter.id}
-                    onClick={() => setActiveFilter(filter.id)}
-                    className={`font-italiana text-sm font-medium uppercase tracking-wide transition-all duration-300 whitespace-nowrap px-6 py-2.5 rounded-lg hover:bg-white/10 border border-transparent hover:border-white/20 ${
-                      activeFilter === filter.id
-                        ? 'text-white bg-white/15 border-white/30'
-                        : 'text-white/70 hover:text-white'
-                    }`}
-                  >
-                    {filter.name}
-                    <span className="ml-2 text-xs opacity-80 normal-case">({filter.count})</span>
-                  </button>
-                ))}
-              </div>
-            </div>
+            {/* Filters removed for clean layout */}
 
             {/* Products Grid */}
             {isLoading ? (

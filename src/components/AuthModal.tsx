@@ -93,7 +93,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
         setErrors({})
       }
     } catch (error) {
-      console.error('Authentication error:', error)
+      if (import.meta.env.DEV) console.error('Authentication error:', error)
     }
   }
 
@@ -101,7 +101,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
     try {
       await onGoogleLogin()
     } catch (error) {
-      console.error('Google login error:', error)
+      if (import.meta.env.DEV) console.error('Google login error:', error)
     }
   }
 

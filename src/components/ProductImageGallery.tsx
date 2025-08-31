@@ -16,9 +16,12 @@ const ProductImageGallery = memo(({ images, productName, className = "" }: Produ
   // Memoized functions to prevent unnecessary re-renders
   const startRotation = useCallback(() => {
     if (intervalRef.current || images.length <= 1) return;
+    // Only animate when user prefers motion
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReduced) return;
     intervalRef.current = setInterval(() => {
       setCurrentImageIndex((prev) => (prev + 1) % images.length);
-    }, 2000);
+    }, 2200);
   }, [images.length]);
 
   const stopRotation = useCallback(() => {
@@ -106,7 +109,7 @@ const ProductImageGallery = memo(({ images, productName, className = "" }: Produ
     <>
       {/* Main Image Display */}
       <div 
-        className={`aspect-square bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl overflow-hidden transition-all duration-300 hover:scale-105 ${className}`}
+        className={`aspect-square bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl overflow-hidden will-change-transform transition-transform duration-300 hover:scale-105 ${className}`}
         ref={containerRef}
       >
         <img

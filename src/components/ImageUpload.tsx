@@ -45,12 +45,12 @@ export const ImageUpload = ({ onImageUploaded, currentImageUrl }: ImageUploadPro
       const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
       const filePath = `product-images/${fileName}`;
 
-      console.log('Starting upload:', { fileName, filePath, fileSize: file.size });
+      if (import.meta.env.DEV) console.log('Starting upload:', { fileName, filePath, fileSize: file.size });
 
       // First, let's test if we can access the storage bucket
-      console.log('Testing storage bucket access...');
+      if (import.meta.env.DEV) console.log('Testing storage bucket access...');
       const { data: buckets, error: bucketError } = await supabase.storage.listBuckets();
-      console.log('Available buckets:', buckets, 'Bucket error:', bucketError);
+      if (import.meta.env.DEV) console.log('Available buckets:', buckets, 'Bucket error:', bucketError);
 
       if (bucketError) {
         throw new Error(`Storage bucket access failed: ${bucketError.message}`);
@@ -59,12 +59,12 @@ export const ImageUpload = ({ onImageUploaded, currentImageUrl }: ImageUploadPro
       // Check if our bucket exists
       const bucketExists = buckets?.some(bucket => bucket.name === 'product-images');
       if (!bucketExists) {
-        console.error('Available buckets:', buckets?.map(b => b.name));
+        if (import.meta.env.DEV) console.error('Available buckets:', buckets?.map(b => b.name));
         throw new Error(`Storage bucket "product-images" not found. Available buckets: ${buckets?.map(b => b.name).join(', ') || 'None'}. Please create the bucket in Supabase Storage.`);
       }
 
       // Upload to Supabase Storage
-      console.log('Uploading file to storage...');
+      if (import.meta.env.DEV) console.log('Uploading file to storage...');
       const { data, error } = await supabase.storage
         .from('product-images')
         .upload(filePath, file, {
@@ -73,24 +73,24 @@ export const ImageUpload = ({ onImageUploaded, currentImageUrl }: ImageUploadPro
         });
 
       if (error) {
-        console.error('Supabase upload error:', error);
+        if (import.meta.env.DEV) console.error('Supabase upload error:', error);
         throw new Error(`Storage upload failed: ${error.message}`);
       }
 
-      console.log('Upload successful:', data);
+      if (import.meta.env.DEV) console.log('Upload successful:', data);
 
       // Get public URL
       const { data: { publicUrl } } = supabase.storage
         .from('product-images')
         .getPublicUrl(filePath);
 
-      console.log('Public URL generated:', publicUrl);
+      if (import.meta.env.DEV) console.log('Public URL generated:', publicUrl);
 
       onImageUploaded(publicUrl);
       setUploadProgress(100);
 
     } catch (error: any) {
-      console.error('Upload error details:', error);
+      if (import.meta.env.DEV) console.error('Upload error details:', error);
       
       let errorMessage = 'Upload failed. Please try again.';
       
@@ -163,13 +163,13 @@ export const ImageUpload = ({ onImageUploaded, currentImageUrl }: ImageUploadPro
           type="button"
           onClick={async () => {
             try {
-              console.log('Testing storage connection...');
-              console.log('Supabase client:', supabase);
-              console.log('Storage available:', !!supabase.storage);
+              if (import.meta.env.DEV) console.log('Testing storage connection...');
+              if (import.meta.env.DEV) console.log('Supabase client:', supabase);
+              if (import.meta.env.DEV) console.log('Storage available:', !!supabase.storage);
               
               if (supabase.storage) {
                 const { data, error } = await supabase.storage.listBuckets();
-                console.log('Buckets:', data, error);
+                if (import.meta.env.DEV) console.log('Buckets:', data, error);
                 
                 if (error) {
                   alert(`Storage test failed: ${error.message}`);
@@ -180,7 +180,7 @@ export const ImageUpload = ({ onImageUploaded, currentImageUrl }: ImageUploadPro
                 alert('Storage is not available in this Supabase client.');
               }
             } catch (err) {
-              console.error('Storage test error:', err);
+              if (import.meta.env.DEV) console.error('Storage test error:', err);
               alert(`Storage test error: ${err}`);
             }
           }}
